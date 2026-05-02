@@ -8,6 +8,7 @@
     "dev:all": "concurrently \"npm run dev\" \"node server.js\"",
     "build": "vite build",
     "start": "node server.js",
+    "postinstall": "npm rebuild sqlite3 --build-from-source",
     "lint": "eslint .",
     "preview": "vite preview"
   },
