@@ -79,7 +79,13 @@ For every requested element, provide a Reliability Score (1-10):
 *   **[Element Name]** - Reliability Score: [X/10] (Source)
     *   **Analog Signal Chain:** [Data]
     *   **3rd Party Plugin Equivalents:** [Data]
-    *   **Stock DAW Approach:** [Data]`;
+    *   **Stock DAW Approach:** [Data]
+
+## 6. References
+Provide exactly three places where you sourced the information for this tracksheet. Format as markdown bullet points with working links.
+*   [[Source Name]]([URL]) - [Brief description of what was sourced from here]
+*   [[Source Name]]([URL]) - [Brief description of what was sourced from here]
+*   [[Source Name]]([URL]) - [Brief description of what was sourced from here]`;
 
 // API Endpoints
 
