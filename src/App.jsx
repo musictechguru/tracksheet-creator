@@ -146,10 +146,23 @@ function App() {
 
   const [searchActive, setSearchActive] = useState(false);
 
-  // Dev Mode state
-  const [devMode, setDevMode] = useState(() => {
-    return localStorage.getItem('tracksheet_dev_mode') === 'true';
+  // Dev Mode state - hidden by default unless unlocked via secret shortcut (Ctrl+Shift+D), ?dev=true, or 5 clicks on title
+  const [devUnlocked, setDevUnlocked] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('dev') === 'true' || params.get('admin') === '1';
+    }
+    return false;
   });
+
+  const [devMode, setDevMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('dev') === 'true' || params.get('admin') === '1';
+    }
+    return false;
+  });
+  const [logoClicks, setLogoClicks] = useState(0);
   const [devTab, setDevTab] = useState('tracksheets'); // 'tracksheets' | 'c1'
   const [devSearch, setDevSearch] = useState('');
   const [devDawFilter, setDevDawFilter] = useState('ALL');
@@ -158,6 +171,39 @@ function App() {
   const [devStats, setDevStats] = useState(null);
   const [peekItem, setPeekItem] = useState(null); // { title, content, type, filename }
   const [showDevExplorer, setShowDevExplorer] = useState(true);
+
+  // Keyboard shortcut listener for secret developer toggle: Ctrl+Shift+D or Cmd+Shift+D
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+        e.preventDefault();
+        setDevUnlocked(true);
+        setDevMode((prev) => {
+          const next = !prev;
+          if (next) fetchDevData();
+          return next;
+        });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleLogoClick = () => {
+    setLogoClicks((prev) => {
+      const next = prev + 1;
+      if (next >= 5) {
+        setDevUnlocked(true);
+        setDevMode((current) => {
+          const toggled = !current;
+          if (toggled) fetchDevData();
+          return toggled;
+        });
+        return 0;
+      }
+      return next;
+    });
+  };
 
   // Layout Mode state for Historical Tracksheet: 'dossier' | 'console' | 'text'
   const [tracksheetLayout, setTracksheetLayout] = useState(() => {
@@ -226,7 +272,6 @@ function App() {
   const toggleDevMode = () => {
     setDevMode((prev) => {
       const next = !prev;
-      localStorage.setItem('tracksheet_dev_mode', String(next));
       if (next) {
         fetchDevData();
       }
@@ -495,19 +540,24 @@ function App() {
       <div className="gradient-blob blob-2"></div>
 
       <header>
-        <div className="header-top-bar">
-          <button 
-            type="button" 
-            className={`dev-mode-btn ${devMode ? 'active' : ''}`}
-            onClick={toggleDevMode}
-            title={devMode ? "Dev Mode is ACTIVE: Click to switch to normal mode" : "Click to activate Dev Mode & access all archived track sheets and C1 solutions"}
-          >
-            <Terminal size={15} />
-            <span>Dev Mode</span>
-            <span className="dev-status-indicator">{devMode ? 'ON' : 'OFF'}</span>
-          </button>
-        </div>
-        <h1><Sparkles size={40} style={{ verticalAlign: 'middle', marginRight: '10px' }}/>Tracksheet Creator</h1>
+        {devUnlocked && (
+          <div className="header-top-bar">
+            <button 
+              type="button" 
+              className={`dev-mode-btn ${devMode ? 'active' : ''}`}
+              onClick={toggleDevMode}
+              title={devMode ? "Dev Mode is ACTIVE: Click to switch to normal mode" : "Click to activate Dev Mode & access all archived track sheets and C1 solutions"}
+            >
+              <Terminal size={15} />
+              <span>Dev Mode</span>
+              <span className="dev-status-indicator">{devMode ? 'ON' : 'OFF'}</span>
+            </button>
+          </div>
+        )}
+        <h1 onClick={handleLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>
+          <Sparkles size={40} style={{ verticalAlign: 'middle', marginRight: '10px' }}/>
+          Tracksheet Creator
+        </h1>
         <p className="subtitle">AI-Powered Musicological Analysis & Audio Engineering Archive</p>
       </header>
 
