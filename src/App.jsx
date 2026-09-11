@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { 
   Sparkles, Music, Mic2, Database, History, Sliders, 
   FileText, Download, Copy, Check, Printer, Disc, CheckCircle2,
-  Terminal, Search, Eye, X, ArrowLeft, RefreshCw, LayoutTemplate
+  Terminal, Search, Eye, X, ArrowLeft, RefreshCw, LayoutTemplate,
+  FileDown, Loader2
 } from 'lucide-react';
 
 import ReactMarkdown from 'react-markdown';
@@ -13,6 +14,7 @@ import DossierView from './components/DossierView';
 import LogbookDossierView from './components/LogbookDossierView';
 import { parseHistoricalTracksheet } from './tracksheetParser';
 import { parseLogbook } from './logbookParser';
+import { downloadGoodLookingPdf } from './pdfExporter';
 
 const normalizeMarkdown = (text) => {
   if (!text) return '';
@@ -478,6 +480,26 @@ function App() {
       setCopyNotification('Copied to clipboard!');
       setTimeout(() => setCopyNotification(''), 2500);
     });
+  };
+
+  const [pdfGenerating, setPdfGenerating] = useState(false);
+
+  const handleDownloadPdf = async ({ type, content, track, artist, daw }) => {
+    if (!content || pdfGenerating) return;
+    try {
+      setPdfGenerating(true);
+      await downloadGoodLookingPdf({
+        type,
+        content,
+        trackName: track || trackName,
+        artistName: artist || artistName,
+        daw: daw || selectedDaw
+      });
+    } catch (err) {
+      console.error('PDF export error:', err);
+    } finally {
+      setPdfGenerating(false);
+    }
   };
 
   const handleDownload = (content, filename) => {
@@ -1139,6 +1161,36 @@ function App() {
 
                 <button 
                   type="button" 
+                  className="btn-toolbar btn-pdf" 
+                  onClick={() => handleDownloadPdf({
+                    type: isTracksheetTab ? 'tracksheet' : 'logbook',
+                    content: activeContent,
+                    track: trackName,
+                    artist: artistName,
+                    daw: currentC1 ? currentC1.daw : selectedDaw
+                  })}
+                  disabled={pdfGenerating}
+                  title="Download professionally formatted PDF"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(56, 189, 248, 0.25))',
+                    borderColor: 'rgba(168, 85, 247, 0.5)',
+                    color: '#F8FAFC',
+                    fontWeight: 600
+                  }}
+                >
+                  {pdfGenerating ? (
+                    <>
+                      <Loader2 size={15} className="spin-slow" /> Generating PDF...
+                    </>
+                  ) : (
+                    <>
+                      <FileDown size={15} color="#C084FC" /> Download PDF
+                    </>
+                  )}
+                </button>
+
+                <button 
+                  type="button" 
                   className="btn-toolbar" 
                   onClick={() => handleDownload(
                     activeContent,
@@ -1153,7 +1205,7 @@ function App() {
                   type="button" 
                   className="btn-toolbar" 
                   onClick={() => window.print()}
-                  title="Print or export as PDF"
+                  title="Print or export via system dialog"
                 >
                   <Printer size={15} /> Print
                 </button>
@@ -1274,10 +1326,30 @@ function App() {
                   <button 
                     type="button" 
                     className="dev-action-btn"
+                    onClick={() => handleDownloadPdf({
+                      type: peekItem.type === 'Historical Tracksheet' ? 'tracksheet' : 'logbook',
+                      content: peekItem.content,
+                      track: peekItem.track_name,
+                      artist: peekItem.artist_name,
+                      daw: peekItem.daw || selectedDaw
+                    })}
+                    disabled={pdfGenerating}
+                    title="Download as PDF"
+                    style={{
+                      background: 'rgba(168, 85, 247, 0.2)',
+                      borderColor: 'rgba(168, 85, 247, 0.4)',
+                      color: '#D8B4FE'
+                    }}
+                  >
+                    {pdfGenerating ? <Loader2 size={13} className="spin-slow" /> : <FileDown size={13} />} PDF
+                  </button>
+                  <button 
+                    type="button" 
+                    className="dev-action-btn"
                     onClick={() => handleDownload(peekItem.content, peekItem.filename)}
                     title="Download as Markdown"
                   >
-                    <Download size={13} /> Download
+                    <Download size={13} /> .md
                   </button>
                   <button 
                     type="button" 
