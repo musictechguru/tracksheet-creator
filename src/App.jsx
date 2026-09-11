@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { 
   Sparkles, Music, Mic2, Database, History, Sliders, 
   FileText, Download, Copy, Check, Printer, Disc, CheckCircle2,
-  Terminal, Search, Eye, X, ArrowLeft, RefreshCw
+  Terminal, Search, Eye, X, ArrowLeft, RefreshCw, LayoutTemplate
 } from 'lucide-react';
 
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './App.css';
 import { TRACKSHEET_ACTIVITY_PHRASES, DAW_ACTIVITY_PHRASES } from './activityPhrases';
+import DossierView from './components/DossierView';
+import LogbookDossierView from './components/LogbookDossierView';
+import { parseHistoricalTracksheet } from './tracksheetParser';
+import { parseLogbook } from './logbookParser';
 
 const normalizeMarkdown = (text) => {
   if (!text) return '';
@@ -154,6 +158,27 @@ function App() {
   const [devStats, setDevStats] = useState(null);
   const [peekItem, setPeekItem] = useState(null); // { title, content, type, filename }
   const [showDevExplorer, setShowDevExplorer] = useState(true);
+
+  // Layout Mode state for Historical Tracksheet: 'dossier' | 'console' | 'text'
+  const [tracksheetLayout, setTracksheetLayout] = useState(() => {
+    return localStorage.getItem('tracksheet_layout_mode') || 'dossier';
+  });
+
+  const handleSetLayout = (mode) => {
+    setTracksheetLayout(mode);
+    localStorage.setItem('tracksheet_layout_mode', mode);
+  };
+
+  // Memoized parsed tracksheet model for Option 2 & Option 3
+  const parsedTracksheet = useMemo(() => {
+    if (!result) return null;
+    return parseHistoricalTracksheet(result);
+  }, [result]);
+
+  const parsedPeekTracksheet = useMemo(() => {
+    if (!peekItem || !peekItem.content || peekItem.type !== 'Historical Tracksheet') return null;
+    return parseHistoricalTracksheet(peekItem.content);
+  }, [peekItem]);
 
   // Fetch history on load
   useEffect(() => {
@@ -427,6 +452,16 @@ function App() {
                     c1Solutions.find(s => s.daw.toLowerCase() === selectedDaw.toLowerCase()) || 
                     c1Solutions[0];
   const activeContent = isTracksheetTab ? result : (currentC1?.content || '');
+
+  const parsedLogbook = useMemo(() => {
+    if (!currentC1 || !currentC1.content) return null;
+    return parseLogbook(currentC1.content);
+  }, [currentC1]);
+
+  const parsedPeekLogbook = useMemo(() => {
+    if (!peekItem || !peekItem.content || peekItem.type === 'Historical Tracksheet') return null;
+    return parseLogbook(peekItem.content);
+  }, [peekItem]);
 
   const filteredTrackSheets = history.filter((item) => {
     const matchesSearch = devSearch === '' || 
@@ -1000,12 +1035,41 @@ function App() {
 
             {/* Document Header & Action Toolbar */}
             <div className="result-header">
-              <h2>
-                {isTracksheetTab 
-                  ? 'Historical Session Tracksheet' 
-                  : `Component 1 Completed Logbook (${currentC1 ? currentC1.daw : selectedDaw})`
-                }
-              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <h2>
+                  {isTracksheetTab 
+                    ? 'Historical Session Tracksheet' 
+                    : `Component 1 Completed Logbook (${currentC1 ? currentC1.daw : selectedDaw})`
+                  }
+                </h2>
+
+                {(isTracksheetTab || currentC1) && (
+                  <div className="layout-switcher-bar">
+                    <span className="layout-switcher-label">
+                      <LayoutTemplate size={13} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                      View:
+                    </span>
+                    <div className="layout-btn-group">
+                      <button 
+                        type="button" 
+                        className={`layout-mode-btn ${tracksheetLayout === 'text' ? 'active' : ''}`}
+                        onClick={() => handleSetLayout('text')}
+                        title="Classic Text Document"
+                      >
+                        <FileText size={13} /> Text View
+                      </button>
+                      <button 
+                        type="button" 
+                        className={`layout-mode-btn ${tracksheetLayout === 'dossier' ? 'active' : ''}`}
+                        onClick={() => handleSetLayout('dossier')}
+                        title="Interactive Dossier View"
+                      >
+                        <Disc size={13} /> Dossier View
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="doc-toolbar">
                 {copyNotification && (
@@ -1047,22 +1111,30 @@ function App() {
             </div>
 
             {/* Content Display Area */}
-            <div className="markdown-body">
+            <div className={`markdown-body ${(isTracksheetTab || currentC1) && tracksheetLayout !== 'text' ? 'custom-layout-active' : ''}`}>
               {isTracksheetTab ? (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={markdownComponents}
-                >
-                  {normalizeMarkdown(result)}
-                </ReactMarkdown>
-              ) : (
-                currentC1 ? (
+                tracksheetLayout === 'dossier' && parsedTracksheet ? (
+                  <DossierView data={parsedTracksheet} />
+                ) : (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={markdownComponents}
                   >
-                    {normalizeMarkdown(currentC1.content)}
+                    {normalizeMarkdown(result)}
                   </ReactMarkdown>
+                )
+              ) : (
+                currentC1 ? (
+                  tracksheetLayout === 'dossier' && parsedLogbook ? (
+                    <LogbookDossierView data={parsedLogbook} daw={currentC1.daw} />
+                  ) : (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                    >
+                      {normalizeMarkdown(currentC1.content)}
+                    </ReactMarkdown>
+                  )
                 ) : (
                   <div style={{ padding: '3rem 1rem', textAlign: 'center' }}>
                     <FileText size={48} color="var(--primary)" style={{ opacity: 0.8, marginBottom: '1rem' }} />
@@ -1118,6 +1190,28 @@ function App() {
                   <FileText size={18} color="#38BDF8" />
                   <span>{peekItem.title}</span>
                 </div>
+
+                {peekItem && (
+                  <div className="layout-btn-group" style={{ marginLeft: 'auto', marginRight: '0.5rem' }}>
+                    <button 
+                      type="button" 
+                      className={`layout-mode-btn ${tracksheetLayout === 'text' ? 'active' : ''}`}
+                      onClick={() => handleSetLayout('text')}
+                      title="Classic Text Document"
+                    >
+                      <FileText size={12} /> Text
+                    </button>
+                    <button 
+                      type="button" 
+                      className={`layout-mode-btn ${tracksheetLayout === 'dossier' ? 'active' : ''}`}
+                      onClick={() => handleSetLayout('dossier')}
+                      title="Interactive Dossier View"
+                    >
+                      <Disc size={12} /> Dossier
+                    </button>
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button 
                     type="button" 
@@ -1146,12 +1240,27 @@ function App() {
                 </div>
               </div>
               <div className="dev-modal-body markdown-body">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={markdownComponents}
-                >
-                  {normalizeMarkdown(peekItem.content)}
-                </ReactMarkdown>
+                {peekItem.type === 'Historical Tracksheet' && parsedPeekTracksheet ? (
+                  tracksheetLayout === 'dossier' ? (
+                    <DossierView data={parsedPeekTracksheet} />
+                  ) : (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={markdownComponents}
+                    >
+                      {normalizeMarkdown(peekItem.content)}
+                    </ReactMarkdown>
+                  )
+                ) : parsedPeekLogbook && tracksheetLayout === 'dossier' ? (
+                  <LogbookDossierView data={parsedPeekLogbook} daw={peekItem.type} />
+                ) : (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={markdownComponents}
+                  >
+                    {normalizeMarkdown(peekItem.content)}
+                  </ReactMarkdown>
+                )}
               </div>
             </div>
           </div>

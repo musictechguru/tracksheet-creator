@@ -361,6 +361,7 @@ For EACH of the instruments above, you must meticulously describe all three inpu
    - Direct connection into interface / DI box.
    - Active vs Passive DI (e.g. BSS AR-133, Radial ProDI), impedance matching (Hi-Z), ground lift.
    - ${dawName} native amp modeling & cabinet impulse response (IR) setup.
+   - *Note on Electric Guitar*: Explicitly emphasize that for Electric Guitar, **Pathway 2 (DI + DAW Amp Modeling)** is just as valid and often superior to Pathway 1 in school environments. It eliminates room spill, bleed, and noise, and allows extensive post-capture flexibility to experiment with amp heads, speaker cabinets, microphone models, and pedal chains (e.g. Logic Pro Amp Designer & Pedalboard, Avid Eleven MK II, Ableton Amp/Cabinet) to craft the ideal tone without acoustic room limitations.
 3. **Pathway 3: Audio Instruments & MIDI Sequencing (Software Instrument Track)**:
    - In-the-box sequencing using ${dawName} native virtual instruments/samplers.
    - Plugin name & exact preset/settings (e.g., Logic Vintage B3 Organ, Vintage Clav, Drum Kit Designer, Studio Horns, Retro Synth).
@@ -372,6 +373,7 @@ For EACH of the instruments above, you must meticulously describe all three inpu
 For EACH instrument, you MUST explicitly declare:
 **⭐ PREFERRED C1 PATHWAY: [Pathway 1 (Microphone) / Pathway 2 (DI) / Pathway 3 (Audio Instruments & MIDI)]**
 Provide a rigorous technical justification citing Component 1 specification criteria (explaining how this choice maximizes marks across Capture, Dynamic Control, Frequency Balance, Acoustic Transducer Technique, or Signal-to-Noise Ratio).
+*For Electric Guitar*: Note that selecting **Pathway 2 (DI with Amp Designer/Cabinet Modeling)** as the Preferred Pathway is fully supported and advantageous where isolation, pristine signal-to-noise ratio, and tonal exploration with amp models and stompboxes enhance production control.
 
 ---
 

@@ -1208,6 +1208,1344 @@ main {
   border-radius: 12px;
 }
 
+/* ==========================================================================
+   LAYOUT SWITCHER BAR (TEXT, DOSSIER, CONSOLE)
+   ========================================================================== */
+.layout-switcher-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.layout-switcher-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding-left: 0.35rem;
+}
+
+.layout-btn-group {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 999px;
+}
+
+.layout-mode-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.layout-mode-btn:hover {
+  color: #F8FAFC;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.layout-mode-btn.active {
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+/* ==========================================================================
+   OPTION 2: INTERACTIVE MUSICOLOGICAL DOSSIER VIEW
+   ========================================================================== */
+.dossier-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.35s ease;
+}
+
+.dossier-hero-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.6), rgba(15, 23, 42, 0.85));
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 20px;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.dossier-hero-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex: 1;
+  min-width: 320px;
+}
+
+.dossier-disc-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dossier-spinning-vinyl {
+  animation: spin 8s linear infinite;
+}
+
+.dossier-disc-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.35), transparent 70%);
+  z-index: -1;
+}
+
+.dossier-badge-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.dossier-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #94A3B8;
+  letter-spacing: 0.04em;
+}
+
+.dossier-pill-primary {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3));
+  color: #DDD6FE;
+  border: 1px solid rgba(192, 132, 252, 0.4);
+}
+
+.dossier-song-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: #F8FAFC;
+  line-height: 1.15;
+}
+
+.dossier-artist-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.25rem 0 1rem 0;
+  color: #C084FC;
+}
+
+.dossier-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.dossier-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dossier-meta-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
+.dossier-meta-value {
+  font-size: 0.88rem;
+  color: #E2E8F0;
+}
+
+.dossier-music-tags {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.dossier-tag {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dossier-tag-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+}
+
+.dossier-tag-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.dossier-youtube-btn {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #F87171;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.dossier-youtube-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #FEF2F2;
+  border-color: #EF4444;
+}
+
+/* Circular Confidence Meter */
+.dossier-confidence-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+}
+
+.dossier-gauge {
+  position: relative;
+  width: 110px;
+  height: 110px;
+}
+
+.dossier-gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.dossier-gauge-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 8;
+}
+
+.dossier-gauge-fill {
+  fill: none;
+  stroke: #34D399;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+
+.dossier-gauge-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossier-gauge-num {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #F8FAFC;
+  line-height: 1;
+}
+
+.dossier-gauge-sub {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.dossier-gauge-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #34D399;
+}
+
+/* Dossier Sections */
+.dossier-section-card {
+  padding: 1.5rem;
+  border-radius: 16px;
+}
+
+.dossier-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dossier-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dossier-section-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.dossier-section-pill {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+}
+
+/* Song Form Timeline */
+.dossier-form-timeline {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dossier-form-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dossier-form-step:hover, .dossier-form-step.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38BDF8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.dossier-form-step-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #38BDF8;
+}
+
+.dossier-form-step-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.dossier-form-step-arrow {
+  color: #64748B;
+  margin-left: 0.25rem;
+}
+
+.dossier-arrangement-box {
+  margin-top: 1rem;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.dossier-box-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dossier-box-text {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #CBD5E1;
+}
+
+/* Studio Environment Grid */
+.dossier-studio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-studio-cell {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dossier-cell-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.06em;
+}
+
+.dossier-cell-val {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #F8FAFC;
+}
+
+.highlight-cyan {
+  color: #38BDF8 !important;
+}
+
+.highlight-purple {
+  color: #C084FC !important;
+}
+
+.highlight-gold {
+  color: #FBBF24 !important;
+}
+
+.dossier-outboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.75rem;
+}
+
+.dossier-outboard-chip {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.dossier-outboard-cat {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #34D399;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dossier-outboard-gear {
+  font-size: 0.88rem;
+  color: #E2E8F0;
+  margin-top: 0.2rem;
+}
+
+.dossier-score-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.4rem;
+}
+
+/* Interactive Instrument Explorer Tabs & Cards */
+.dossier-inst-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dossier-inst-tab-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94A3B8;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dossier-inst-tab-btn:hover {
+  background: rgba(30, 41, 59, 0.9);
+  color: #F8FAFC;
+  border-color: #C084FC;
+}
+
+.dossier-inst-tab-btn.active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(236, 72, 153, 0.15));
+  border-color: #A855F7;
+  color: #F8FAFC;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+}
+
+.dossier-inst-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dossier-inst-detail-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.dossier-inst-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dossier-inst-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.dossier-inst-pathway {
+  display: block;
+  font-size: 0.82rem;
+  color: #94A3B8;
+  margin-top: 0.25rem;
+}
+
+.dossier-inst-pathway strong {
+  color: #DDD6FE;
+}
+
+.dossier-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: #34D399;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 8px;
+}
+
+.dossier-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.dossier-spec-card {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.dossier-spec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.dossier-spec-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #DDD6FE;
+  letter-spacing: 0.02em;
+}
+
+.dossier-spec-score {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #34D399;
+  background: rgba(52, 211, 153, 0.1);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.dossier-spec-body {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #E2E8F0;
+}
+
+.dossier-spec-source {
+  display: block;
+  font-size: 0.72rem;
+  color: #94A3B8;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Visual Signal Chain Ribbon */
+.dossier-chain-section {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.dossier-chain-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dossier-chain-node-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dossier-chain-node {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.dossier-node-idx {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #F59E0B;
+  background: rgba(245, 158, 11, 0.15);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossier-node-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #F8FAFC;
+}
+
+.dossier-chain-connector {
+  color: #F59E0B;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.dossier-chain-citation {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+.dossier-tape-allocation-box {
+  background: rgba(236, 72, 153, 0.08);
+  border: 1px solid rgba(236, 72, 153, 0.25);
+  border-radius: 10px;
+  padding: 0.9rem 1.25rem;
+}
+
+.dossier-tape-text {
+  margin: 0.35rem 0 0 0;
+  font-size: 0.88rem;
+  color: #FCE7F3;
+  line-height: 1.5;
+}
+
+/* Personnel Grid */
+.dossier-personnel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.dossier-col-title {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #DDD6FE;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dossier-personnel-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.dossier-personnel-item {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.dossier-p-role {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #38BDF8;
+  letter-spacing: 0.05em;
+}
+
+.dossier-p-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin-top: 0.15rem;
+}
+
+.dossier-p-source {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  margin-top: 0.2rem;
+}
+
+.dossier-musicians-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.dossier-musician-card {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.dossier-m-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dossier-m-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.dossier-m-score {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #34D399;
+}
+
+.dossier-m-instruments {
+  font-size: 0.85rem;
+  color: #C084FC;
+  margin-top: 0.2rem;
+}
+
+.dossier-m-source {
+  font-size: 0.72rem;
+  color: #94A3B8;
+  margin-top: 0.25rem;
+}
+
+/* Reference Cards */
+.dossier-references-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.dossier-reference-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 10px;
+  padding: 1rem;
+  text-decoration: none;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.dossier-reference-card:hover {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: #FBBF24;
+  transform: translateY(-2px);
+}
+
+.dossier-ref-icon {
+  color: #FBBF24;
+  margin-top: 2px;
+}
+
+.dossier-ref-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.dossier-ref-desc {
+  font-size: 0.78rem;
+  color: #94A3B8;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   COMPONENT 1 LOGBOOK DOSSIER VIEW
+   ========================================================================== */
+.logbook-dossier-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.35s ease;
+}
+
+.logbook-hero-card {
+  padding: 2rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(30, 27, 75, 0.65), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+.logbook-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logbook-exam-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+
+.logbook-daw-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid;
+  letter-spacing: 0.04em;
+}
+
+.logbook-hero-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.logbook-track-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: #F8FAFC;
+  line-height: 1.15;
+}
+
+.logbook-artist-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0.25rem 0 0 0;
+  color: #C084FC;
+}
+
+.logbook-hero-desc {
+  font-size: 0.9rem;
+  color: #94A3B8;
+  margin: 0.5rem 0 0 0;
+  max-width: 750px;
+  line-height: 1.5;
+}
+
+.logbook-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.logbook-stat-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.logbook-stat-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.05em;
+}
+
+.logbook-stat-val {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  line-height: 1.4;
+}
+
+/* Logbook Sections */
+.logbook-section-card {
+  padding: 1.75rem;
+  border-radius: 18px;
+}
+
+.logbook-sec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.logbook-sec-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.logbook-sec-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+.logbook-sec-pill {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* Logbook Master Track Table */
+.logbook-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.logbook-trk-pill {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.logbook-pathway-pill {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.logbook-pathway-pill.p1 {
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  color: #DDD6FE;
+}
+
+.logbook-pathway-pill.p2 {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #7DD3FC;
+}
+
+.logbook-pathway-pill.p3 {
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  color: #FDE047;
+}
+
+/* Logbook Instrument Tabs & Hub */
+.logbook-inst-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.logbook-inst-tab-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94A3B8;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.logbook-inst-tab-btn:hover {
+  background: rgba(30, 41, 59, 0.9);
+  color: #F8FAFC;
+  border-color: #C084FC;
+}
+
+.logbook-inst-tab-btn.active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(236, 72, 153, 0.2));
+  border-color: #A855F7;
+  color: #F8FAFC;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);
+}
+
+.logbook-inst-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #C084FC;
+  background: rgba(192, 132, 252, 0.15);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logbook-inst-name {
+  font-weight: 600;
+}
+
+.logbook-inst-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Preferred Exam Pathway Banner */
+.logbook-preferred-banner {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(168, 85, 247, 0.12));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.logbook-pref-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.logbook-pref-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #FBBF24;
+  letter-spacing: 0.02em;
+}
+
+.logbook-pref-title strong {
+  color: #FDE047;
+}
+
+.logbook-pref-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #E2E8F0;
+}
+
+/* 3-Pathways Comparison Grid */
+.logbook-pathways-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.logbook-pathway-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.logbook-p-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logbook-p-header.p1 {
+  color: #C084FC;
+}
+
+.logbook-p-header.p2 {
+  color: #38BDF8;
+}
+
+.logbook-p-header.p3 {
+  color: #FBBF24;
+}
+
+.logbook-p-body {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #CBD5E1;
+  white-space: pre-line;
+}
+
+/* Channel Strip Box */
+.logbook-channel-strip-box {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.logbook-box-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #DDD6FE;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.logbook-strip-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.logbook-slot-pill {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.logbook-knob-badges {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.logbook-knob-badge {
+  background: linear-gradient(135deg, rgba(24, 24, 37, 0.95), rgba(30, 27, 75, 0.85));
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: #38BDF8;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 5px;
+  font-family: ui-monospace, monospace;
+}
+
+/* Footer Items: 3rd Party & Pitfalls */
+.logbook-inst-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.logbook-thirdparty-box {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logbook-footer-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94A3B8;
+}
+
+.logbook-tp-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.logbook-tp-badge {
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #DDD6FE;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.logbook-tp-badge:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: #F8FAFC;
+}
+
+.logbook-pitfall-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.logbook-pitfall-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #F87171;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.logbook-pitfall-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #FCA5A5;
+}
+
+/* Master Bus Cards */
+.logbook-master-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.logbook-master-card {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.logbook-master-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #34D399;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logbook-master-body {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #CBD5E1;
+}
+
 /* Print Formatting */
 @media print {
   body {
