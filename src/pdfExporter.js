@@ -108,25 +108,7 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                     ` : ""}
                   </div>
 
-                  ${prefReason ? `
-                    <div class="pdf-preferred-reason">
-                      <strong>Pearson Edexcel C1 Justification:</strong> ${prefReason}
-                    </div>
-                  ` : ""}
-
-                  <div class="pdf-dedicated-card pdf-preferred-card">
-                    <div class="pdf-dedicated-title" style="color: #15803d;">
-                      <span>⭐ PREFERRED COURSEWORK PATHWAY: ${prefPathway || "Selected Capture Solution"}</span>
-                      <span class="pdf-preferred-badge">Official Coursework Choice</span>
-                    </div>
-                    ${prefReason ? `
-                      <div class="pdf-preferred-reason">
-                        <strong>Pearson Edexcel C1 Mark Scheme Justification:</strong> ${prefReason}
-                      </div>
-                    ` : ""}
-                  </div>
-
-                  <!-- Selected Capture Solution (Single Chosen Pathway from Track List) -->
+                  <!-- Instrumental Capture Procedure (Preferred Pathway Only) -->
                   ${(() => {
                     let pathwayStr = '';
                     if (data.trackTable && Array.isArray(data.trackTable)) {
@@ -159,13 +141,21 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                     }
 
                     return `
-                      <div class="pdf-dedicated-card">
-                        <div class="pdf-dedicated-title" style="color: #4338ca; display: flex; justify-content: space-between; align-items: center;">
-                          <span>Active Instrumental Capture Solution (${activeTitle})</span>
-                          <span class="pdf-badge ${badgeClass}" style="font-size: 7.5pt;">Selected from Track List</span>
+                      <div class="pdf-dedicated-card pdf-preferred-card">
+                        <div class="pdf-dedicated-title" style="color: #15803d; display: flex; justify-content: space-between; align-items: center;">
+                          <span>⭐ Instrumental Capture Procedure: ${prefPathway || activeTitle}</span>
+                          <span class="pdf-preferred-badge">Preferred Coursework Pathway</span>
                         </div>
-                        <div style="font-size: 8.2pt; line-height: 1.5; color: #1e293b; padding: 4px 6px;">
-                          ${activeBody.split('\n').map(l => `<p style="margin: 3px 0;">${l.replace(/^\s*[•*]\s*/, '• ')}</p>`).join('')}
+                        ${prefReason ? `
+                          <div class="pdf-preferred-reason" style="margin-bottom: 6px;">
+                            <strong>Pearson Edexcel C1 Mark Scheme Justification:</strong> ${prefReason}
+                          </div>
+                        ` : ""}
+                        <div style="font-size: 8.2pt; line-height: 1.5; color: #1e293b; padding: 5px 8px; background: #ffffff; border-radius: 4px; border: 1px solid #e2e8f0;">
+                          <div style="font-weight: 700; color: #0f172a; margin-bottom: 4px; font-size: 8pt;">
+                            Signal Chain & Acoustic Capture Setup (${activeTitle}):
+                          </div>
+                          ${activeBody.split('\n').map(l => `<p style="margin: 2.5px 0;">${l.replace(/^\s*[•*]\s*/, '• ')}</p>`).join('')}
                         </div>
                       </div>
                     `;

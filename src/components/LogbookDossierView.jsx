@@ -266,60 +266,54 @@ export default function LogbookDossierView({ data, daw }) {
           {/* Active Instrument Dedicated Sections */}
           {activeInstrument && (
             <div className="logbook-inst-hub">
-              {/* 1. Dedicated Section: Preferred Coursework Pathway */}
-              {activeInstrument.preferredPathway && (
-                <div className="logbook-dedicated-section preferred-section">
-                  <div className="logbook-section-card-title">
-                    <div className="logbook-card-title-left">
-                      <Star size={18} fill="#FBBF24" color="#FBBF24" />
-                      <span>PREFERRED COURSEWORK PATHWAY: {activeInstrument.name}</span>
-                    </div>
-                    <span className="logbook-badge-pref">⭐ Official Coursework Choice</span>
-                  </div>
-                  <div className="logbook-preferred-card-body">
-                    <div className="logbook-preferred-title-highlight">
-                      Selected Pathway: <strong>{activeInstrument.preferredPathway}</strong>
-                    </div>
-                    {activeInstrument.preferredJustification && (
-                      <div className="logbook-preferred-justification-block">
-                        <span className="logbook-justification-label">Pearson Edexcel Component 1 Mark Scheme Justification:</span>
-                        <p className="logbook-justification-text">{activeInstrument.preferredJustification}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* 2. Dedicated Section: Selected Capture Solution (Single Chosen Pathway from Track List) */}
+              {/* Dedicated Section: Instrumental Capture Procedure (Preferred Pathway Only) */}
               {(() => {
                 const selected = getSelectedCaptureSolution(activeInstrument);
                 if (!selected || !selected.body) return null;
 
                 const headerClass = selected.num === 1 ? 'p1' : selected.num === 2 ? 'p2' : 'p3';
                 const HeaderIcon = selected.num === 1 ? Mic2 : selected.num === 2 ? Zap : Radio;
+                const prefPathwayTitle = activeInstrument.preferredPathway || selected.title;
 
                 return (
-                  <div className="logbook-dedicated-section pathways-section">
+                  <div className="logbook-dedicated-section preferred-capture-section">
                     <div className="logbook-section-card-title">
                       <div className="logbook-card-title-left">
-                        <Layers size={18} color="#C084FC" />
-                        <span>Active Instrumental Capture Solution ({selected.title})</span>
+                        <HeaderIcon size={18} color={selected.num === 1 ? '#38BDF8' : selected.num === 2 ? '#FBBF24' : '#C084FC'} />
+                        <span>Instrumental Capture Procedure: {activeInstrument.name}</span>
                       </div>
-                      <span className="logbook-section-pill">Selected from Track List</span>
+                      <span className="logbook-badge-pref">⭐ Preferred Pathway: {selected.title.split(':')[0]}</span>
                     </div>
 
-                    <div className="logbook-pathway-card single-active-pathway" style={{ maxWidth: '100%' }}>
-                      <div className={`logbook-p-header ${headerClass}`}>
-                        <HeaderIcon size={18} />
-                        <span style={{ fontSize: '0.95rem' }}>{selected.title}</span>
-                        <span className="logbook-badge-pref" style={{ marginLeft: 'auto', fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}>
-                          ✓ In Use
-                        </span>
+                    <div className="logbook-preferred-capture-card">
+                      {/* Preferred Declaration & Edexcel Justification Banner */}
+                      <div className="logbook-preferred-banner">
+                        <div className="logbook-preferred-title-highlight">
+                          <Star size={15} fill="#FBBF24" color="#FBBF24" />
+                          <span>Selected Preferred Pathway: <strong>{prefPathwayTitle}</strong></span>
+                        </div>
+                        {activeInstrument.preferredJustification && (
+                          <div className="logbook-preferred-justification-block">
+                            <span className="logbook-justification-label">Pearson Edexcel Component 1 Mark Scheme Justification:</span>
+                            <p className="logbook-justification-text">{activeInstrument.preferredJustification}</p>
+                          </div>
+                        )}
                       </div>
-                      <div className="logbook-p-body" style={{ fontSize: '0.9rem', lineHeight: '1.7' }}>
-                        {selected.body.split('\n').map((line, lIdx) => (
-                          <p key={lIdx} style={{ margin: '0.4rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                        ))}
+
+                      {/* Step-by-Step Capture Procedure & Acoustic Setup */}
+                      <div className="logbook-capture-procedure-box">
+                        <div className={`logbook-p-header ${headerClass}`}>
+                          <HeaderIcon size={16} />
+                          <span>{selected.title} — Signal Chain & Acoustic Capture Procedure</span>
+                          <span className="logbook-badge-pref" style={{ marginLeft: 'auto', fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}>
+                            ✓ Official C1 Submission
+                          </span>
+                        </div>
+                        <div className="logbook-p-body" style={{ fontSize: '0.9rem', lineHeight: '1.7' }}>
+                          {selected.body.split('\n').map((line, lIdx) => (
+                            <p key={lIdx} style={{ margin: '0.4rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
