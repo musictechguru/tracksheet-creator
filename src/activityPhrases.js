@@ -229,6 +229,8 @@ export const DAW_ACTIVITY_PHRASES = {
     'Setting audio engine to 44.1 kHz / 24-bit (and closing 47 Chrome tabs to save RAM)…',
     'Color-coding mixer channels with neon pastel shades so the examiner knows we mean business…',
     'Labeling aux buses with names more professional than "Drum Smash 1" and "Vocal Big Boy"…',
+    'Freezing 32 processor-heavy track stacks so the MacBook Pro fans don’t enter supersonic orbit…',
+    'Configuring Logic Drum Machine Designer pad chokes to prevent open and closed hi-hat overlap…',
 
     // Phase 2: Pathway 1 - Acoustic Drum Multi-Miking
     'Engineering Pathway 1: Mic’ing the kick drum with an AKG D112 ("the golden school studio egg")…',
@@ -237,24 +239,32 @@ export const DAW_ACTIVITY_PHRASES = {
     'Rigging small diaphragm condenser overheads with the 3:1 rule so cymbals don’t sound like falling cutlery…',
     'Inverting drum channel phase: discovering half the low end was currently disappearing into the void…',
     'Ransacking the school music tech mic locker for 4 microphone clips that aren’t cracked…',
+    'Aligning snare top and snare bottom phase: recovering the 200 Hz body lost in acoustic cancellation…',
 
     // Phase 3: Pathway 2 - DI Box & Preamp Calibration
     'Engineering Pathway 2: Plugging bass into a BSS AR-133 DI box and praying phantom power works…',
     'Flipping the ground lift switch to banish the demonic 50 Hz mains hum back to the underworld…',
     'Gain-staging audio interface preamps: green LEDs happy, amber LEDs sweating, red LEDs strictly forbidden…',
     'Miking the guitar amp cabinet with a trusty dynamic mic aimed 2 inches off the dust cap…',
+    'Using Direction Mixer to narrow the stereo width of the bass synth below 200 Hz…',
 
     // Phase 4: Vocals & Acoustic Tracking
     'Rigging the Large Diaphragm Condenser vocal chain with a double-mesh pop filter…',
     'Positioning the reflection filter around the singer to tame the acoustics of the school practice room…',
     'Reminding the vocalist to stay 6 inches away so proximity effect doesn’t turn their voice into Barry White…',
     'Positioning an SDC condenser at the acoustic guitar 12th fret to avoid soundhole boomy boom…',
+    'Engaging Flex Pitch on the lead vocal: nudging microtonal notes without sounding like a robot…',
+    'Double-checking that no audio tracks accidentally have the dreaded orange Low Latency Mode bypass…',
 
     // Phase 5: Pathway 3 - Virtual Instruments & MIDI
     'Engineering Pathway 3: Summoning Logic Pro Studio Instruments without letting it sound like a ringtone…',
     'Humanizing MIDI note velocities so the drummer doesn’t sound like a caffeinated cyborg…',
     'Injecting subtle groove swing because nobody on Earth plays quantised at 100.000% grid…',
     'Drawing smooth CC11 Expression curves with a mouse and heroic wrist endurance…',
+    'Auditioning Logic 11 Session Players: asking the virtual bassist to play with 8% more groove swing…',
+    'Routing Alchemy synth granular engine to weave an atmospheric acoustic guitar soundscape…',
+    'Enabling Quick Sampler slice mode to chop acoustic snare hits across the keyboard…',
+    'Setting up Logic Step Sequencer with polyrhythmic step rates for intricate shaker patterns…',
 
     // Phase 6: Channel EQ & Dynamics (Logic Pro Stock)
     'Instantiating Logic Channel EQ: notching out 320 Hz "cardboard box resonance"…',
@@ -262,23 +272,29 @@ export const DAW_ACTIVITY_PHRASES = {
     'Selecting Logic Vintage FET compressor circuit: cranking the attack for that aggressive 1176 snare snap…',
     'Switching to Vintage Opto for vocals: smooth optical leveling that forgives singer microphone antics…',
     'Tuning compressor release time to track tempo so the needle breathes musically in 4/4 time…',
+    'Inspecting Logic Multipressor 4-band crossover points to keep low-end energy under strict control…',
+    'Verifying Logic Channel EQ linear phase mode on master bus to prevent crossover phase smearing…',
 
     // Phase 7: Space Designer & ChromaGlow
     'Loading Space Designer convolution reverb: dialed to a vintage studio plate impulse response…',
     'Setting ChromaVerb predelay to 30 ms so the dry vocal cuts through before the cathedral arrives…',
     'Engaging Logic 11 ChromaGlow saturation (Modern Tube mode): adding 12% "expensive console mojo"…',
     'Inserting Tape Delay with dotted 8th note repeats to give the lead guitar that stadium swagger…',
+    'Applying ChromaVerb "Bloom" algorithm to backing vocal doubles for airy stadium dimension…',
+    'Summoning Logic Vintage B3 Organ: setting drawbars to 888000000 with fast Leslie rotor brake…',
 
     // Phase 8: De-Esser & 3rd-Party Hyperlinks
     'Sweeping Logic De-Esser detection to 6.8 kHz: extinguishing sibilant laser beams…',
     'Cross-referencing FabFilter Pro-Q 3 and Waves CLA-76 with functioning hyperlink validation…',
     'Referencing UAD LA-2A and Soothe2: because examiners love to see students dream big…',
+    'Engaging Logic 11 Stem Splitter: isolating reference stem elements for forensic coursework analysis…',
 
     // Phase 9: Examiner Warnings & Master Track Sheet
     'Formulating Examiner Traps: phase cancellation between Kick and Overheads (examiners smell this instantly)…',
     'Warning against digital clipping: "Red lights in digital audio mean sadness, not warmth"…',
     'Compiling Master Track Sheet: hardware inputs, pan laws, and fader balances…',
     'Panning instruments across the stereo field so everyone isn’t clambering over each other at Center 0…',
+    'Automating Smart Tempo transitions so the acoustic breakdown breathes with natural human pacing…',
 
     // Phase 10: Master Output & Finalization
     'Checking mix bus headroom: sitting comfortably at -12 dBFS peak before the master chain…',
@@ -294,6 +310,8 @@ export const DAW_ACTIVITY_PHRASES = {
     'Configuring 24-bit / 44.1 kHz BWF session (and checking that the iLok cloud didn’t disconnect)…',
     'Setting Hardware Buffer Size to 64 samples for tracking: zero latency, maximum adrenaline…',
     'Creating dedicated Aux Input stem tracks for Drums, Guitars, Keys, and Vocal submixes…',
+    'Clearing PT Prefs and database cache to exorcise mysterious phantom buffer underruns…',
+    'Toggling Smart Tool multi-functional mode: trimmer, selector, and grabber working in harmony…',
 
     // Phase 2: Pathway 1 - Drum Capture
     'Engineering Pathway 1: Assigning multi-mic drum stems across the Pro Tools Mix window…',
@@ -302,24 +320,30 @@ export const DAW_ACTIVITY_PHRASES = {
     'Measuring Overhead spaced pair equidistant from snare center using an XLR cable as a tape measure…',
     'Flipping the channel Phase Invert switch: instant low-end reinforcement, phase cancellation defeated…',
     'Specifying robust UK school studio mics (AKG D112, SM57, SDC pair) that survive student drop tests…',
+    'Arming QuickPunch mode and warning the band to keep playing past the splice point…',
 
     // Phase 3: Pathway 2 - DI Tracking & Preamp Gain
     'Engineering Pathway 2: Direct Injection for bass guitar, bypassing noisy student practice amps…',
     'Checking DI box impedance: high-Z engaged, active buffer running, 50 Hz hum successfully terminated…',
     'Setting interface preamp gain: peaks hovering comfortably around -14 dBFS with plenty of daylight…',
     'Miking the guitar amp speaker 2 inches off-center to skip the ice-pick treble zone…',
+    'Nudging vocal Clip Gain line by 1.5 dB before hitting the hardware emulation chain…',
 
     // Phase 4: Vocals & Acoustic Tracking
     'Setting up vocal track with cardioid Large Diaphragm Condenser and shockmount suspension…',
     'Tightening the gooseneck pop filter before gravity makes it droop mid-chorus…',
     'Instructing the vocalist to stand 6 inches back: preserving dynamics and saving the condenser capsule…',
     'Aiming an SDC at the 12th fret of the acoustic guitar: crisp fretboard sparkle, zero boomy resonance…',
+    'Switching Elastic Audio to Polyphonic algorithm to tighten rhythm acoustic guitars without transient smearing…',
+    'Configuring pre-roll and post-roll markers to give the vocalist a 2-bar run-in before the bridge…',
 
     // Phase 5: Pathway 3 - Instrument Tracks & MIDI
     'Engineering Pathway 3: Pro Tools Instrument Tracks with Boom, Structure Free, or Xpand!2…',
     'Sequencing backing instruments with MIDI clips and resisting the urge to overcomplicate chords…',
     'Applying Pro Tools MIDI Real-Time Properties: humanizing velocities so it doesn’t sound like a Commodore 64…',
     'Drawing CC11 Expression automation curves without causing RSI in the mouse finger…',
+    'Inserting Avid X-Form algorithm for artifact-free time compression on double-tracked guitars…',
+    'Engaging HEAT (Harmonic Enhancement Algorithm Technology) across all audio tracks for console warmth…',
 
     // Phase 6: Pro Tools Stock Processing (EQ3 & Dyn3)
     'Inserting Avid EQ3 7-Band on kick: sweeping the Q band to notch out the hollow 320 Hz bin…',
@@ -328,26 +352,31 @@ export const DAW_ACTIVITY_PHRASES = {
     'Dialing 25 ms attack on Dyn3 so the drumstick transient punches through before the clamp engages…',
     'Applying gentle 2.5:1 Dyn3 leveling on bass DI to smooth out uneven student finger-picking…',
     'Tuning compressor release times to groove naturally with the song tempo…',
+    'Using Avid Channel Strip Expander/Gate to silence noisy guitar amp hum between rhythm hits…',
 
     // Phase 7: Aux Sends, D-Verb & Mod Delay
     'Setting up post-fader Aux Sends to internal Bus 1-2 for spatial time-based processing…',
     'Inserting the legendary Pro Tools D-Verb: choosing Medium Plate (the sound of 10,000 university demos)…',
     'Dialing 25 ms predelay on D-Verb so the dry vocal remains upfront while the cathedral sits behind…',
     'Inserting Avid Mod Delay III with tempo-synced dotted 8th stereo ping-pong repeats…',
+    'Creating VCA Master faders for Drums and Vocals to control levels without disturbing group aux sends…',
 
     // Phase 8: Specialist Plugins & 3rd-Party Alternatives
     'Inserting Avid Dyn3 De-Esser: hunting sibilance around 7.2 kHz without giving the singer a lisp…',
     'Linking industry 3rd-party alternatives: FabFilter Pro-C 2, Pro-Q 3, and Soundtoys EchoBoy…',
     'Referencing Universal Audio 1176 LN and Waves SSL G-Master bus compressor hyperlinks…',
+    'Auditing Delay Compensation indicator: green means pristine time alignment, orange means freeze time…',
 
     // Phase 9: Examiner Warnings & Track Sheet Construction
     'Compiling Examiner Pitfalls: warning against drum phase comb filtering and headphone bleed…',
     'Explaining to examiners why clipping interface preamps produces "pain, not analog saturation"…',
     'Compiling Master Track Sheet: track names, hardware input assignments, faders, and pan spots…',
     'Setting stereo pan law (-3.0 dB compensated) and balancing track panorama positions…',
+    'Checking Avid Video Engine memory allocation and praying it doesn’t hog the entire playback engine…',
 
     // Phase 10: Master Fader & Final Verification
     'Creating Master Fader stereo track for mix bus gain staging (Pro Tools 101 requirement)…',
+    'Setting Pro Tools I/O buffer to 1024 samples for mixdown: maximum DSP power, zero playback stutter…',
     'Inserting Avid Maxim / Master Limiter with True Peak ceiling pinned to -1.0 dBFS…',
     'Verifying integrated loudness adheres strictly to -14 to -16 LUFS target…',
     'Formatting technical mixdown tables and channel strip insertion logs…',
@@ -360,6 +389,8 @@ export const DAW_ACTIVITY_PHRASES = {
     'Configuring Ableton Audio Engine preferences: 44.1 kHz / 24-bit with minimal buffer latency…',
     'Switching to Arrangement View because the examiner expects a real chronological song timeline…',
     'Creating Group Tracks for Drums, Guitars, and Vocals with pleasing custom color palettes…',
+    'Checking Arrangement View locator markers: Intro, Verse 1, Chorus 1, Bridge, and Outro neatly labeled…',
+    'Freezing and flattening MIDI instrument tracks to reclaim 40% CPU before starting the final mixdown…',
 
     // Phase 2: Pathway 1 - Acoustic Drum Kit Tracking
     'Engineering Pathway 1: Multi-mic drum kit capture routed into dedicated audio tracks…',
@@ -368,24 +399,30 @@ export const DAW_ACTIVITY_PHRASES = {
     'Rigging matched SDC pair in spaced array: measuring distances with an XLR lead and genuine hope…',
     'Flipping Ableton Live Utility phase invert to confirm kick and overheads are in phase agreement…',
     'Auditing standard school mic locker gear (AKG D112, Shure SM57, SDC pair) for realistic exam marks…',
+    'Assigning Drum Rack choke groups so the open hi-hat immediately cuts out when the pedal closes…',
 
     // Phase 3: Pathway 2 - DI Box & Interface Tracking
     'Engineering Pathway 2: Direct Injection recording for bass guitar via active DI box…',
     'Engaging DI ground lift switch to silence the ghost humming inside the electrical mains…',
     'Setting interface preamp gain: peak signal hovering at -14 dBFS (saving headroom for enthusiastic choruses)…',
     'Miking electric guitar cabinet with dynamic mic aimed 2 inches off-center from speaker cone…',
+    'Engaging Complex Pro warping mode: optimizing Envelope and Formant settings for vocal stems…',
 
     // Phase 4: Vocal & Acoustic Instrument Capture
     'Arming Lead Vocal audio track with Large Diaphragm Condenser and dual-layer pop shield…',
     'Mounting portable acoustic reflection shield to defeat the acoustic bounce of the school music room…',
     'Positioning vocalist 6 inches back: zero proximity mud, maximum vocal clarity…',
     'Tracking acoustic guitar with small diaphragm condenser aimed at 12th fret: sparkling highs, no boom…',
+    'Using Ableton Simpler 1-Shot mode with Warp enabled to preserve pitch during tempo changes…',
 
     // Phase 5: Pathway 3 - Virtual Instruments & MIDI
     'Engineering Pathway 3: Virtual instrument tracks via Ableton Simpler, Sampler, and Instrument Racks…',
     'Sequencing backing instruments with MIDI clips and resisting the temptation to hit 100% Quantize…',
     'Applying Ableton Groove Pool template for that elusive "human being with feelings" timing…',
     'Drawing MIDI velocity curves and automating Clip Modulation parameters…',
+    'Fine-tuning Ableton Live 12 Meld dual-oscillator macro to generate lush harmonic textures…',
+    'Mapping 8 Macro controls in an Audio Effect Rack to modulate delay feedback, filter cutoff, and reverb send…',
+    'Applying Ableton 16th-note swing from the Groove Pool at 28% velocity and 15% timing…',
 
     // Phase 6: Ableton Stock Audio Effects (EQ Eight & Compressor)
     'Loading Ableton EQ Eight on kick: carving out 300 Hz "mud tub" and boosting 60 Hz chest thump…',
@@ -394,30 +431,36 @@ export const DAW_ACTIVITY_PHRASES = {
     'Loading Ableton Glue Compressor on Drum Group: dialing 2:1 ratio for authentic analog console glue…',
     'Setting gentle vocal compression: needle moving 3-4 dB on passionate vocal crescendos…',
     'Tuning compressor release to track tempo so the audio pump breathes with the musical groove…',
+    'Setting up Sidechain Routing on the Ableton Glue Compressor triggered by the kick drum transient…',
 
     // Phase 7: Return Tracks, Hybrid Reverb & Roar
     'Routing Aux Sends to Return Track A (Ableton Hybrid Reverb): blending convolution and algorithmic space…',
     'Dialing 20 ms predelay on drum room reverb so the initial snare transient slaps you in the face first…',
     'Routing to Return Track B (Ableton Echo) for tempo-synced ping-pong spatial width…',
     'Inserting Ableton Utility device: toggling "Bass Mono" at 120 Hz so club subwoofers don’t catch fire…',
+    'Activating Ableton Roar feedback mode: dialing subtle parallel saturation into the snare drum…',
+    'Automating Ableton Echo ping-pong offset for hypnotic stereo movement across the stereo spectrum…',
 
     // Phase 8: Specialist Devices & 3rd-Party Alternatives
     'Engaging Ableton Live 12 Roar saturation: adding 10% multi-stage analog warmth without melting the speaker…',
     'Inserting Ableton Multiband Dynamics in split-band mode to de-ess sharp vocal sibilance…',
     'Linking industry 3rd-party alternatives: FabFilter Pro-Q 3, Pro-C 2, and Soundtoys Decapitator…',
     'Referencing UAD 1176 and Waves CLA-76 compressor models with validated clickable links…',
+    'Engaging Ableton Multiband Dynamics upward expansion to bring delicate vocal breath details forward…',
 
     // Phase 9: Examiner Warnings & Track Sheet Assembly
     'Flagging Examiner Traps: phase cancellation between multiple drum mics and nasty warp artifacts…',
     'Warning against digital preamp clipping: "You cannot EQ distortion out of a clipped vocal take"…',
     'Compiling Master Track Sheet: interface input mapping, panning laws, and stem balance…',
     'Setting channel pan knobs and initial fader balance across the stereo field…',
+    'Adjusting Clip Launch Quantization to 1 Bar to avoid erratic arrangement playback…',
 
-    // Phase 10: Master Channel & Final化
+    // Phase 10: Master Channel & Finalization
     'Checking Master channel headroom (-12 to -14 dBFS peak before the limiter)…',
     'Inserting Ableton Limiter with True Peak ceiling pinned securely to -1.0 dBFS…',
     'Verifying integrated loudness adheres to the official -14 to -16 LUFS target…',
     'Formatting technical mixdown tables and channel strip logs…',
+    'Exporting Ableton stems: checking "All Individual Tracks" with dither set to Triangular…',
     'Finalizing official Ableton Live Component 1 Completed Logbook… certified examiner-ready!'
   ],
 
@@ -427,6 +470,7 @@ export const DAW_ACTIVITY_PHRASES = {
     'Setting Project Setup to 44.1 kHz / 24-bit Broadcast Wave (and making sure the eLicenser is behaving)…',
     'Pressing F4 to open Audio Connections: configuring interface input buses without getting tangled…',
     'Organizing session into Folder Tracks and Group Channels with coordinated German engineering precision…',
+    'Double-checking that the Steinberg licensing engine is happily communicating with the desktop…',
 
     // Phase 2: Pathway 1 - Acoustic Drum Kit Tracking
     'Engineering Pathway 1: Acoustic drum kit multi-mic routing across the Cubase MixConsole…',
@@ -435,24 +479,29 @@ export const DAW_ACTIVITY_PHRASES = {
     'Setting up Overhead matched SDC pair: measuring distances carefully so the snare image sits dead center…',
     'Hitting the Phase Invert button in the MixConsole Pre-Rack: low-end instantly punchier, phase victory!…',
     'Specifying standard school studio mics (AKG D112, Shure SM57, SDCs) from the department equipment locker…',
+    'Splitting drum audio transient hits into HALion Sampler Track for custom sample layering…',
 
     // Phase 3: Pathway 2 - DI Box & Electric Instruments
     'Engineering Pathway 2: Electric bass Direct Injection (DI) tracking via active DI box…',
     'Flipping DI ground lift switch: silencing 50 Hz electrical ground loops like an audio ninja…',
     'Calibrating Steinberg interface preamps: keeping peaks at -14 dBFS with plenty of headroom for slap bass…',
     'Miking electric guitar amplifier with dynamic mic 45° off-axis to tame fizzy high frequencies…',
+    'Engaging Cubase MixConsole Pre-Rack 18 dB/oct Low Cut to banish sub-bass clutter from guitars…',
 
     // Phase 4: Vocals & Acoustic Instruments
     'Setting up Lead Vocal track with studio Large Diaphragm Condenser and shockmount suspension…',
     'Fastening pop shield and positioning reflection filter to control classroom acoustics…',
     'Reminding vocalist to stay 6 inches back: zero proximity mud, maximum vocal expression…',
     'Positioning small diaphragm condenser at acoustic guitar 12th fret: sparkling chime, zero boom…',
+    'Opening Steinberg VariAudio 3 to inspect vocal micro-pitch curves and formant resonance…',
+    'Using Steinberg Audio Alignment tool to match backing vocal double timing with laser accuracy…',
 
     // Phase 5: Pathway 3 - Instrument Tracks & MIDI (HALion)
     'Engineering Pathway 3: Cubase Instrument Tracks loaded with HALion Sonic and Groove Agent…',
     'Sequencing backing instruments with MIDI clips and applying subtle groove quantization…',
     'Using Cubase Logical Editor to humanize note timing and velocity so it sounds played by a human…',
     'Mapping Cubase Quick Controls to filter cutoff and CC11 expression for expressive performance…',
+    'Setting up Cubase Chord Track: guiding MIDI backing harmony voicings with musical accuracy…',
 
     // Phase 6: Cubase MixConsole Channel Strip Processing
     'Opening Cubase MixConsole Channel Strip StudioEQ on kick: scooping 300 Hz cardboard box mud…',
@@ -460,29 +509,35 @@ export const DAW_ACTIVITY_PHRASES = {
     'Inserting Cubase Vintage Compressor on snare: dialing 30 ms attack for that punchy crack…',
     'Applying Cubase Tube Compressor for warm optical-style vocal leveling with smooth gain reduction…',
     'Tuning compressor release to track tempo so the gain reduction meter breathes in time with the song…',
+    'Applying Cubase Frequency 2 dynamic EQ: taming 4 kHz harshness on the lead vocal during loud choruses…',
+    'Configuring Cubase Direct Offline Processing: applying non-destructive EQ notches to noisy acoustic clips…',
 
     // Phase 7: FX Channels & REVerence Convolution
     'Creating dedicated FX Channel Track with Steinberg REVerence convolution reverb…',
     'Loading vintage studio plate impulse response for depth without drowning the mix in mud…',
     'Setting up Cubase RoomWorks algorithmic reverb with 25 ms predelay for vocal dimension…',
     'Inserting Cubase MonoDelay with dotted 8th note tempo sync for rhythmic spatial bounce…',
+    'Routing Cubase Control Room independent headphone cues to performer outputs A and B…',
 
     // Phase 8: Specialist Plugins & 3rd-Party Alternatives
     'Inserting Cubase DeEsser: sweeping detection to tame 6.5 kHz sibilance without lisping…',
     'Cross-referencing FabFilter Pro-Q 3, Pro-C 2, and Waves SSL 4000 Collection hyperlinks…',
     'Referencing UAD LA-2A and Soothe2: validating every single 3rd-party markdown link…',
+    'Loading Cubase SuperVision analyzer: monitoring spectral distribution, phase correlation, and LUFS in real time…',
 
     // Phase 9: Examiner Warnings & Track Sheet Assembly
     'Detailing Examiner Traps: avoiding comb filtering in multi-mic drum setups (examiners love catching this)…',
     'Warning against digital preamp clipping: "Digital clipping is not saturation, it is digital regret"…',
     'Compiling Master Track Sheet: hardware inputs, track names, panning laws, and fader balance…',
     'Balancing MixConsole faders and stereo panning positions for a cohesive 3D soundstage…',
+    'Automating Cubase VCA faders to pull down the rhythm section by 2 dB during the vocal breakdown…',
 
     // Phase 10: Stereo Out & Finalization
     'Monitoring Stereo Out mix bus headroom (-12 to -14 dBFS Peak before limiting)…',
     'Engaging Cubase Brickwall Limiter with true peak threshold locked securely at -1.0 dBFS…',
     'Verifying integrated dynamic range adheres strictly to -14 to -16 LUFS target…',
     'Formatting technical mixdown tables and channel strip logs…',
+    'Rendering in-place with complete channel strip signal path preserved for archival security…',
     'Finalizing official Steinberg Cubase Component 1 Completed Logbook… Wunderbar!'
   ],
 
@@ -492,6 +547,8 @@ export const DAW_ACTIVITY_PHRASES = {
     'Configuring Bitwig Audio Engine preferences: 44.1 kHz / 24-bit with razor-sharp latency…',
     'Setting up Audio Tracks and Track Groups in the Bitwig Arranger with color-coded elegance…',
     'Configuring audio interface multi-channel input routing without opening a single confusing menu…',
+    'Auditing Bitwig audio engine DSP graph: keeping processing load smoothly balanced across all CPU cores…',
+    'Configuring Bitwig Arranger cue markers for seamless Component 1 section navigation…',
 
     // Phase 2: Pathway 1 - Acoustic Drum Kit Tracking
     'Engineering Pathway 1: Drum kit multi-track audio routing across Bitwig audio channels…',
@@ -500,24 +557,31 @@ export const DAW_ACTIVITY_PHRASES = {
     'Rigging matched stereo pair of small diaphragm condensers for overheads with the 3:1 rule…',
     'Checking overhead phase coherency using Bitwig Tool device phase invert: instant bass thud unlocked…',
     'Specifying standard school studio mics (AKG D112, Shure SM57, SDCs) from the department locker…',
+    'Setting up Bitwig multi-output drum machine routing to discrete audio channels for individual processing…',
 
     // Phase 3: Pathway 2 - DI Box & Electric Instruments
     'Engineering Pathway 2: Direct Injection recording for bass guitar via active DI box…',
     'Flipping DI ground lift switch to banish 50 Hz electrical hum back to the void…',
     'Setting interface preamp gain levels to hover around -18 dBFS RMS (safe headroom is happy headroom)…',
     'Miking electric guitar cabinet with dynamic mic aimed 2 inches off-center from the cone…',
+    'Slicing transient markers directly in the Bitwig Arranger timeline with zero latency…',
 
     // Phase 4: Vocals & Acoustic Instruments
     'Configuring Lead Vocal audio track with Large Diaphragm Condenser and dual-mesh pop shield…',
     'Fastening studio reflection filter to keep the practice room acoustic reflections out of the track…',
     'Mitigating proximity bass boost through proper vocalist positioning: 6 inches back, perfect tone…',
     'Setting up small diaphragm condenser aimed at acoustic guitar 12th fret: sparkling highs, no mud…',
+    'Applying Bitwig Tool device mid-side processing: boosting sides by 1.2 dB above 5 kHz for airy stereo width…',
 
     // Phase 5: Pathway 3 - Instrument Tracks & Polymer/Sampler
     'Engineering Pathway 3: Bitwig Instrument Tracks using Polymer, Sampler, and virtual instruments…',
     'Sequencing backing instruments with Bitwig MIDI clips and applying humanized groove timing…',
     'Humanizing MIDI velocity dynamics so the performance breathes with authentic human emotion…',
     'Mapping Bitwig Modulators (Macro, LFO, Vibrato) because a fader without modulation is a lonely fader…',
+    'Nesting Bitwig ParSeq-8 and Steps modulators to create dynamic breathing filter movement…',
+    'Configuring Bitwig Voice Stacking: detuning 4 voices across the stereo field for a massive synth pad…',
+    'Constructing a custom sub-harmonic synthesizer inside The Grid modular environment…',
+    'Routing Polymer oscillator morphing to an LFO synced to 1/4-note tempo divisions…',
 
     // Phase 6: Bitwig Stock Audio Devices (EQ+ & Compressor)
     'Loading Bitwig EQ+ on kick: grabbing the spectrum graph to scoop out 300 Hz cardboard mud…',
@@ -526,12 +590,16 @@ export const DAW_ACTIVITY_PHRASES = {
     'Applying Bitwig Dynamics device for two-stage upward and downward dynamic control…',
     'Adjusting vocal compressor attack and release to mirror singer phrasing without choking the words…',
     'Balancing gain reduction meters to 3-4 dB on energetic peaks: controlled, punchy, musical…',
+    'Modulating Bitwig EQ+ band gain with an Audio Rate modulator triggered by the vocal input…',
+    'Applying Bitwig Dynamics upward compression to recover ghost snare notes without raising room noise…',
 
     // Phase 7: Effect Tracks, Reverb & Delay+
     'Creating dedicated Effect Tracks for spatial time-based processing with zero track clutter…',
     'Inserting Bitwig Reverb device: dialing Medium Hall with 25 ms predelay for vocal dimension…',
     'Loading Bitwig Delay+ device with ping-pong crossfeed and tempo synchronization…',
     'Inserting Bitwig Tool device to collapse low-end frequencies below 100 Hz to pure mono…',
+    'Engaging Bitwig Delay+ pitch drift mode: adding tape-style warmth and wobble to electric piano chords…',
+    'Using Bitwig Clip Launcher polyrhythms to generate unpredictable organic percussion loops…',
 
     // Phase 8: Specialist Devices & 3rd-Party Alternatives
     'Configuring Bitwig Dynamics in split-band mode for surgical high-frequency de-essing…',
@@ -543,12 +611,134 @@ export const DAW_ACTIVITY_PHRASES = {
     'Preventing digital interface clipping: "Clipped audio in coursework makes moderators weep"…',
     'Compiling Master Track Sheet: hardware input mapping, pan positions, and fader balance…',
     'Setting channel pan positions and initial stem balance for a broad, immersive stereo image…',
+    'Setting Bitwig Peak Limiter lookahead to 5 ms for transparent, artifact-free peak catch…',
 
     // Phase 10: Master Track & Final Verification
     'Checking Master Track headroom: sitting comfortably at -12 to -14 dBFS Peak before limiting…',
     'Inserting Bitwig Peak Limiter with ceiling pinned securely to -1.0 dBFS True Peak…',
     'Verifying integrated loudness adheres strictly to the official -14 to -16 LUFS target…',
     'Formatting technical mixdown tables and channel strip logs…',
+    'Saving project snapshot with complete modulator assignments and routing verified!',
     'Finalizing official Bitwig Studio Component 1 Completed Logbook… modular perfection achieved!'
   ]
 };
+
+// Universal engineering, studio lore, coursework forensics, mixing and mastering phrases
+export const UNIVERSAL_ENGINEERING_PHRASES = [
+  'Untangling a nest of 12 bantam patch cords that somehow tied themselves into a nautical knot…',
+  'Discovering someone plugged the condenser mic into line input 3 and wondered why it was dead silent…',
+  'Checking the phantom power switch: 48 volts safely engaged without detonating the vintage ribbon microphone…',
+  'Explaining to the singer why singing 1 inch from the microphone grille produces "thunderstorm mud"…',
+  'Hunting down the single functioning 1/4-inch to 3.5mm gold headphone adapter in the entire building…',
+  'Warning the coursework candidate: "Clipped preamps do not count as vintage analog saturation"…',
+  'Aligning delay compensation so the parallel drum bus doesn’t sound like a passing fighter jet…',
+  'Calibrating the NS-10 tissue paper layer: two single plies over the tweeters for peak 1980s truth…',
+  'Checking the phase correlation meter: firmly planted at +0.8, avoiding catastrophic stereo cancellation…',
+  'Carving 3 dB out of the 320 Hz boxiness bin so the acoustic guitar stops sounding like a shoe box…',
+  'Sweeping high-pass filters across 16 channels to eliminate London underground tube train rumble…',
+  'Automating vocal fader rides in 0.5 dB increments so every single syllable cuts through the dense chorus…',
+  'Reminding the drummer that the hi-hat is not a blacksmith anvil during delicate verse passages…',
+  'Auditing the 200–400 Hz collision zone: granting diplomatic immunity to the bass and kick drum…',
+  'Setting compressor attack slow enough to let the snare transient bite, fast enough to catch the body…',
+  'Engaging stereo de-esser: taming piercing vocal sibilance without turning the singer into Daffy Duck…',
+  'Running the sacred car stereo test: confirming the bassline cuts through on blown £20 hatchback door speakers…',
+  'Auditing integrated loudness: locking the mix firmly onto the -14 LUFS streaming sweet spot…',
+  'Pinning the true peak ceiling to -1.0 dBFS to prevent inter-sample clipping on MP3 and AAC encoders…',
+  'Double-checking that the vocal reverb aux return is high-passed at 150 Hz to prevent low-end mud buildup…',
+  'Checking that the talkback mic wasn’t accidentally left open while the control room critiqued take 7…',
+  'Inspecting the coursework specification: confirming all 3 mandatory pathways are fully demonstrated…',
+  'Verifying that both stock plugins and professional 3rd-party equivalents have valid technical hyperlinks…',
+  'Calibrating headphone mix volume: saving the vocalist from temporary high-frequency hearing fatigue…',
+  'Sweeping a narrow Q notch filter to silence an elusive 50 Hz ground loop from a dodgy guitar lead…',
+  'Checking drum overhead spacing with an XLR cable ruler: snare drum sitting dead center in the stereo image…',
+  'Applying 1.5 dB of gentle bus compression: needle barely dancing to glue the rhythm section together…',
+  'Testing mono compatibility on an Auratone 5C sound cube: lead vocal and snare punching through clearly…',
+  'Explaining to the band why turning every single instrument up to maximum does not make the song louder…',
+  'Rescuing a student who saved their entire 50 GB project file into the desktop recycle bin by mistake…',
+  'Checking the DI box battery: 9 volts confirmed, preventing mid-solo distortion panics…',
+  'Aligning backing vocal transients so the consonants "S" and "T" hit in unison instead of spray paint…',
+  'Ensuring the acoustic piano stereo pair doesn’t suffer comb filtering when collapsed to mono…',
+  'Balancing bass guitar low-end weight with a saturated upper-mid track for small smartphone speakers…',
+  'Reminding the artist that the red light on the audio interface indicates suffering, not passion…',
+  'Dialing 25 ms of pre-delay on the vocal plate reverb so words stay upfront before the reverb tails…',
+  'Checking that the master fader is set to 0.0 dB unity gain without sneaky negative offsets…',
+  'Verifying coursework candidate details, examiner traps, and technical mark scheme alignment…',
+  'Listening to the final chorus at whisper quiet volume: confirming the groove balance translates effortlessly…',
+  'Brewing an emergency pot of dark roast coffee while the digital audio workstation finishes the export…',
+  'Checking that the polarity on the snare bottom microphone is inverted to prevent paper-thin snare tone…',
+  'Banning the rhythm guitarist from touching the console master fader with greasy takeaway fingers…',
+  'Checking the microphone stand clutch before the heavy Neumann slowly bows to the floor mid-take…',
+  'Muting the drummer’s monitor cue to stop the click track from leaking into the delicate acoustic intro…',
+  'Verifying pan laws: -3 dB compensated pan law engaged to preserve equal power across the stereo panorama…',
+  'Checking room acoustic modes: notching out 128 Hz standing wave trapped between the parallel back walls…',
+  'Engaging dynamic EQ on the acoustic guitar to dip 2.8 kHz only when the lead vocal is singing…',
+  'Replacing a crackly XLR lead on the primary vocal chain that only worked when bent at a 45° angle…',
+  'Nudging the bass guitar track 8 ms late on the grid for that relaxed, authentic pocket groove…',
+  'Testing high-frequency response on £15 plastic earbuds: confirming sibilance is silky, not razor-sharp…'
+];
+
+// Helper: Fisher-Yates array shuffle
+export function shufflePhrases(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Procedural dynamic phrases generated fresh on every solution run
+export function generateProceduralPhrases(daw = 'Logic Pro', context = {}) {
+  const { trackName, artistName } = context;
+  const title = (trackName || 'session').trim();
+  const artist = (artistName || '').trim();
+
+  const randomFreq1 = Math.floor(Math.random() * 250) + 200; // 200 - 450 Hz
+  const randomFreq2 = (Math.floor(Math.random() * 40) + 25) / 10; // 2.5 - 6.5 kHz
+  const randomCut = (Math.random() * 2.5 + 2.0).toFixed(1); // 2.0 - 4.5 dB
+  const randomBoost = (Math.random() * 2.0 + 1.2).toFixed(1); // 1.2 - 3.2 dB
+  const randomRatio = [2, 3, 4, 6][Math.floor(Math.random() * 4)];
+  const randomAttack = [15, 20, 25, 30][Math.floor(Math.random() * 4)];
+  const randomBuffer = [32, 64, 128, 256][Math.floor(Math.random() * 4)];
+  const randomLufs = Math.floor(Math.random() * 3) + 14; // 14 - 16 LUFS
+  const randomCorrelation = (0.75 + Math.random() * 0.2).toFixed(2); // +0.75 to +0.95
+  const randomPredelay = Math.floor(Math.random() * 25) + 15; // 15 - 40 ms
+  const randomWidth = Math.floor(Math.random() * 20) + 80; // 80 - 100%
+
+  return [
+    `Analyzing "${title}" session dynamics: mapping out frequency real estate across ${daw}…`,
+    `Engineering Component 1 stem balance for "${title}"${artist ? ` (${artist})` : ''}…`,
+    `Sweeping parametric notch filter at ${randomFreq1} Hz: scooping cardboard box resonance on ${title}…`,
+    `Applying ${randomRatio}:1 compression on snare: dialing ${randomAttack} ms attack to preserve stick impact…`,
+    `Calibrating ${daw} buffer size to ${randomBuffer} samples: zero perceptible latency during tracking…`,
+    `Dialing ${randomBoost} dB high-shelf boost at ${randomFreq2} kHz: giving lead vocal breath without harshness…`,
+    `Carving ${randomCut} dB out of low-mids on guitars: clearing room for bass and snare fundamentals…`,
+    `Checking phase correlation meter: locked at +${randomCorrelation} for ironclad mono radio compatibility…`,
+    `Tuning plate reverb pre-delay to ${randomPredelay} ms: keeping dry transients crystal clear before the wash…`,
+    `Targeting -${randomLufs} LUFS integrated dynamic range: hitting official streaming and coursework spec…`,
+    `A/B referencing ${title} mix against uncompressed master stems: harmonic clarity verified!…`,
+    `Automating ${daw} stereo imaging: setting side-chain width to ${randomWidth}% for a cinematic soundstage…`
+  ];
+}
+
+// Master generator for solution engineering monitoring text:
+// Shuffles the order randomly AND injects newly chosen phrases every single run!
+export function getSolutionEngineeringPhrases(daw = 'Logic Pro', context = {}) {
+  const dawPhrases = DAW_ACTIVITY_PHRASES[daw] || DAW_ACTIVITY_PHRASES['Logic Pro'] || [];
+
+  // 1. Base DAW-specific engineering phrases
+  const basePool = [...dawPhrases];
+
+  // 2. Sample a random batch of 12-16 universal engineering phrases every time
+  const randomUniversal = shufflePhrases(UNIVERSAL_ENGINEERING_PHRASES).slice(0, 14);
+
+  // 3. Generate dynamic procedural phrases tailored to this run with new values & track context
+  const dynamicProcedural = generateProceduralPhrases(daw, context);
+
+  // 4. Combine and deduplicate
+  const combined = Array.from(new Set([...basePool, ...randomUniversal, ...dynamicProcedural]));
+
+  // 5. Return fully shuffled random order every time
+  return shufflePhrases(combined);
+}
+

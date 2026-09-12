@@ -114,23 +114,25 @@ export function parseLogbook(markdown) {
         rawBody: body
       };
 
-      // Extract Pathway 1
-      const p1Match = body.match(/\*\s+\*\*Pathway\s*1[^*]*\*\*[:\s]*([\s\S]*?)(?=\*\s+\*\*Pathway\s*2|\*\s+(?:\*\*)?⭐|\n####|$)/i);
+      // Extract Pathway 1 (Acoustic / Mic)
+      const p1Match = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}Pathway\s*1[^*:\n]*\*{0,2}[:\s]*([\s\S]*?)(?=(?:#{1,6}\s*|\*\s+)?\*{0,2}Pathway\s*2|(?:#{1,6}\s*|\*\s+)?\*{0,2}⭐|(?:#{1,6}\s*|\*\s+)?\*{0,2}PREFERRED|\n####|$)/i);
       if (p1Match) instObj.pathway1 = p1Match[1].trim().replace(/^\s*\*\s+/gm, '• ');
 
-      // Extract Pathway 2
-      const p2Match = body.match(/\*\s+\*\*Pathway\s*2[^*]*\*\*[:\s]*([\s\S]*?)(?=\*\s+\*\*Pathway\s*3|\*\s+(?:\*\*)?⭐|\n####|$)/i);
+      // Extract Pathway 2 (DI / Line)
+      const p2Match = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}Pathway\s*2[^*:\n]*\*{0,2}[:\s]*([\s\S]*?)(?=(?:#{1,6}\s*|\*\s+)?\*{0,2}Pathway\s*3|(?:#{1,6}\s*|\*\s+)?\*{0,2}⭐|(?:#{1,6}\s*|\*\s+)?\*{0,2}PREFERRED|\n####|$)/i);
       if (p2Match) instObj.pathway2 = p2Match[1].trim().replace(/^\s*\*\s+/gm, '• ');
 
-      // Extract Pathway 3
-      const p3Match = body.match(/\*\s+\*\*Pathway\s*3[^*]*\*\*[:\s]*([\s\S]*?)(?=\*\s+(?:\*\*)?⭐|\n####|\*\*Channel Strip|Channel Strip:|$)/i);
+      // Extract Pathway 3 (MIDI / Instrument)
+      const p3Match = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}Pathway\s*3[^*:\n]*\*{0,2}[:\s]*([\s\S]*?)(?=(?:#{1,6}\s*|\*\s+)?\*{0,2}⭐|(?:#{1,6}\s*|\*\s+)?\*{0,2}PREFERRED|\n####|(?:#{1,6}\s*|\*\s+)?\*{0,2}Channel Strip|$)/i);
       if (p3Match) instObj.pathway3 = p3Match[1].trim().replace(/^\s*\*\s+/gm, '• ');
 
       // Extract Preferred Pathway & Justification
-      const prefMatch = body.match(/\*\s+(?:\*\*)?⭐\s*PREFERRED C1 PATHWAY:\s*([^*.]+)[.*]?\s*([\s\S]*?)(?=\*\*Channel Strip|Channel Strip:|\n####|\*\s+\*\*Logic|\*\s+\*\*Pro|\*\s+\*\*Ableton|\*\s+\*\*Cubase|\*\s+\*\*3rd|$)/i);
+      const prefMatch = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}⭐?\s*PREFERRED C1 PATHWAY[:\s]*([^\n*.]+)[.*]?\s*([\s\S]*?)(?=(?:#{1,6}\s*|\*\s+)?\*{0,2}Channel Strip|(?:#{1,6}\s*|\*\s+)?\*{0,2}(?:Modern\s*3rd|3rd-Party)|\n####|$)/i);
       if (prefMatch) {
         instObj.preferredPathway = prefMatch[1].trim();
-        instObj.preferredJustification = prefMatch[2].trim().replace(/^\*?\s*Justification:\s*/i, '').replace(/^\s*\*\s+/gm, '');
+        instObj.preferredJustification = prefMatch[2].trim()
+          .replace(/^\*?\s*(?:\*\*)?(?:Mark-Scheme\s*)?Justification:?(?:\*\*)?\s*/i, '')
+          .replace(/^\s*\*\s+/gm, '• ');
       }
 
       // Extract Channel Strip: Table or Bullet List
@@ -168,21 +170,21 @@ export function parseLogbook(markdown) {
       }
 
       // Extract 3rd Party Plugins
-      const tpMatch = body.match(/\*\s+\*\*(?:3rd-Party|Third-Party)[^*]*:\*\*\s*([^\n]+)/i);
+      const tpMatch = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}(?:Modern\s*3rd|Third-Party|3rd-Party)[^*:\n]*\*{0,2}[:\s]*([\s\S]*?)(?=(?:#{1,6}\s*|\*\s+)?\*{0,2}Examiner|\n#{1,6}|\n---|$)/i);
       if (tpMatch) {
-        const line = tpMatch[1];
-        const linkMatches = [...line.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g)];
+        const tpText = tpMatch[1].trim();
+        const linkMatches = [...tpText.matchAll(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g)];
         if (linkMatches.length > 0) {
           instObj.thirdParty = linkMatches.map(m => ({ name: m[1], url: m[2] }));
         } else {
-          instObj.thirdParty = [{ name: line.trim(), url: '' }];
+          instObj.thirdParty = tpText.split('\n').filter(Boolean).map(l => ({ name: l.replace(/^\s*[•*]\s*/, '').trim(), url: '' }));
         }
       }
 
       // Extract Examiner Pitfall
-      const pitfallMatch = body.match(/\*\s+\*\*Examiner Pitfall[^*]*:\*\*\s*([^\n]+(?:\n(?!\*)[^\n]+)*)/i);
+      const pitfallMatch = body.match(/(?:#{1,6}\s*|\*\s+)?\*{0,2}Examiner\s*(?:Pitfall|Trap)[^*:\n]*\*{0,2}[:\s]*([\s\S]*?)(?=\n#{1,6}|\n---|$)/i);
       if (pitfallMatch) {
-        instObj.examinerPitfall = pitfallMatch[1].trim();
+        instObj.examinerPitfall = pitfallMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
       }
 
       result.instruments.push(instObj);
@@ -282,6 +284,46 @@ export function parseLogbook(markdown) {
       result.mixStrategy.philosophy = rawPhilosophy.replace(/^\s*\*\s+/gm, '• ');
     }
 
+    // Check anywhere in Section 4 (prior to Master Bus) for Fader Hierarchy table if not found yet
+    const s45Idx = s4Text.search(/(?:####\s*4\.5|###\s*Section 4\.5|Master Bus Processing|Master Bus Signal Chain|Mastering & Final Limiting)/i);
+    const s4PreMaster = s45Idx !== -1 ? s4Text.substring(0, s45Idx) : s4Text;
+
+    if (result.mixStrategy.faderHierarchy.length === 0) {
+      const globalFaderMatch = s4PreMaster.match(/\|([^\n]*(?:stem|element|instrument)[^\n]*(?:fader|level|pan|placement)[^\n]*)\|\n\|[-| :]+\|\n((?:\|[^\n]+\|\n?)+)/i);
+      if (globalFaderMatch) {
+        const headerCells = globalFaderMatch[1].split('|').map(c => c.trim().toLowerCase()).filter(Boolean);
+        const stemIdx = headerCells.findIndex(h => h.includes('stem') || h.includes('element') || h.includes('instrument') || h.includes('track'));
+        const levelIdx = headerCells.findIndex(h => h.includes('fader') || h.includes('level') || h.includes('db'));
+        const panIdx = headerCells.findIndex(h => h.includes('pan') || h.includes('pos') || h.includes('stereo'));
+        const roleIdx = headerCells.findIndex(h => (h.includes('role') || h.includes('spectral') || h.includes('frequency') || h.includes('placement')) && !h.includes('spatial'));
+        const stagingIdx = headerCells.findIndex(h => h.includes('spatial') || h.includes('depth') || h.includes('reverb') || (h.includes('staging') && !h.includes('role')));
+
+        const rows = globalFaderMatch[2].trim().split('\n');
+        for (const row of rows) {
+          const cells = row.split('|').map(c => c.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+          if (cells.length >= 2) {
+            const element = stemIdx !== -1 && cells[stemIdx] ? cells[stemIdx] : cells[0];
+            const faderLevel = levelIdx !== -1 && cells[levelIdx] ? cells[levelIdx] : cells[1];
+            const pan = panIdx !== -1 && cells[panIdx] ? cells[panIdx] : (cells.length > 2 ? cells[2] : 'Center');
+            const role = roleIdx !== -1 && cells[roleIdx] ? cells[roleIdx] : (cells.length > 3 ? cells[3] : '');
+            const staging = stagingIdx !== -1 && cells[stagingIdx] ? cells[stagingIdx] : (cells.length > 4 ? cells[4] : '');
+
+            const dbMatch = faderLevel.match(/([-+]?\d+(?:\.\d+)?)/);
+            const dbNum = dbMatch ? parseFloat(dbMatch[1]) : 0;
+
+            result.mixStrategy.faderHierarchy.push({
+              element,
+              faderLevel,
+              dbNum,
+              pan,
+              role,
+              staging
+            });
+          }
+        }
+      }
+    }
+
     // Fallback: If faderHierarchy is still empty but trackTable exists, populate from trackTable
     if (result.mixStrategy.faderHierarchy.length === 0 && result.trackTable.length > 0) {
       result.trackTable.forEach(t => {
@@ -300,32 +342,65 @@ export function parseLogbook(markdown) {
     }
 
     // 2. Frequency Masking Management & Spectral Separation
-    const freqMatch = s4Text.match(/(?:Frequency Separation|Masking Management|Spectral Separation|Frequency Pocketing|Low-End Management)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Dynamic|\*\*Spatial|\*\*Master Bus|\*\*Master Limiting|$))/i);
+    const freqMatch = s4Text.match(/(?:####\s*4\.2[^\n]*|\bFrequency Masking Management[^\n]*|\bFrequency Separation[^\n]*)\n([\s\S]*?)(?=(?:####\s*4\.\d|###\s*Section\s*4\.\d|\n####\s*4|\n###\s*4|$))/i);
     if (freqMatch) {
       result.mixStrategy.frequencySeparation = freqMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
+    } else {
+      // Fallback
+      const legacyFreq = s4Text.match(/(?:Frequency Separation|Masking Management|Spectral Separation|Frequency Pocketing|Low-End Management)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Dynamic|\*\*Spatial|\*\*Master Bus|\*\*Master Limiting|$))/i);
+      if (legacyFreq) {
+        result.mixStrategy.frequencySeparation = legacyFreq[1].trim().replace(/^\s*\*\s+/gm, '• ');
+      }
     }
 
-    // 3. Dynamic Control, Mix Subgroups & Automation
-    const dynMatch = s4Text.match(/(?:Dynamic Control|Subgroup|Bus Processing|Subgroup Strategy|Sidechain)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Spatial|\*\*Master Bus|\*\*Master Limiting|$))/i);
-    if (dynMatch) {
-      result.mixStrategy.dynamicControl = dynMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
+    // 3. Dynamic Control, Mix Subgroups & Automation (Section 4.3)
+    const dynSecMatch = s4Text.match(/(?:####\s*4\.3[^\n]*|\bDynamic Control[^\n]*)\n([\s\S]*?)(?=(?:####\s*4\.\d|###\s*Section\s*4\.\d|\n####\s*4|\n###\s*4|$))/i);
+    if (dynSecMatch) {
+      const full43 = dynSecMatch[1].trim();
+      // Check if 4.3 contains automation subheading/bullet
+      const autoSplitIdx = full43.search(/(?:^|\n)(?:#{1,6}\s*|\*\s+\*\*|\*\*?)?(?:Mix Automation|Automation Strategy|Automation Passes|Fader Rides)/i);
+      if (autoSplitIdx !== -1) {
+        result.mixStrategy.dynamicControl = full43.substring(0, autoSplitIdx).trim().replace(/^\s*\*\s+/gm, '• ');
+        result.mixStrategy.automation = full43.substring(autoSplitIdx).trim().replace(/^\s*\*\s+/gm, '• ');
+      } else {
+        result.mixStrategy.dynamicControl = full43.replace(/^\s*\*\s+/gm, '• ');
+      }
+    } else {
+      // Fallback
+      const legacyDyn = s4Text.match(/(?:Dynamic Control|Subgroup|Bus Processing|Subgroup Strategy|Sidechain)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Spatial|\*\*Master Bus|\*\*Master Limiting|$))/i);
+      if (legacyDyn) {
+        result.mixStrategy.dynamicControl = legacyDyn[1].trim().replace(/^\s*\*\s+/gm, '• ');
+      }
     }
 
-    // 4. Spatial Depth & Time-Based FX
-    const spatMatch = s4Text.match(/(?:Spatial Depth|Time-Based FX|Reverb & Delay|Spatial Dimension|Front-to-Back)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Automation|\*\*Master Bus|\*\*Master Limiting|\|[^\n]+\|[-| :]+|$))/i);
+    // Clean any leaked fader table from dynamicControl
+    if (result.mixStrategy.dynamicControl && /\|[^\n]*(?:stem|element)[^\n]*\|/i.test(result.mixStrategy.dynamicControl)) {
+      result.mixStrategy.dynamicControl = result.mixStrategy.dynamicControl.replace(/\|[^\n]*(?:stem|element)[^\n]*\|\n\|[-| :]+\|\n(?:\|[^\n]+\|\n?)+/gi, '').trim();
+    }
+
+    // 4. Spatial Depth & Time-Based FX (Section 4.4)
+    const spatMatch = s4Text.match(/(?:####\s*4\.4[^\n]*|\bSpatial Depth[^\n]*)\n([\s\S]*?)(?=(?:####\s*4\.\d|###\s*Section\s*4\.\d|\n####\s*4|\n###\s*4|$))/i);
     if (spatMatch) {
       result.mixStrategy.spatialDepth = spatMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
+    } else {
+      // Fallback
+      const legacySpat = s4Text.match(/(?:Spatial Depth|Time-Based FX|Reverb & Delay|Spatial Dimension|Front-to-Back)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Automation|\*\*Master Bus|\*\*Master Limiting|\|[^\n]+\|[-| :]+|$))/i);
+      if (legacySpat) {
+        result.mixStrategy.spatialDepth = legacySpat[1].trim().replace(/^\s*\*\s+/gm, '• ');
+      }
     }
 
-    // 5. Automation Strategy
-    const autoMatch = s4Text.match(/(?:Automation Strategy|Mix Automation|Fader Rides)[^:\n]*:?\s*([\s\S]*?)(?=(?:###|\n####|\*\*4\.\d|\*\*Master Bus|\*\*Master Limiting|\|[^\n]+\|[-| :]+|$))/i);
-    if (autoMatch) {
-      result.mixStrategy.automation = autoMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
+    // 5. Automation Strategy (if not already extracted from Section 4.3)
+    if (!result.mixStrategy.automation) {
+      const autoMatch = s4Text.match(/(?:####\s*4\.\d\s+)?(?:Automation Strategy|Mix Automation|Fader Rides)[^:\n]*:?\s*([\s\S]*?)(?=(?:####\s*4\.\d|###\s*Section\s*4\.\d|\n####\s*4|\n###\s*4|$))/i);
+      if (autoMatch) {
+        result.mixStrategy.automation = autoMatch[1].trim().replace(/^\s*\*\s+/gm, '• ');
+      }
     }
 
     // 6. Master Bus Table (Search specifically within Section 4.5 to avoid collision with 4.1)
-    const s45Idx = s4Text.search(/(?:####\s*4\.5|###\s*Section 4\.5|Master Bus Processing|Master Bus Signal Chain|Mastering & Final Limiting)/i);
-    const s45Text = s45Idx !== -1 ? s4Text.substring(s45Idx) : s4Text;
+    const s45TableIdx = s4Text.search(/(?:####\s*4\.5|###\s*Section 4\.5|Master Bus Processing|Master Bus Signal Chain|Mastering & Final Limiting)/i);
+    const s45Text = s45TableIdx !== -1 ? s4Text.substring(s45TableIdx) : s4Text;
     const tableMatch = s45Text.match(/\|[^\n]+\|\n\|[-| :]+\|\n((?:\|[^\n]+\|\n?)+)/);
     if (tableMatch) {
       result.masterBus.table = [];

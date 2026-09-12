@@ -296,25 +296,25 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
               ${data.mixStrategy.frequencySeparation ? `
                 <div class="pdf-card" style="padding: 6px 10px;">
                   <div class="pdf-card-title" style="font-size: 8.5pt; color: #7c3aed;">Frequency Masking & Separation</div>
-                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.frequencySeparation}</p>
+                  ${data.mixStrategy.frequencySeparation.split('\n').map(l => l.trim()).filter(l => l && !(l.startsWith('|') && l.endsWith('|'))).map(l => `<p style="font-size: 7.2pt; line-height: 1.35; margin: 2.5px 0; color: #334155;">${l.replace(/^[•*-]\s*/, '• ').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')}</p>`).join('')}
                 </div>
               ` : ""}
               ${data.mixStrategy.dynamicControl ? `
                 <div class="pdf-card" style="padding: 6px 10px;">
                   <div class="pdf-card-title" style="font-size: 8.5pt; color: #d97706;">Dynamic Control & Subgroups</div>
-                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.dynamicControl}</p>
+                  ${data.mixStrategy.dynamicControl.split('\n').map(l => l.trim()).filter(l => l && !(l.startsWith('|') && l.endsWith('|'))).map(l => `<p style="font-size: 7.2pt; line-height: 1.35; margin: 2.5px 0; color: #334155;">${l.replace(/^[•*-]\s*/, '• ').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')}</p>`).join('')}
                 </div>
               ` : ""}
               ${data.mixStrategy.spatialDepth ? `
                 <div class="pdf-card" style="padding: 6px 10px;">
                   <div class="pdf-card-title" style="font-size: 8.5pt; color: #059669;">Spatial Depth & Time-Based FX</div>
-                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.spatialDepth}</p>
+                  ${data.mixStrategy.spatialDepth.split('\n').map(l => l.trim()).filter(l => l && !(l.startsWith('|') && l.endsWith('|'))).map(l => `<p style="font-size: 7.2pt; line-height: 1.35; margin: 2.5px 0; color: #334155;">${l.replace(/^[•*-]\s*/, '• ').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')}</p>`).join('')}
                 </div>
               ` : ""}
               ${data.mixStrategy.automation ? `
                 <div class="pdf-card" style="padding: 6px 10px; grid-column: span 2;">
                   <div class="pdf-card-title" style="font-size: 8.5pt; color: #db2777;">Automation Passes & Fader Rides</div>
-                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.automation}</p>
+                  ${data.mixStrategy.automation.split('\n').map(l => l.trim()).filter(l => l && !(l.startsWith('|') && l.endsWith('|'))).map(l => `<p style="font-size: 7.2pt; line-height: 1.35; margin: 2.5px 0; color: #334155;">${l.replace(/^[•*-]\s*/, '• ').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')}</p>`).join('')}
                 </div>
               ` : ""}
             </div>

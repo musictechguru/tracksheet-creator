@@ -91,6 +91,218 @@ export default function LogbookDossierView({ data, daw }) {
     return Math.max(14, Math.min(100, Math.round(((val + 12) / 12) * 86 + 14)));
   };
 
+  // Helper to parse embedded markdown table
+  const parseMarkdownTable = (text) => {
+    if (!text) return null;
+    const tableMatch = text.match(/\|([^\n]+)\|\n\|[-| :]+\|\n((?:\|[^\n]+\|\n?)+)/);
+    if (!tableMatch) return null;
+    
+    const headers = tableMatch[1].split('|').map(c => c.trim()).filter(Boolean);
+    const rows = tableMatch[2].trim().split('\n').map(row => 
+      row.split('|').map(c => c.trim()).filter((_, idx, arr) => idx > 0 && idx < arr.length - 1)
+    );
+
+    const beforeText = text.substring(0, tableMatch.index).trim();
+    const afterText = text.substring(tableMatch.index + tableMatch[0].length).trim();
+
+    return {
+      headers,
+      rows,
+      beforeText,
+      afterText
+    };
+  };
+
+  // Helper to highlight audio parameter tokens (frequencies, levels, ratios, times, BPM)
+  const renderFormattedAudioText = (rawStr) => {
+    if (!rawStr) return null;
+    const paramRegex = /([±+-]?\d+(?:\.\d+)?\s*(?:kHz|Hz|dBFS|dB|ms|s|BPM)|\b\d+(?:\.\d+)?:\d+\b|\b\d+\s*–\s*\d+\s*(?:kHz|Hz|dB)\b|\b\d+\s*to\s*\d+\s*(?:kHz|Hz|dB)\b)/gi;
+    const parts = rawStr.split(paramRegex);
+    return parts.map((part, idx) => {
+      if (part && paramRegex.test(part)) {
+        paramRegex.lastIndex = 0;
+        return <span key={idx} className="logbook-param-token">{part}</span>;
+      }
+      return part;
+    });
+  };
+
+  // Render structured mix strategy card content
+  const renderMixCardContent = (rawText, accentColor) => {
+    if (!rawText) return null;
+
+    const tableData = parseMarkdownTable(rawText);
+
+    const renderNarrativeBlocks = (content) => {
+      if (!content) return null;
+      const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+
+      return lines.map((line, idx) => {
+        const cleanLine = line.replace(/^[•*-]\s*/, '');
+
+        // Check for Markdown Subheading (e.g. ##### Subgroup Processing & Bus Glue)
+        const subheadMatch = cleanLine.match(/^#{1,6}\s+(.*)$/);
+        if (subheadMatch) {
+          const subheadTitle = subheadMatch[1].replace(/[*#]/g, '').trim();
+          return (
+            <div key={idx} className="logbook-mix-block" style={{ marginTop: idx > 0 ? '0.65rem' : '0' }}>
+              <span 
+                className="logbook-mix-subhead-pill" 
+                style={{ 
+                  background: `${accentColor}18`, 
+                  borderColor: `${accentColor}45`, 
+                  color: accentColor 
+                }}
+              >
+                {subheadTitle}
+              </span>
+            </div>
+          );
+        }
+
+        // Check for Bold Title bullet: e.g. **Low-End Management (Kick vs. Bass):** text
+        const boldTitleMatch = cleanLine.match(/^\*\*([^*]+)\*\*:?\s*(.*)$/);
+        if (boldTitleMatch) {
+          const title = boldTitleMatch[1].replace(/:$/, '').trim();
+          const desc = boldTitleMatch[2].trim();
+          return (
+            <div key={idx} className="logbook-mix-block">
+              <span 
+                className="logbook-mix-subhead-pill" 
+                style={{ 
+                  background: `${accentColor}18`, 
+                  borderColor: `${accentColor}45`, 
+                  color: accentColor 
+                }}
+              >
+                {title}
+              </span>
+              {desc && (
+                <p className="logbook-mix-block-text">
+                  {renderFormattedAudioText(desc)}
+                </p>
+              )}
+            </div>
+          );
+        }
+
+        // Check for Numbered Step item: e.g. 1. *Drums Subgroup:* text or 1. **Drums Subgroup:** text
+        const numStepMatch = cleanLine.match(/^(\d+)\.\s*(?:\*\*|\*)?([^*:]+)(?:\*\*|\*)?:?\s*(.*)$/);
+        if (numStepMatch) {
+          const num = numStepMatch[1];
+          const stepTitle = numStepMatch[2].trim();
+          const stepDesc = numStepMatch[3].trim();
+          return (
+            <div key={idx} className="logbook-mix-step-item">
+              <span 
+                className="logbook-mix-step-num"
+                style={{ background: `${accentColor}25`, borderColor: `${accentColor}55`, color: accentColor }}
+              >
+                {num}
+              </span>
+              <div className="logbook-mix-step-content">
+                <strong className="logbook-mix-step-title">{stepTitle}</strong>
+                {stepDesc && (
+                  <span className="logbook-mix-block-text">
+                    {renderFormattedAudioText(stepDesc)}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        // Check for Italic Stem bullet: e.g. *Lead Vocal:* text
+        const stemMatch = cleanLine.match(/^\*([^*]+)\*:?\s*(.*)$/);
+        if (stemMatch) {
+          const stemName = stemMatch[1].replace(/:$/, '').trim();
+          const stemDesc = stemMatch[2].trim();
+          return (
+            <div key={idx} className="logbook-mix-stem-row">
+              <span className="logbook-mix-stem-pill">{stemName}</span>
+              <span className="logbook-mix-block-text">
+                {renderFormattedAudioText(stemDesc)}
+              </span>
+            </div>
+          );
+        }
+
+        // Standard paragraph
+        return (
+          <p key={idx} className="logbook-mix-block-text" style={{ margin: '0.2rem 0' }}>
+            {renderFormattedAudioText(cleanLine.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1'))}
+          </p>
+        );
+      });
+    };
+
+    return (
+      <>
+        {tableData?.beforeText && renderNarrativeBlocks(tableData.beforeText)}
+
+        {tableData && (
+          <div className="table-wrapper" style={{ margin: '0.5rem 0', borderRadius: '8px' }}>
+            <table className="logbook-master-table" style={{ fontSize: '0.78rem' }}>
+              <thead>
+                <tr>
+                  {tableData.headers.map((th, hIdx) => (
+                    <th key={hIdx} style={{ padding: '6px 8px' }}>{th}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.rows.map((rowCells, rIdx) => (
+                  <tr key={rIdx}>
+                    {rowCells.map((cell, cIdx) => {
+                      const dbMatch = cell.match(/([-+]?\d+(?:\.\d+)?)\s*dB/i);
+                      if (dbMatch) {
+                        const dbVal = parseFloat(dbMatch[1]);
+                        const theme = getFaderTheme(dbVal);
+                        return (
+                          <td key={cIdx} style={{ textAlign: 'center', padding: '5px 8px' }}>
+                            <span 
+                              className="logbook-fader-badge" 
+                              style={{ background: theme.badgeBg, borderColor: theme.border, color: theme.text, fontSize: '0.7rem' }}
+                            >
+                              {cell}
+                            </span>
+                          </td>
+                        );
+                      }
+                      if (/center|pan\s*\d|hard\s*[lr]/i.test(cell) && cell.length < 25) {
+                        return (
+                          <td key={cIdx} style={{ textAlign: 'center', padding: '5px 8px' }}>
+                            <span className="logbook-pan-pill" style={{ fontSize: '0.7rem' }}>{cell}</span>
+                          </td>
+                        );
+                      }
+                      if (cIdx === 0) {
+                        return (
+                          <td key={cIdx} style={{ padding: '5px 8px' }}>
+                            <strong style={{ color: '#F8FAFC' }}>{cell}</strong>
+                          </td>
+                        );
+                      }
+                      return (
+                        <td key={cIdx} style={{ padding: '5px 8px', color: '#CBD5E1' }}>
+                          {renderFormattedAudioText(cell)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {tableData?.afterText && renderNarrativeBlocks(tableData.afterText)}
+
+        {!tableData && renderNarrativeBlocks(rawText)}
+      </>
+    );
+  };
+
   // Helper to determine the specific capture pathway being used from the track list
   const getSelectedCaptureSolution = (inst) => {
     if (!inst) return null;
@@ -115,26 +327,26 @@ export default function LogbookDossierView({ data, daw }) {
 
     const norm = pathwayStr.toLowerCase();
 
-    // Determine Pathway 1, 2, or 3
-    if (norm.includes('pathway 1') || norm.includes('acoustic') || norm.includes('mic') || norm.includes('p1')) {
+    // Determine Pathway 1, 2, or 3 with precise boundary checks
+    if (norm.includes('pathway 1') || /\bp1\b/.test(norm) || norm.includes('acoustic') || norm.includes('microphone')) {
       return {
         num: 1,
         title: 'Pathway 1: Acoustic / Microphone Capture',
         body: inst.pathway1 || inst.pathway2 || inst.pathway3
       };
     }
-    if (norm.includes('pathway 2') || norm.includes('direct') || norm.includes('di') || norm.includes('line') || norm.includes('p2')) {
-      return {
-        num: 2,
-        title: 'Pathway 2: Direct Injection (DI) & Line Input',
-        body: inst.pathway2 || inst.pathway1 || inst.pathway3
-      };
-    }
-    if (norm.includes('pathway 3') || norm.includes('midi') || norm.includes('software') || norm.includes('audio instrument') || norm.includes('p3')) {
+    if (norm.includes('pathway 3') || /\bp3\b/.test(norm) || norm.includes('midi') || norm.includes('software instrument') || norm.includes('audio instrument')) {
       return {
         num: 3,
         title: 'Pathway 3: Audio Instruments & MIDI',
         body: inst.pathway3 || inst.pathway2 || inst.pathway1
+      };
+    }
+    if (norm.includes('pathway 2') || /\bp2\b/.test(norm) || norm.includes('direct injection') || /\bdi\b/.test(norm) || norm.includes('line input')) {
+      return {
+        num: 2,
+        title: 'Pathway 2: Direct Injection (DI) & Line Input',
+        body: inst.pathway2 || inst.pathway1 || inst.pathway3
       };
     }
 
@@ -309,10 +521,48 @@ export default function LogbookDossierView({ data, daw }) {
                             ✓ Official C1 Submission
                           </span>
                         </div>
-                        <div className="logbook-p-body" style={{ fontSize: '0.9rem', lineHeight: '1.7' }}>
-                          {selected.body.split('\n').map((line, lIdx) => (
-                            <p key={lIdx} style={{ margin: '0.4rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                          ))}
+                        <div className="logbook-p-body" style={{ fontSize: '0.88rem', lineHeight: '1.65', padding: '1rem' }}>
+                          {selected.body.split('\n').map((line, lIdx) => {
+                            const trimmed = line.trim();
+                            if (!trimmed) return null;
+                            const clean = trimmed.replace(/^[•*-]\s*/, '');
+                            
+                            // Check for Bold Title bullet: e.g. **Transducer Category & Model:** text
+                            const boldBulletMatch = clean.match(/^\*\*([^*]+)\*\*:?\s*(.*)$/);
+                            if (boldBulletMatch) {
+                              const bTitle = boldBulletMatch[1].replace(/:$/, '').trim();
+                              const bDesc = boldBulletMatch[2].trim();
+                              return (
+                                <div key={lIdx} style={{ margin: '0.5rem 0', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                                  <span style={{ color: selected.num === 1 ? '#38BDF8' : selected.num === 2 ? '#FBBF24' : '#C084FC', fontWeight: 700, fontSize: '0.82rem', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                                    {bTitle}
+                                  </span>
+                                  {bDesc && (
+                                    <p style={{ margin: 0, color: '#E2E8F0' }}>
+                                      {renderFormattedAudioText(bDesc)}
+                                    </p>
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            // Subhead check
+                            if (/^#{1,6}\s+/.test(clean)) {
+                              return (
+                                <div key={lIdx} style={{ margin: '0.6rem 0 0.3rem 0' }}>
+                                  <strong style={{ color: '#F8FAFC', fontSize: '0.9rem' }}>
+                                    {clean.replace(/^#{1,6}\s+/, '')}
+                                  </strong>
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <p key={lIdx} style={{ margin: '0.35rem 0', color: '#CBD5E1' }}>
+                                {renderFormattedAudioText(clean)}
+                              </p>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
@@ -526,8 +776,13 @@ export default function LogbookDossierView({ data, daw }) {
                                   {item.pan || 'Center (0)'}
                                 </span>
                               </div>
-                              <div className="logbook-fader-col-role">
-                                <span className="logbook-role-text">{item.role || item.staging || 'Mix Element'}</span>
+                              <div 
+                                className="logbook-fader-col-role"
+                                title={[item.role, item.staging && item.staging !== 'Mix Staging' && item.staging !== item.role ? item.staging : null].filter(Boolean).join(' • ') || item.role || item.staging || 'Mix Element'}
+                              >
+                                <span className="logbook-role-text">
+                                  {[item.role, item.staging && item.staging !== 'Mix Staging' && item.staging !== item.role ? item.staging : null].filter(Boolean).join(' • ') || item.role || item.staging || 'Mix Element'}
+                                </span>
                               </div>
                             </div>
                           );
@@ -591,57 +846,77 @@ export default function LogbookDossierView({ data, daw }) {
               <div className="logbook-mix-grid" style={{ marginTop: '1.25rem' }}>
 
                 {mixStrategy.frequencySeparation && (
-                  <div className="logbook-mix-card">
+                  <div className="logbook-mix-card" style={{ borderColor: 'rgba(192, 132, 252, 0.28)' }}>
                     <div className="logbook-mix-card-header">
-                      <Activity size={15} color="#C084FC" />
-                      <span>Frequency Masking Management & Spectral Separation</span>
+                      <div className="logbook-mix-card-title-group">
+                        <div className="logbook-mix-card-icon-wrap" style={{ background: 'rgba(192, 132, 252, 0.15)', borderColor: 'rgba(192, 132, 252, 0.4)' }}>
+                          <Activity size={16} color="#C084FC" />
+                        </div>
+                        <span className="logbook-mix-card-title">Frequency Masking Management & Spectral Separation</span>
+                      </div>
+                      <span className="logbook-mix-card-tag" style={{ background: 'rgba(192, 132, 252, 0.12)', color: '#C084FC', borderColor: 'rgba(192, 132, 252, 0.3)' }}>
+                        EQ & Pocketing
+                      </span>
                     </div>
                     <div className="logbook-mix-card-body">
-                      {mixStrategy.frequencySeparation.split('\n').map((line, idx) => (
-                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                      ))}
+                      {renderMixCardContent(mixStrategy.frequencySeparation, '#C084FC')}
                     </div>
                   </div>
                 )}
 
                 {mixStrategy.dynamicControl && (
-                  <div className="logbook-mix-card">
+                  <div className="logbook-mix-card" style={{ borderColor: 'rgba(251, 191, 36, 0.28)' }}>
                     <div className="logbook-mix-card-header">
-                      <Volume2 size={15} color="#FBBF24" />
-                      <span>Dynamic Control, Mix Subgroups & Bus Glue</span>
+                      <div className="logbook-mix-card-title-group">
+                        <div className="logbook-mix-card-icon-wrap" style={{ background: 'rgba(251, 191, 36, 0.15)', borderColor: 'rgba(251, 191, 36, 0.4)' }}>
+                          <Volume2 size={16} color="#FBBF24" />
+                        </div>
+                        <span className="logbook-mix-card-title">Dynamic Control, Mix Subgroups & Bus Glue</span>
+                      </div>
+                      <span className="logbook-mix-card-tag" style={{ background: 'rgba(251, 191, 36, 0.12)', color: '#FBBF24', borderColor: 'rgba(251, 191, 36, 0.3)' }}>
+                        VCA & Subgroups
+                      </span>
                     </div>
                     <div className="logbook-mix-card-body">
-                      {mixStrategy.dynamicControl.split('\n').map((line, idx) => (
-                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                      ))}
+                      {renderMixCardContent(mixStrategy.dynamicControl, '#FBBF24')}
                     </div>
                   </div>
                 )}
 
                 {mixStrategy.spatialDepth && (
-                  <div className="logbook-mix-card">
+                  <div className="logbook-mix-card" style={{ borderColor: 'rgba(52, 211, 153, 0.28)' }}>
                     <div className="logbook-mix-card-header">
-                      <Disc size={15} color="#34D399" />
-                      <span>Spatial Depth & Time-Based FX Architecture</span>
+                      <div className="logbook-mix-card-title-group">
+                        <div className="logbook-mix-card-icon-wrap" style={{ background: 'rgba(52, 211, 153, 0.15)', borderColor: 'rgba(52, 211, 153, 0.4)' }}>
+                          <Disc size={16} color="#34D399" />
+                        </div>
+                        <span className="logbook-mix-card-title">Spatial Depth & Time-Based FX Architecture</span>
+                      </div>
+                      <span className="logbook-mix-card-tag" style={{ background: 'rgba(52, 211, 153, 0.12)', color: '#34D399', borderColor: 'rgba(52, 211, 153, 0.3)' }}>
+                        Reverb & Delays
+                      </span>
                     </div>
                     <div className="logbook-mix-card-body">
-                      {mixStrategy.spatialDepth.split('\n').map((line, idx) => (
-                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                      ))}
+                      {renderMixCardContent(mixStrategy.spatialDepth, '#34D399')}
                     </div>
                   </div>
                 )}
 
                 {mixStrategy.automation && (
-                  <div className="logbook-mix-card">
+                  <div className="logbook-mix-card" style={{ borderColor: 'rgba(244, 114, 182, 0.28)' }}>
                     <div className="logbook-mix-card-header">
-                      <Zap size={15} color="#F472B6" />
-                      <span>Mix Automation Passes & Dynamic Rides</span>
+                      <div className="logbook-mix-card-title-group">
+                        <div className="logbook-mix-card-icon-wrap" style={{ background: 'rgba(244, 114, 182, 0.15)', borderColor: 'rgba(244, 114, 182, 0.4)' }}>
+                          <Zap size={16} color="#F472B6" />
+                        </div>
+                        <span className="logbook-mix-card-title">Mix Automation Passes & Dynamic Rides</span>
+                      </div>
+                      <span className="logbook-mix-card-tag" style={{ background: 'rgba(244, 114, 182, 0.12)', color: '#F472B6', borderColor: 'rgba(244, 114, 182, 0.3)' }}>
+                        Fader Passes
+                      </span>
                     </div>
                     <div className="logbook-mix-card-body">
-                      {mixStrategy.automation.split('\n').map((line, idx) => (
-                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                      ))}
+                      {renderMixCardContent(mixStrategy.automation, '#F472B6')}
                     </div>
                   </div>
                 )}

@@ -9,7 +9,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './App.css';
-import { TRACKSHEET_ACTIVITY_PHRASES, DAW_ACTIVITY_PHRASES } from './activityPhrases';
+import { TRACKSHEET_ACTIVITY_PHRASES, DAW_ACTIVITY_PHRASES, getSolutionEngineeringPhrases } from './activityPhrases';
 import DossierView from './components/DossierView';
 import LogbookDossierView from './components/LogbookDossierView';
 import { parseHistoricalTracksheet } from './tracksheetParser';
@@ -83,23 +83,25 @@ function shuffleArray(array) {
   return arr;
 }
 
-function ActivityTypewriter({ phrases, shuffle = false }) {
-  const [deck, setDeck] = useState(() => (shuffle && phrases ? shuffleArray(phrases) : (phrases || [])));
+function ActivityTypewriter({ phrases, shuffle = false, getFreshPhrases = null }) {
+  const [prevPhrases, setPrevPhrases] = useState(phrases);
+  const [deck, setDeck] = useState(() => {
+    const initial = getFreshPhrases ? getFreshPhrases() : phrases;
+    return shuffle && initial ? shuffleArray(initial) : (initial || []);
+  });
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // When phrases prop changes (e.g. search restarted), reset deck with fresh non-repeating shuffle
-  useEffect(() => {
-    if (!phrases || phrases.length === 0) {
-      setDeck([]);
-      return;
-    }
-    setDeck(shuffle ? shuffleArray(phrases) : [...phrases]);
+  // When phrases prop changes (e.g. solution regenerated or search restarted), reset deck cleanly
+  if (phrases !== prevPhrases) {
+    setPrevPhrases(phrases);
+    const current = getFreshPhrases ? getFreshPhrases() : phrases;
+    setDeck(shuffle && current ? shuffleArray(current) : (current || []));
     setPhraseIdx(0);
     setDisplayText('');
     setIsDeleting(false);
-  }, [phrases, shuffle]);
+  }
 
   useEffect(() => {
     if (!deck || deck.length === 0) return;
@@ -132,10 +134,17 @@ function ActivityTypewriter({ phrases, shuffle = false }) {
           setIsDeleting(false);
           setPhraseIdx((prev) => {
             const next = prev + 1;
-            // When full 200 deck has played without repeating, reshuffle if shuffle enabled
-            if (next >= deck.length && shuffle) {
-              setDeck(shuffleArray(phrases));
-              return 0;
+            // When full deck has played without repeating, obtain fresh phrases if provider given, or reshuffle
+            if (next >= deck.length) {
+              if (getFreshPhrases) {
+                const fresh = getFreshPhrases();
+                setDeck(shuffle ? shuffleArray(fresh) : fresh);
+                return 0;
+              }
+              if (shuffle) {
+                setDeck(shuffleArray(phrases));
+                return 0;
+              }
             }
             return next % deck.length;
           });
@@ -144,7 +153,7 @@ function ActivityTypewriter({ phrases, shuffle = false }) {
     }
 
     return () => clearTimeout(timer);
-  }, [displayText, isDeleting, phraseIdx, deck, shuffle, phrases]);
+  }, [displayText, isDeleting, phraseIdx, deck, shuffle, phrases, getFreshPhrases]);
 
   return (
     <span className="typewriter-container">
@@ -166,6 +175,7 @@ function App() {
   const [selectedDaw, setSelectedDaw] = useState('Logic Pro');
   const [c1Solutions, setC1Solutions] = useState([]);
   const [c1Loading, setC1Loading] = useState(false);
+  const [c1Phrases, setC1Phrases] = useState([]);
   const [activeTab, setActiveTab] = useState('tracksheet'); // 'tracksheet' or 'c1'
   const [copyNotification, setCopyNotification] = useState('');
 
@@ -479,6 +489,9 @@ function App() {
     const dawToUse = dawOverride || selectedDaw;
     if (!currentTrackId && !result) return;
 
+    // Generate fresh engineering phrases with random order and newly selected/procedural ones every time
+    const freshPhrases = getSolutionEngineeringPhrases(dawToUse, { trackName, artistName });
+    setC1Phrases(freshPhrases);
     setC1Loading(true);
 
     try {
@@ -1142,7 +1155,11 @@ function App() {
                       {selectedDaw} LOGBOOK ENGINEERING MONITOR
                     </span>
                     <div className="activity-phrase-container">
-                      <ActivityTypewriter phrases={DAW_ACTIVITY_PHRASES[selectedDaw] || DAW_ACTIVITY_PHRASES['Logic Pro']} />
+                      <ActivityTypewriter 
+                        phrases={c1Phrases.length > 0 ? c1Phrases : getSolutionEngineeringPhrases(selectedDaw, { trackName, artistName })} 
+                        shuffle={true} 
+                        getFreshPhrases={() => getSolutionEngineeringPhrases(selectedDaw, { trackName, artistName })}
+                      />
                     </div>
                   </div>
                 </div>
