@@ -63,11 +63,13 @@ export function parseHistoricalTracksheet(markdown) {
 
     musicology: {
       formBreakdown: [],
+      formSections: [],
       key: '',
       tempo: '',
       bpm: '',
       timeSignature: '4/4',
-      arrangementTechniques: ''
+      arrangementTechniques: '',
+      arrangementPoints: []
     },
 
     mixdown: {
@@ -253,23 +255,29 @@ export function parseHistoricalTracksheet(markdown) {
     // SECTION 4: Musical & Structural Analysis
     else if (currentSection === 4) {
       const isIndented = /^\s{2,}\*/.test(line);
-      const bulletMatch = trimmed.match(/^\*\s+\*\*([^*]+)\*\*\s*(.*)$/);
+      const bulletMatch = trimmed.match(/^\*\s+(?:\*\*([^*]+)\*\*|\*([^*]+)\*)\s*(.*)$/);
 
       if (bulletMatch && !isIndented) {
-        const key = bulletMatch[1].replace(/:$/, '').trim().toLowerCase();
-        const rawVal = bulletMatch[2].replace(/^:\s*/, '').trim();
+        const rawHeading = (bulletMatch[1] || bulletMatch[2]).replace(/:$/, '').trim().toLowerCase();
+        const rawVal = bulletMatch[3].replace(/^:\s*/, '').trim();
         const parsed = extractScoreAndSource(rawVal);
         if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
 
-        if (key.includes('form') || key.includes('structure')) {
+        if (rawHeading.includes('form') || rawHeading.includes('structure')) {
           currentMusicologyField = 'form';
           if (parsed.value) {
             const parts = parsed.value.split(/->|→/).map(p => p.trim()).filter(Boolean);
             if (parts.length > 0) {
               result.musicology.formBreakdown = parts;
+              result.musicology.formSections = parts.map(p => ({
+                title: p,
+                description: '',
+                score: parsed.score || '',
+                source: parsed.source || ''
+              }));
             }
           }
-        } else if (key.includes('key') || key.includes('tempo') || key.includes('modulation')) {
+        } else if (rawHeading.includes('key') || rawHeading.includes('tempo') || rawHeading.includes('modulation')) {
           currentMusicologyField = 'key_tempo';
           if (parsed.value) {
             const text = parsed.value;
@@ -286,7 +294,7 @@ export function parseHistoricalTracksheet(markdown) {
             const timeMatch = text.match(/(\d\/\d)/);
             if (timeMatch) result.musicology.timeSignature = timeMatch[1];
           }
-        } else if (key.includes('arrangement') || key.includes('production')) {
+        } else if (rawHeading.includes('arrangement') || rawHeading.includes('production')) {
           currentMusicologyField = 'arrangement';
           if (parsed.value) {
             result.musicology.arrangementTechniques = parsed.value;
@@ -295,25 +303,32 @@ export function parseHistoricalTracksheet(markdown) {
           currentMusicologyField = null;
         }
       } else if (bulletMatch && isIndented && currentMusicologyField) {
-        // Sub-bullet under an active Section 4 heading
-        const subKey = bulletMatch[1].replace(/:$/, '').trim();
-        const subRawVal = bulletMatch[2].replace(/^:\s*/, '').trim();
+        // Sub-bullet under an active Section 4 heading (supports both **Bold:** and *Italic:*)
+        const subKey = (bulletMatch[1] || bulletMatch[2]).replace(/:$/, '').trim();
+        const subRawVal = bulletMatch[3].replace(/^:\s*/, '').trim();
         const parsed = extractScoreAndSource(subRawVal);
         if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
 
         if (currentMusicologyField === 'form') {
-          // Format as "Intro (0:00 - 0:13)" or clean title
           const label = subKey || parsed.value;
           if (label && !result.musicology.formBreakdown.includes(label)) {
             result.musicology.formBreakdown.push(label);
+            result.musicology.formSections.push({
+              title: label,
+              description: parsed.value || '',
+              score: parsed.score || '',
+              source: parsed.source || ''
+            });
           }
         } else if (currentMusicologyField === 'key_tempo') {
           const combined = `${subKey}: ${parsed.value}`;
-          const keyMatch = combined.match(/(?:Root Key of|Key of|Key:?)\s*([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
-          if (keyMatch && !result.musicology.key) result.musicology.key = keyMatch[1].trim();
-          else if (!result.musicology.key && subKey.toLowerCase().includes('key') && parsed.value) {
-            const directKey = parsed.value.match(/([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
+          const keyMatch = combined.match(/(?:Root Key of|Key of|\bKey:\s*)([A-G][b#]?(?:-flat|-sharp)?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
+          if (keyMatch && !result.musicology.key) {
+            result.musicology.key = keyMatch[1].trim();
+          } else if (!result.musicology.key && subKey.toLowerCase().trim() === 'key' && parsed.value) {
+            const directKey = parsed.value.match(/^([A-G][b#]?(?:-flat|-sharp)?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
             if (directKey) result.musicology.key = directKey[1].trim();
+            else result.musicology.key = parsed.value.split('.')[0].split('(')[0].trim();
           }
 
           const bpmMatch = combined.match(/(\d{2,3})\s*BPM/i);
@@ -325,10 +340,18 @@ export function parseHistoricalTracksheet(markdown) {
           const timeMatch = combined.match(/(\d\/\d)/);
           if (timeMatch) result.musicology.timeSignature = timeMatch[1];
         } else if (currentMusicologyField === 'arrangement') {
-          const phrase = subKey ? `${subKey}: ${parsed.value}` : parsed.value;
-          if (phrase) {
+          const title = subKey || '';
+          const desc = parsed.value || '';
+          if (title || desc) {
+            result.musicology.arrangementPoints.push({
+              title,
+              description: desc,
+              score: parsed.score || '',
+              source: parsed.source || ''
+            });
+            const phrase = title ? `${title}: ${desc}` : desc;
             result.musicology.arrangementTechniques = result.musicology.arrangementTechniques
-              ? `${result.musicology.arrangementTechniques} ${phrase}`
+              ? `${result.musicology.arrangementTechniques}\n\n${phrase}`
               : phrase;
           }
         }

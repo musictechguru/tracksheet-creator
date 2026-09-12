@@ -148,30 +148,101 @@ export default function DossierView({ data }) {
             <span className="dossier-section-pill">{musicology.formBreakdown.length} Sections</span>
           </div>
 
+          {/* Interactive Form Timeline */}
           <div className="dossier-form-timeline">
-            {musicology.formBreakdown.map((sec, idx) => (
-              <div 
-                key={idx} 
-                className={`dossier-form-step ${selectedSectionIdx === idx ? 'active' : ''}`}
-                onClick={() => setSelectedSectionIdx(selectedSectionIdx === idx ? null : idx)}
-              >
-                <span className="dossier-form-step-num">0{idx + 1}</span>
-                <span className="dossier-form-step-name">{sec}</span>
-                {idx < musicology.formBreakdown.length - 1 && (
-                  <ChevronRight size={14} className="dossier-form-step-arrow" />
-                )}
-              </div>
-            ))}
+            {musicology.formBreakdown.map((sec, idx) => {
+              const secDetail = musicology.formSections && musicology.formSections[idx];
+              const hasDetail = secDetail && secDetail.description;
+              return (
+                <div 
+                  key={idx} 
+                  className={`dossier-form-step ${selectedSectionIdx === idx ? 'active' : ''} ${hasDetail ? 'has-detail' : ''}`}
+                  onClick={() => setSelectedSectionIdx(selectedSectionIdx === idx ? null : idx)}
+                  title={hasDetail ? "Click to view musical analysis & timing breakdown" : undefined}
+                >
+                  <span className="dossier-form-step-num">0{idx + 1}</span>
+                  <span className="dossier-form-step-name">{sec}</span>
+                  {idx < musicology.formBreakdown.length - 1 && (
+                    <ChevronRight size={14} className="dossier-form-step-arrow" />
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {musicology.arrangementTechniques && (
+          {/* Selected Section Forensic Detail Card (Revealed on click) */}
+          {selectedSectionIdx !== null && musicology.formSections && musicology.formSections[selectedSectionIdx] && (
+            <div className="dossier-section-detail-box">
+              <div className="dossier-section-detail-head">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span className="dossier-step-pill">SECTION 0{selectedSectionIdx + 1}</span>
+                  <h4 className="dossier-step-title">{musicology.formSections[selectedSectionIdx].title}</h4>
+                </div>
+                {musicology.formSections[selectedSectionIdx].score && (
+                  <span className="dossier-score-badge">Reliability: {musicology.formSections[selectedSectionIdx].score}</span>
+                )}
+              </div>
+              {musicology.formSections[selectedSectionIdx].description ? (
+                <p className="dossier-step-desc">{musicology.formSections[selectedSectionIdx].description}</p>
+              ) : (
+                <p className="dossier-step-desc" style={{ color: '#94A3B8', fontStyle: 'italic' }}>
+                  Form section documented as part of the commercial master arrangement timeline.
+                </p>
+              )}
+              {musicology.formSections[selectedSectionIdx].source && (
+                <span className="dossier-spec-source">Source: {musicology.formSections[selectedSectionIdx].source}</span>
+              )}
+            </div>
+          )}
+
+          {/* Complete Breakdown of All Sections */}
+          {musicology.formSections && musicology.formSections.some(s => s.description) && (
+            <div className="dossier-all-sections-grid">
+              <div className="dossier-box-label" style={{ marginBottom: '0.65rem' }}>
+                <Layers size={14} color="#38BDF8" /> SECTION-BY-SECTION ARRANGEMENT FORENSICS & TIMINGS
+              </div>
+              <div className="dossier-section-cards-list">
+                {musicology.formSections.filter(s => s.description).map((sec, idx) => (
+                  <div key={idx} className="dossier-section-subcard">
+                    <div className="dossier-subcard-head">
+                      <strong className="dossier-subcard-title">{sec.title}</strong>
+                      {sec.score && <span className="dossier-score-badge">{sec.score}</span>}
+                    </div>
+                    <p className="dossier-subcard-body">{sec.description}</p>
+                    {sec.source && <span className="dossier-spec-source">Source: {sec.source}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Production & Arrangement Forensics */}
+          {musicology.arrangementPoints && musicology.arrangementPoints.length > 0 ? (
+            <div className="dossier-arrangement-box">
+              <div className="dossier-box-label" style={{ marginBottom: '0.75rem' }}>
+                <Radio size={14} color="#C084FC" /> PRODUCTION & ARRANGEMENT SIGNATURES ({musicology.arrangementPoints.length} FORENSIC PILLARS)
+              </div>
+              <div className="dossier-arrangement-grid">
+                {musicology.arrangementPoints.map((pt, idx) => (
+                  <div key={idx} className="dossier-arrangement-card">
+                    <div className="dossier-arr-title">
+                      <strong>{pt.title}</strong>
+                      {pt.score && <span className="dossier-score-badge">{pt.score}</span>}
+                    </div>
+                    <p className="dossier-arr-desc">{pt.description}</p>
+                    {pt.source && <span className="dossier-spec-source">Source: {pt.source}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : musicology.arrangementTechniques ? (
             <div className="dossier-arrangement-box">
               <div className="dossier-box-label">
                 <Radio size={14} color="#C084FC" /> PRODUCTION & ARRANGEMENT FORENSICS
               </div>
               <p className="dossier-box-text">{musicology.arrangementTechniques}</p>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 

@@ -442,7 +442,7 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                   <div style="font-size: 8pt; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;">
                     🎼 Musical Form & Structural Arrangement Roadmap (${data.musicology.formBreakdown.length} Sections):
                   </div>
-                  <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px;">
                     ${data.musicology.formBreakdown.map((sec, idx) => `
                       <span style="display: inline-flex; align-items: center; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 2px 6px; font-size: 7.2pt; color: #0369a1; font-weight: 600;">
                         <strong style="color: #0284c7; margin-right: 4px;">0${idx + 1}</strong> ${sec}
@@ -450,9 +450,31 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                       ${idx < data.musicology.formBreakdown.length - 1 ? `<span style="color: #94a3b8; font-size: 7.5pt; margin: 0 1px;">➔</span>` : ""}
                     `).join("")}
                   </div>
+                  ${data.musicology.formSections && data.musicology.formSections.some(s => s.description) ? `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px;">
+                      ${data.musicology.formSections.filter(s => s.description).map(s => `
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; font-size: 7.2pt;">
+                          <strong style="color: #0369a1;">${s.title}</strong>
+                          <p style="margin: 2px 0 0 0; color: #334155; line-height: 1.35;">${s.description}</p>
+                        </div>
+                      `).join("")}
+                    </div>
+                  ` : ""}
                 </div>
               ` : ""}
-              ${data.musicology.arrangementTechniques ? `
+              ${data.musicology.arrangementPoints && data.musicology.arrangementPoints.length > 0 ? `
+                <div style="margin-top: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 0.6rem;">
+                  <strong style="font-size: 8pt; color: #475569; text-transform: uppercase;">Arrangement & Production Signatures:</strong>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 4px;">
+                    ${data.musicology.arrangementPoints.map(pt => `
+                      <div style="background: #faf5ff; border: 1px solid #f3e8ff; border-radius: 4px; padding: 4px 6px; font-size: 7.2pt;">
+                        <strong style="color: #7e22ce;">${pt.title}</strong>
+                        <p style="margin: 2px 0 0 0; color: #3b0764; line-height: 1.35;">${pt.description}</p>
+                      </div>
+                    `).join("")}
+                  </div>
+                </div>
+              ` : data.musicology.arrangementTechniques ? `
                 <div style="margin-top: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 0.6rem;">
                   <strong style="font-size: 8pt; color: #475569;">Arrangement & Production Signatures:</strong>
                   <p style="margin: 0.25rem 0 0 0; font-size: 8.2pt; line-height: 1.45; color: #1e293b;">${data.musicology.arrangementTechniques}</p>
