@@ -636,15 +636,15 @@ app.post('/api/tracksheets/generate', async (req, res) => {
     let generatedContent = "";
     try {
       const primaryModel = genAI.getGenerativeModel({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-3.6-flash",
         systemInstruction: SYSTEM_PROMPT,
       });
       const result = await primaryModel.generateContent(prompt);
       generatedContent = result.response.text();
     } catch (primaryErr) {
-      console.warn("Primary model (gemini-3.1-pro-preview) error, falling back to gemini-3.6-flash:", primaryErr.message);
+      console.warn("Primary model (gemini-3.6-flash) error, trying gemini-3.1-pro-preview:", primaryErr.message);
       const fallbackModel = genAI.getGenerativeModel({
-        model: "gemini-3.6-flash",
+        model: "gemini-3.1-pro-preview",
         systemInstruction: SYSTEM_PROMPT,
       });
       const result = await fallbackModel.generateContent(prompt);
@@ -756,15 +756,15 @@ app.post('/api/tracksheets/:id/c1', async (req, res) => {
       let c1Content = "";
       try {
         const primaryModel = genAI.getGenerativeModel({
-          model: "gemini-3.1-pro-preview",
+          model: "gemini-3.6-flash",
           systemInstruction,
         });
         const result = await primaryModel.generateContent(prompt);
         c1Content = result.response.text();
       } catch (primaryErr) {
-        console.warn("Primary model (gemini-3.1-pro-preview) error, falling back to gemini-3.6-flash:", primaryErr.message);
+        console.warn("Primary model (gemini-3.6-flash) error, trying gemini-3.1-pro-preview:", primaryErr.message);
         const fallbackModel = genAI.getGenerativeModel({
-          model: "gemini-3.6-flash",
+          model: "gemini-3.1-pro-preview",
           systemInstruction,
         });
         const result = await fallbackModel.generateContent(prompt);
