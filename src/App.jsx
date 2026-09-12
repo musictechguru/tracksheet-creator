@@ -477,15 +477,20 @@ function App() {
 
   const handleGenerateC1 = async (dawOverride) => {
     const dawToUse = dawOverride || selectedDaw;
-    if (!currentTrackId) return;
+    if (!currentTrackId && !result) return;
 
     setC1Loading(true);
 
     try {
-      const res = await fetch(`/api/tracksheets/${currentTrackId}/c1`, {
+      const res = await fetch(`/api/tracksheets/${currentTrackId || 0}/c1`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ daw: dawToUse })
+        body: JSON.stringify({ 
+          daw: dawToUse,
+          track_name: trackName,
+          artist_name: artistName,
+          content: result
+        })
       });
 
       if (res.ok) {

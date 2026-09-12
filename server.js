@@ -716,16 +716,25 @@ app.post('/api/tracksheets/generate', async (req, res) => {
 
 // Generate Component 1 (Recording) Solution & Completed Logbook for a specific DAW
 app.post('/api/tracksheets/:id/c1', async (req, res) => {
-  const { daw } = req.body;
+  const { daw, track_name: bodyTrackName, artist_name: bodyArtistName, content: bodyContent } = req.body;
   const trackId = req.params.id;
   const dawName = daw || 'Logic Pro';
 
-  db.get('SELECT * FROM tracksheets WHERE id = ?', [trackId], async (err, track) => {
+  db.get('SELECT * FROM tracksheets WHERE id = ?', [trackId], async (err, dbTrack) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
+
+    // Support fallback from client body if database row was wiped or restarted on ephemeral disk
+    const track = dbTrack || (bodyContent ? {
+      id: trackId,
+      track_name: bodyTrackName || 'Selected Track',
+      artist_name: bodyArtistName || '',
+      content: bodyContent
+    } : null);
+
     if (!track) {
-      return res.status(404).json({ error: 'Tracksheet not found' });
+      return res.status(404).json({ error: 'Tracksheet not found. Please generate or select a tracksheet first.' });
     }
 
     try {
