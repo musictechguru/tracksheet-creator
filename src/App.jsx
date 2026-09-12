@@ -503,11 +503,13 @@ function App() {
         setActiveTab(data.daw);
         setSelectedDaw(data.daw);
       } else {
-        alert('Error generating Component 1 solution. Please try again.');
+        const errData = await res.json().catch(() => null);
+        const errMsg = errData?.error || `Server returned error (${res.status})`;
+        alert(`Error generating Component 1 solution: ${errMsg}\n\nTip: If you recently redeployed or opened the app in a new session, please generate or select the tracksheet first.`);
       }
     } catch (error) {
       console.error('C1 generation failed', error);
-      alert('Error connecting to the server for Component 1 generation.');
+      alert('Error connecting to the server for Component 1 generation. Check your network connection.');
     } finally {
       setC1Loading(false);
     }

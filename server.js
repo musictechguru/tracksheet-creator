@@ -630,15 +630,26 @@ app.post('/api/tracksheets/generate', async (req, res) => {
     const p2 = "KkTSmN6XJ53-";
     const p3 = "KZXS483e3Zgb16R44";
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || (p1 + p2 + p3));
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3.1-pro-preview",
-      systemInstruction: SYSTEM_PROMPT,
-    });
 
     const prompt = `Please create a tracksheet for the song "${track_name}" by ${artist_name || 'Unknown'}. Please make sure you return the exact markdown format specified in the system prompt.`;
     
-    const result = await model.generateContent(prompt);
-    let generatedContent = result.response.text();
+    let generatedContent = "";
+    try {
+      const primaryModel = genAI.getGenerativeModel({
+        model: "gemini-3.1-pro-preview",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+      const result = await primaryModel.generateContent(prompt);
+      generatedContent = result.response.text();
+    } catch (primaryErr) {
+      console.warn("Primary model (gemini-3.1-pro-preview) error, falling back to gemini-3.6-flash:", primaryErr.message);
+      const fallbackModel = genAI.getGenerativeModel({
+        model: "gemini-3.6-flash",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+      const result = await fallbackModel.generateContent(prompt);
+      generatedContent = result.response.text();
+    }
     
     // Fallback: If the AI missed the YouTube link, append it to the end of the metadata or document
     if (!generatedContent.includes('youtube.com')) {
@@ -729,15 +740,27 @@ app.post('/api/tracksheets/:id/c1', async (req, res) => {
       const p2 = "KkTSmN6XJ53-";
       const p3 = "KZXS483e3Zgb16R44";
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || (p1 + p2 + p3));
-      const model = genAI.getGenerativeModel({
-        model: "gemini-3.1-pro-preview",
-        systemInstruction: getC1SystemPrompt(dawName, dawKnowledge),
-      });
+      const systemInstruction = getC1SystemPrompt(dawName, dawKnowledge);
 
       const prompt = `Please create the official, completed Component 1 Recording Logbook document for the song "${track.track_name}" by ${track.artist_name || 'Unknown Artist'}.\n\nPrimary DAW: ${dawName}.\n\nBase your instrument choices, acoustic characteristics, tempo, and key on the following historical tracksheet session information:\n\n${track.content}\n\nMake sure to cover all mandatory stems: Kick Drum, Snare Drum, Drum Overheads, Bass, Electric Guitar, Main Vocal, Backing Vocals, and two additional instruments.\n\nCRITICAL SPECIFICATION RESTRICTIONS:\n1. NO UNTUNED PERCUSSION: Do NOT use tambourines, shakers, bongos, congas, cowbells, or other untuned percussion instruments for the additional instruments.\n2. ONE ADDITIONAL INSTRUMENT CAN BE AN ELECTRIC/MIDI INSTRUMENT: E.g., Grand/Upright Piano, Rhodes/Wurlitzer, Synthesizer, or Hammond Organ.\n3. CONCISE CHANNEL STRIP TABLES: Format the complete plugin chain for EACH instrument into ONE SINGLE CONCISE CHANNEL STRIP TABLE showing its full insert chain top-to-bottom (Slot/Order, Processor/Plugin, Type & Circuit, Graphical Dialled Settings / Knobs, Technical Objective). Do NOT repeat the instrument name on every row. Present settings in punchy graphical code badges e.g. \`[Thresh: -32dB]\` \`[HPF: 30Hz @ 24dB/oct]\` \`[Notch: 320Hz | -5dB]\` \`[Ratio: 4:1 | Attack: 25ms | GR: 3-4dB]\`.\n4. UP-TO-DATE DAW PLUGINS: Ensure stock plugins and 3rd-party alternatives are thoroughly modern and up-to-date for ${dawName} (e.g. Logic 11 ChromaGlow and Mastering Assistant, Ableton Live 12 Roar, Cubase 13/14 Black Valve and VoxComp, Pro Tools Avid Complete Bundle).\n5. COMPREHENSIVE MIX STRATEGY & MASTERING SUITE: Section 4 must provide a dedicated, comprehensive mixdown and mastering strategy covering 4.1 Mix Philosophy & Fader Hierarchy, 4.2 Frequency Separation & Masking Management, 4.3 Dynamic Control & Mix Subgroups, 4.4 Spatial Depth & Time-Based FX Architecture, and 4.5 Master Bus Processing Table & Coursework Loudness Specifications (-1.0 dBFS True Peak, -14 to -16 LUFS Integrated). Do NOT include any Student Authentication, Teacher Verification declarations, candidate numbers, centre numbers, or signature lines at the bottom. End the logbook cleanly with Section 4: Comprehensive Mix Strategy & Mastering Suite.`;
 
-      const result = await model.generateContent(prompt);
-      const c1Content = result.response.text();
+      let c1Content = "";
+      try {
+        const primaryModel = genAI.getGenerativeModel({
+          model: "gemini-3.1-pro-preview",
+          systemInstruction,
+        });
+        const result = await primaryModel.generateContent(prompt);
+        c1Content = result.response.text();
+      } catch (primaryErr) {
+        console.warn("Primary model (gemini-3.1-pro-preview) error, falling back to gemini-3.6-flash:", primaryErr.message);
+        const fallbackModel = genAI.getGenerativeModel({
+          model: "gemini-3.6-flash",
+          systemInstruction,
+        });
+        const result = await fallbackModel.generateContent(prompt);
+        c1Content = result.response.text();
+      }
 
       db.run(
         'INSERT INTO c1_solutions (track_id, daw, content) VALUES (?, ?, ?)',
