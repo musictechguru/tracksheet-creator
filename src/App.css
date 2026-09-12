@@ -2635,6 +2635,289 @@ main {
   margin: 0.35rem 0;
 }
 
+/* 4.1 Fader Hierarchy & Mix Staging Console Card */
+.logbook-fader-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.logbook-fader-card:hover {
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.logbook-fader-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.logbook-view-toggle {
+  display: inline-flex;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.logbook-view-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.logbook-view-toggle-btn:hover {
+  color: #F8FAFC;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.logbook-view-toggle-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38BDF8;
+  font-weight: 700;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.logbook-philosophy-banner {
+  background: rgba(2, 6, 23, 0.45);
+  border-left: 3px solid #38BDF8;
+  border-radius: 0 8px 8px 0;
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #CBD5E1;
+}
+
+.logbook-philosophy-banner p {
+  margin: 0.25rem 0;
+}
+
+/* Console Fader Bank */
+.logbook-fader-console {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.85rem;
+}
+
+.logbook-fader-console-header {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748B;
+  padding: 0.2rem 0.5rem 0.4rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.logbook-fader-row {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 0.5rem 0.65rem;
+  transition: all 0.15s ease;
+}
+
+.logbook-fader-row:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.logbook-fader-col-stem {
+  width: 20%;
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+}
+
+.logbook-fader-stem-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logbook-fader-col-level {
+  width: 100px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.logbook-fader-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace, monospace;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  letter-spacing: 0.02em;
+}
+
+.logbook-fader-col-meter {
+  flex: 1;
+  min-width: 160px;
+  padding: 0 1rem;
+}
+
+.logbook-fader-track {
+  height: 20px;
+  background: rgba(2, 6, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.logbook-fader-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.35s ease;
+}
+
+.logbook-fader-thumb {
+  position: absolute;
+  top: 1px;
+  width: 14px;
+  height: 16px;
+  background: linear-gradient(180deg, #F8FAFC 0%, #94A3B8 50%, #475569 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  transition: left 0.35s ease;
+}
+
+.logbook-fader-ticks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
+  pointer-events: none;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  font-family: monospace;
+}
+
+.logbook-fader-col-pan {
+  width: 115px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.logbook-pan-pill {
+  display: inline-block;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #93C5FD;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.logbook-fader-col-role {
+  width: 25%;
+  min-width: 140px;
+  padding-left: 0.5rem;
+}
+
+.logbook-role-text {
+  font-size: 0.78rem;
+  color: #94A3B8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+/* Mini Table Meter */
+.logbook-mini-meter {
+  height: 10px;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.logbook-mini-meter-fill {
+  height: 100%;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .logbook-fader-console-header {
+    display: none;
+  }
+  .logbook-fader-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .logbook-fader-col-stem {
+    width: 100%;
+  }
+  .logbook-fader-col-level {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .logbook-fader-col-meter {
+    width: 100%;
+    padding: 0;
+  }
+  .logbook-fader-col-pan {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .logbook-fader-col-role {
+    width: 100%;
+    padding-left: 0;
+  }
+}
+
 /* Master Bus Processing Table */
 .logbook-master-table {
   width: 100%;

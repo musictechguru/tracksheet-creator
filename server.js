@@ -465,8 +465,19 @@ The output must be formatted as the official **Completed Component 1 Recording L
 *(Detail the overall mix engineering strategy, balance hierarchy, frequency allocation, subgroup processing, spatial depth staging, and final mastering chain engineered specifically for ${dawName}.)*
 
 #### 4.1 Overall Mix Philosophy, Balance & Fader Hierarchy
-*   **Fader Hierarchy & Gain Staging**: Detail the relative fader levels and balance hierarchy (e.g. Lead Vocal as the focal point at 0 dB reference; Kick and Snare anchoring the rhythm section at -2 to -4 dB; Bass locked tight at -3.5 dB; Guitars and Keyboards panned wide at -6 to -8 dB).
-*   **Stereo Staging & Panning Architecture**: Detail the L/C/R stereo distribution across the 180° panorama to maximize clarity, separation, and phase stability.
+*   **Mixdown Gain Staging & Balance Principles**: Detail the gain staging methodology, DAW peak headroom targets (e.g. -18 dBFS nominal RMS, peaks below -6 dBFS before mix bus), monitoring levels, and reference balancing.
+*   **Fader Hierarchy & Stereo Staging Table**:
+**MANDATORY FORMAT REQUIREMENT**: Provide a structured Markdown table detailing the fader hierarchy and stereo panorama for ALL key stems. **CRITICAL: DO NOT USE RAW ASCII DASHES, HYPHENS, OR CODE BLOCK TEXT DIAGRAMS** (e.g. do NOT output "[ 0.0 dB] -------- Lead Vocal"). You MUST format this as a clean, complete Markdown table:
+| Stem / Element | Target Fader Level | Panorama (Pan) | Frequency Role & Mix Placement | Spatial Staging |
+|---|---|---|---|---|
+| Lead Vocal | 0.0 dB (Ref) | Center (0) | Lead melodic focal point, upfront intelligibility | Intimate front, dry / subtle plate |
+| Kick Drum | -3.0 dB | Center (0) | Low-end rhythmic anchor (50–60 Hz fundamental) | Tight front-center punch |
+| Snare Drum (Top) | -3.5 dB | Center (0) | Midrange rhythmic backbeat (200 Hz body, 4.5 kHz crack) | Center, medium room ambience |
+| Bass Guitar | -4.0 dB | Center (0) | Sub & low-mid foundation, locked with kick | Tight mono center |
+| Rhythm Electric Guitars | -6.5 dB | Pan 45° L / 45° R | Midrange harmonic drive and stereo spread | Medium depth, panned wide |
+| Drum Overheads (L/R) | -7.5 dB | Hard L/R (100%) | Cymbal sheen and natural kit stereo dimension | Wide back-to-mid stage |
+| Backing Vocals | -8.0 dB | Pan 35° L / 35° R | Harmonic support and stereo widening | Wide, lush plate / hall send |
+| Acoustic / Secondary Instrument | -8.5 dB | Pan 30° L | Melodic fill, acoustic sparkle & definition | Left wing, medium plate |
 
 #### 4.2 Frequency Masking Management & Spectral Separation
 *   **Low-End Management (Kick vs. Bass)**: Detail the precise frequency carve-outs preventing low-end masking (e.g. Kick fundamental centered at 55–60 Hz with Bass dipping at 60 Hz and dominating at 90–120 Hz, or vice versa).

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { 
   Sliders, Mic2, Disc, FileText, CheckCircle2, AlertTriangle, 
-  ExternalLink, Layers, Volume2, Cpu, Star, Radio, Zap, Activity
+  ExternalLink, Layers, Volume2, Cpu, Star, Radio, Zap, Activity,
+  BarChart2, Table
 } from 'lucide-react';
 
 export default function LogbookDossierView({ data, daw }) {
   if (!data) return null;
 
   const [activeInstIdx, setActiveInstIdx] = useState(0);
+  const [faderViewMode, setFaderViewMode] = useState('meters'); // 'meters' | 'table' | 'split'
 
   const {
     trackName,
@@ -50,6 +52,43 @@ export default function LogbookDossierView({ data, daw }) {
       );
     }
     return <span style={{ color: '#38BDF8' }}>{settingsStr}</span>;
+  };
+
+  const getFaderTheme = (dbNum) => {
+    const val = typeof dbNum === 'number' && !isNaN(dbNum) ? dbNum : 0;
+    if (val >= -0.5) return { 
+      badgeBg: 'rgba(239, 68, 68, 0.2)', 
+      border: '#EF4444', 
+      text: '#FCA5A5', 
+      fillGradient: 'linear-gradient(90deg, #10B981 0%, #F59E0B 70%, #EF4444 100%)',
+      glow: 'rgba(239, 68, 68, 0.4)' 
+    };
+    if (val >= -3.5) return { 
+      badgeBg: 'rgba(56, 189, 248, 0.2)', 
+      border: '#38BDF8', 
+      text: '#7DD3FC', 
+      fillGradient: 'linear-gradient(90deg, #10B981 0%, #0284C7 80%, #38BDF8 100%)',
+      glow: 'rgba(56, 189, 248, 0.4)' 
+    };
+    if (val >= -6.5) return { 
+      badgeBg: 'rgba(52, 211, 153, 0.2)', 
+      border: '#34D399', 
+      text: '#6EE7B7', 
+      fillGradient: 'linear-gradient(90deg, #059669 0%, #10B981 80%, #34D399 100%)',
+      glow: 'rgba(52, 211, 153, 0.4)' 
+    };
+    return { 
+      badgeBg: 'rgba(192, 132, 252, 0.2)', 
+      border: '#C084FC', 
+      text: '#E9D5FF', 
+      fillGradient: 'linear-gradient(90deg, #6366F1 0%, #8B5CF6 80%, #C084FC 100%)',
+      glow: 'rgba(192, 132, 252, 0.4)' 
+    };
+  };
+
+  const getFaderPct = (dbNum) => {
+    const val = typeof dbNum === 'number' && !isNaN(dbNum) ? dbNum : -6.0;
+    return Math.max(14, Math.min(100, Math.round(((val + 12) / 12) * 86 + 14)));
   };
 
   // Helper to determine the specific capture pathway being used from the track list
@@ -393,20 +432,169 @@ export default function LogbookDossierView({ data, daw }) {
                 <span className="logbook-section-pill">Staging & Balance</span>
               </div>
 
-              <div className="logbook-mix-grid">
-                {mixStrategy.philosophy && (
-                  <div className="logbook-mix-card">
-                    <div className="logbook-mix-card-header">
-                      <Sliders size={15} color="#38BDF8" />
-                      <span>Mix Philosophy, Balance & Fader Hierarchy</span>
+              {/* 4.1 Featured Card: Fader Hierarchy, Balance & Stereo Staging */}
+              {(mixStrategy.faderHierarchy?.length > 0 || mixStrategy.philosophy) && (
+                <div className="logbook-fader-card">
+                  <div className="logbook-fader-card-header">
+                    <div className="logbook-card-title-left">
+                      <Sliders size={16} color="#38BDF8" />
+                      <span>4.1 Mix Balance, Fader Hierarchy & Stereo Staging</span>
                     </div>
-                    <div className="logbook-mix-card-body">
+                    {mixStrategy.faderHierarchy?.length > 0 && (
+                      <div className="logbook-view-toggle">
+                        <button 
+                          type="button"
+                          className={`logbook-view-toggle-btn ${faderViewMode === 'meters' ? 'active' : ''}`}
+                          onClick={() => setFaderViewMode('meters')}
+                          title="Console Fader Meters"
+                        >
+                          <BarChart2 size={13} />
+                          <span>Console Faders</span>
+                        </button>
+                        <button 
+                          type="button"
+                          className={`logbook-view-toggle-btn ${faderViewMode === 'table' ? 'active' : ''}`}
+                          onClick={() => setFaderViewMode('table')}
+                          title="Staging Table"
+                        >
+                          <Table size={13} />
+                          <span>Staging Table</span>
+                        </button>
+                        <button 
+                          type="button"
+                          className={`logbook-view-toggle-btn ${faderViewMode === 'split' ? 'active' : ''}`}
+                          onClick={() => setFaderViewMode('split')}
+                          title="Split Dual View"
+                        >
+                          <span>Split View</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Philosophy narrative overview */}
+                  {mixStrategy.philosophy && (
+                    <div className="logbook-philosophy-banner">
                       {mixStrategy.philosophy.split('\n').map((line, idx) => (
-                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                        <p key={idx}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* Visual Console Fader Bank */}
+                  {mixStrategy.faderHierarchy?.length > 0 && (faderViewMode === 'meters' || faderViewMode === 'split') && (
+                    <div className="logbook-fader-console">
+                      <div className="logbook-fader-console-header">
+                        <span className="logbook-fader-col-stem">Stem / Instrument</span>
+                        <span className="logbook-fader-col-level">Target Level</span>
+                        <span className="logbook-fader-col-meter">Console Fader Meter (0 to -12 dB)</span>
+                        <span className="logbook-fader-col-pan">Stereo Pan</span>
+                        <span className="logbook-fader-col-role">Mix Role & Staging</span>
+                      </div>
+                      <div className="logbook-fader-console-body">
+                        {mixStrategy.faderHierarchy.map((item, fIdx) => {
+                          const theme = getFaderTheme(item.dbNum);
+                          const pct = getFaderPct(item.dbNum);
+                          return (
+                            <div key={fIdx} className="logbook-fader-row">
+                              <div className="logbook-fader-col-stem">
+                                <span className="logbook-fader-stem-name">{item.element}</span>
+                              </div>
+                              <div className="logbook-fader-col-level">
+                                <span 
+                                  className="logbook-fader-badge" 
+                                  style={{ background: theme.badgeBg, borderColor: theme.border, color: theme.text }}
+                                >
+                                  {item.faderLevel}
+                                </span>
+                              </div>
+                              <div className="logbook-fader-col-meter">
+                                <div className="logbook-fader-track">
+                                  <div 
+                                    className="logbook-fader-fill" 
+                                    style={{ width: `${pct}%`, background: theme.fillGradient, boxShadow: `0 0 10px ${theme.glow}` }}
+                                  />
+                                  <div 
+                                    className="logbook-fader-thumb" 
+                                    style={{ left: `calc(${pct}% - 7px)` }}
+                                  />
+                                  <div className="logbook-fader-ticks">
+                                    <span>-12</span>
+                                    <span>-9</span>
+                                    <span>-6</span>
+                                    <span>-3</span>
+                                    <span style={{ color: '#EF4444', fontWeight: 700 }}>0 dB</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="logbook-fader-col-pan">
+                                <span className="logbook-pan-pill">
+                                  {item.pan || 'Center (0)'}
+                                </span>
+                              </div>
+                              <div className="logbook-fader-col-role">
+                                <span className="logbook-role-text">{item.role || item.staging || 'Mix Element'}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Structured Fader Table View */}
+                  {mixStrategy.faderHierarchy?.length > 0 && (faderViewMode === 'table' || faderViewMode === 'split') && (
+                    <div className="table-wrapper" style={{ marginTop: faderViewMode === 'split' ? '1.25rem' : '0.5rem' }}>
+                      <table className="logbook-master-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: '180px' }}>Stem / Instrument</th>
+                            <th style={{ width: '110px', textAlign: 'center' }}>Target Level</th>
+                            <th style={{ width: '140px' }}>Meter Level</th>
+                            <th style={{ width: '120px', textAlign: 'center' }}>Stereo Pan</th>
+                            <th>Dynamic & Frequency Role</th>
+                            <th>Spatial Staging</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {mixStrategy.faderHierarchy.map((row, rIdx) => {
+                            const theme = getFaderTheme(row.dbNum);
+                            const pct = getFaderPct(row.dbNum);
+                            return (
+                              <tr key={rIdx}>
+                                <td><strong style={{ color: '#F8FAFC' }}>{row.element}</strong></td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <span 
+                                    className="logbook-fader-badge" 
+                                    style={{ background: theme.badgeBg, borderColor: theme.border, color: theme.text }}
+                                  >
+                                    {row.faderLevel}
+                                  </span>
+                                </td>
+                                <td>
+                                  <div className="logbook-mini-meter">
+                                    <div 
+                                      className="logbook-mini-meter-fill" 
+                                      style={{ width: `${pct}%`, background: theme.fillGradient }} 
+                                    />
+                                  </div>
+                                </td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <span className="logbook-pan-pill">{row.pan}</span>
+                                </td>
+                                <td style={{ color: '#CBD5E1', fontSize: '0.84rem' }}>{row.role || '—'}</td>
+                                <td style={{ color: '#94A3B8', fontSize: '0.82rem' }}>{row.staging || 'Mix Staging'}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="logbook-mix-grid" style={{ marginTop: '1.25rem' }}>
 
                 {mixStrategy.frequencySeparation && (
                   <div className="logbook-mix-card">

@@ -249,14 +249,60 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
         <div class="pdf-section pdf-avoid-break">
           <div class="pdf-section-title">4. Mix Strategy, Master Bus & Final Mastering Suite</div>
 
-          ${data.mixStrategy && (data.mixStrategy.philosophy || data.mixStrategy.frequencySeparation || data.mixStrategy.dynamicControl || data.mixStrategy.spatialDepth || data.mixStrategy.automation) ? `
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          ${data.mixStrategy && (data.mixStrategy.faderHierarchy?.length > 0 || data.mixStrategy.philosophy) ? `
+            <div class="pdf-card" style="padding: 7px 10px; margin-bottom: 8px;">
+              <div class="pdf-card-title" style="font-size: 8.5pt; color: #0284c7; margin-bottom: 4px;">4.1 Mix Balance, Fader Hierarchy & Stereo Staging Architecture</div>
               ${data.mixStrategy.philosophy ? `
-                <div class="pdf-card" style="padding: 6px 10px;">
-                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #0284c7;">Mix Philosophy & Fader Hierarchy</div>
-                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.philosophy}</p>
-                </div>
+                <p style="font-size: 7.2pt; line-height: 1.4; color: #334155; margin: 0 0 6px 0;">${data.mixStrategy.philosophy}</p>
               ` : ""}
+              ${data.mixStrategy.faderHierarchy && data.mixStrategy.faderHierarchy.length > 0 ? `
+                <table style="width: 100%; border-collapse: collapse; font-size: 6.8pt; margin-top: 3px;">
+                  <thead>
+                    <tr style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1;">
+                      <th style="padding: 3px 5px; text-align: left; width: 22%;">Stem / Element</th>
+                      <th style="padding: 3px 5px; text-align: center; width: 13%;">Target Fader</th>
+                      <th style="padding: 3px 5px; text-align: left; width: 22%;">Visual Level Meter</th>
+                      <th style="padding: 3px 5px; text-align: center; width: 15%;">Stereo Pan</th>
+                      <th style="padding: 3px 5px; text-align: left; width: 28%;">Mix Role & Staging</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${data.mixStrategy.faderHierarchy.map(item => {
+                      const db = typeof item.dbNum === 'number' && !isNaN(item.dbNum) ? item.dbNum : 0;
+                      const pct = Math.max(14, Math.min(100, Math.round(((db + 12) / 12) * 86 + 14)));
+                      const color = db >= -0.5 ? '#ef4444' : db >= -3.5 ? '#0284c7' : db >= -6.5 ? '#059669' : '#7c3aed';
+                      return `
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                          <td style="padding: 2.5px 5px; font-weight: 600; color: #0f172a;">${item.element}</td>
+                          <td style="padding: 2.5px 5px; text-align: center;">
+                            <span style="display: inline-block; padding: 1px 4px; border-radius: 3px; font-weight: 700; font-size: 6.5pt; color: ${color}; background: #f8fafc; border: 1px solid ${color}40;">
+                              ${item.faderLevel}
+                            </span>
+                          </td>
+                          <td style="padding: 2.5px 5px;">
+                            <div style="background: #e2e8f0; border-radius: 2px; height: 8px; width: 100%; position: relative; overflow: hidden;">
+                              <div style="width: ${pct}%; height: 100%; border-radius: 2px; background: ${color};"></div>
+                            </div>
+                          </td>
+                          <td style="padding: 2.5px 5px; text-align: center;">
+                            <span style="display: inline-block; padding: 1px 4px; border-radius: 3px; font-size: 6.5pt; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;">
+                              ${item.pan || 'Center'}
+                            </span>
+                          </td>
+                          <td style="padding: 2.5px 5px; color: #475569;">
+                            ${item.role ? item.role : ''}${item.staging && item.staging !== 'Mix Staging' ? ` (${item.staging})` : ''}
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              ` : ""}
+            </div>
+          ` : ""}
+
+          ${data.mixStrategy && (data.mixStrategy.frequencySeparation || data.mixStrategy.dynamicControl || data.mixStrategy.spatialDepth || data.mixStrategy.automation) ? `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
               ${data.mixStrategy.frequencySeparation ? `
                 <div class="pdf-card" style="padding: 6px 10px;">
                   <div class="pdf-card-title" style="font-size: 8.5pt; color: #7c3aed;">Frequency Masking & Separation</div>
