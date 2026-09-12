@@ -17,6 +17,7 @@ export default function LogbookDossierView({ data, daw }) {
     monitoring,
     trackTable,
     instruments,
+    mixStrategy,
     masterBus
   } = data;
 
@@ -196,52 +197,60 @@ export default function LogbookDossierView({ data, daw }) {
               )}
 
               {/* 2. Dedicated Section: 3-Pathway Instrumental Solutions */}
-              <div className="logbook-dedicated-section pathways-section">
-                <div className="logbook-section-card-title">
-                  <div className="logbook-card-title-left">
-                    <Layers size={18} color="#C084FC" />
-                    <span>3-Pathway Instrumental Solutions & Capture Options</span>
+              {(activeInstrument.pathway1 || activeInstrument.pathway2 || activeInstrument.pathway3) && (
+                <div className="logbook-dedicated-section pathways-section">
+                  <div className="logbook-section-card-title">
+                    <div className="logbook-card-title-left">
+                      <Layers size={18} color="#C084FC" />
+                      <span>3-Pathway Instrumental Solutions & Capture Options</span>
+                    </div>
+                    <span className="logbook-section-pill">Capture Methodology</span>
                   </div>
-                  <span className="logbook-section-pill">Capture Methodology</span>
-                </div>
-                <div className="logbook-pathways-grid">
-                  {activeInstrument.pathway1 && (
-                    <div className="logbook-pathway-card">
-                      <div className="logbook-p-header p1">
-                        <Mic2 size={16} />
-                        <span>Pathway 1: Acoustic / Microphone Capture</span>
+                  <div className="logbook-pathways-grid">
+                    {activeInstrument.pathway1 && (
+                      <div className="logbook-pathway-card">
+                        <div className="logbook-p-header p1">
+                          <Mic2 size={16} />
+                          <span>Pathway 1: Acoustic / Microphone Capture</span>
+                        </div>
+                        <div className="logbook-p-body">
+                          {activeInstrument.pathway1.split('\n').map((line, lIdx) => (
+                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                          ))}
+                        </div>
                       </div>
-                      <div className="logbook-p-body">
-                        {activeInstrument.pathway1}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {activeInstrument.pathway2 && (
-                    <div className="logbook-pathway-card">
-                      <div className="logbook-p-header p2">
-                        <Zap size={16} />
-                        <span>Pathway 2: Direct Injection (DI) & Line Input</span>
+                    {activeInstrument.pathway2 && (
+                      <div className="logbook-pathway-card">
+                        <div className="logbook-p-header p2">
+                          <Zap size={16} />
+                          <span>Pathway 2: Direct Injection (DI) & Line Input</span>
+                        </div>
+                        <div className="logbook-p-body">
+                          {activeInstrument.pathway2.split('\n').map((line, lIdx) => (
+                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                          ))}
+                        </div>
                       </div>
-                      <div className="logbook-p-body">
-                        {activeInstrument.pathway2}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {activeInstrument.pathway3 && (
-                    <div className="logbook-pathway-card">
-                      <div className="logbook-p-header p3">
-                        <Radio size={16} />
-                        <span>Pathway 3: Audio Instruments & MIDI</span>
+                    {activeInstrument.pathway3 && (
+                      <div className="logbook-pathway-card">
+                        <div className="logbook-p-header p3">
+                          <Radio size={16} />
+                          <span>Pathway 3: Audio Instruments & MIDI</span>
+                        </div>
+                        <div className="logbook-p-body">
+                          {activeInstrument.pathway3.split('\n').map((line, lIdx) => (
+                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                          ))}
+                        </div>
                       </div>
-                      <div className="logbook-p-body">
-                        {activeInstrument.pathway3}
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* 3. Dedicated Section: Channel Strip Insert Chain Table */}
               {activeInstrument.channelStrip && activeInstrument.channelStrip.length > 0 && (
@@ -327,39 +336,188 @@ export default function LogbookDossierView({ data, daw }) {
         </div>
       )}
 
-      {/* 4. Section 4: Mixdown & Master Bus Processing Suite */}
-      {masterBus && (masterBus.mixBusChain || masterBus.limiting) && (
+      {/* 4. Section 4: Comprehensive Mix Strategy & Mastering Suite */}
+      {(mixStrategy || masterBus) && (
         <div className="logbook-section-card glass-panel">
           <div className="logbook-sec-header">
             <div className="logbook-sec-title-wrap">
               <Cpu size={20} color="#34D399" />
-              <h3 className="logbook-sec-title">Section 4: Mixdown & Master Bus Processing Log</h3>
+              <h3 className="logbook-sec-title">Section 4: Comprehensive Mix Strategy & Mastering Suite</h3>
             </div>
-            <span className="logbook-sec-pill">Mastering Chain</span>
+            <span className="logbook-sec-pill">Production Architecture</span>
           </div>
 
-          <div className="logbook-master-grid">
-            {masterBus.mixBusChain && (
-              <div className="logbook-master-card">
-                <div className="logbook-master-card-title">Mix Bus Insert Chain & Glue Compression</div>
-                <div className="logbook-master-body">
-                  {masterBus.mixBusChain.split('\n').map((line, lIdx) => (
-                    <p key={lIdx} style={{ margin: '0.35rem 0' }}>{line.replace(/^\*\s+/, '')}</p>
-                  ))}
+          {/* 4.1 to 4.4: Mixdown Engineering Strategy Grid */}
+          {mixStrategy && (mixStrategy.philosophy || mixStrategy.frequencySeparation || mixStrategy.dynamicControl || mixStrategy.spatialDepth || mixStrategy.automation) && (
+            <div className="logbook-mix-strategy-container">
+              <div className="logbook-section-card-title" style={{ marginTop: '0.5rem', marginBottom: '1rem' }}>
+                <div className="logbook-card-title-left">
+                  <Sliders size={18} color="#38BDF8" />
+                  <span>Mixdown Engineering Strategy & Staging Architecture</span>
                 </div>
+                <span className="logbook-section-pill">Staging & Balance</span>
               </div>
-            )}
 
-            {masterBus.limiting && (
-              <div className="logbook-master-card">
-                <div className="logbook-master-card-title">Master Limiting, Ceiling & Target Headroom</div>
-                <div className="logbook-master-body">
-                  {masterBus.limiting.split('\n').map((line, lIdx) => (
-                    <p key={lIdx} style={{ margin: '0.35rem 0' }}>{line.replace(/^\*\s+/, '')}</p>
-                  ))}
-                </div>
+              <div className="logbook-mix-grid">
+                {mixStrategy.philosophy && (
+                  <div className="logbook-mix-card">
+                    <div className="logbook-mix-card-header">
+                      <Sliders size={15} color="#38BDF8" />
+                      <span>Mix Philosophy, Balance & Fader Hierarchy</span>
+                    </div>
+                    <div className="logbook-mix-card-body">
+                      {mixStrategy.philosophy.split('\n').map((line, idx) => (
+                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mixStrategy.frequencySeparation && (
+                  <div className="logbook-mix-card">
+                    <div className="logbook-mix-card-header">
+                      <Activity size={15} color="#C084FC" />
+                      <span>Frequency Masking Management & Spectral Separation</span>
+                    </div>
+                    <div className="logbook-mix-card-body">
+                      {mixStrategy.frequencySeparation.split('\n').map((line, idx) => (
+                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mixStrategy.dynamicControl && (
+                  <div className="logbook-mix-card">
+                    <div className="logbook-mix-card-header">
+                      <Volume2 size={15} color="#FBBF24" />
+                      <span>Dynamic Control, Mix Subgroups & Bus Glue</span>
+                    </div>
+                    <div className="logbook-mix-card-body">
+                      {mixStrategy.dynamicControl.split('\n').map((line, idx) => (
+                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mixStrategy.spatialDepth && (
+                  <div className="logbook-mix-card">
+                    <div className="logbook-mix-card-header">
+                      <Disc size={15} color="#34D399" />
+                      <span>Spatial Depth & Time-Based FX Architecture</span>
+                    </div>
+                    <div className="logbook-mix-card-body">
+                      {mixStrategy.spatialDepth.split('\n').map((line, idx) => (
+                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {mixStrategy.automation && (
+                  <div className="logbook-mix-card">
+                    <div className="logbook-mix-card-header">
+                      <Zap size={15} color="#F472B6" />
+                      <span>Mix Automation Passes & Dynamic Rides</span>
+                    </div>
+                    <div className="logbook-mix-card-body">
+                      {mixStrategy.automation.split('\n').map((line, idx) => (
+                        <p key={idx} style={{ margin: '0.3rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+          )}
+
+          {/* 4.5: Master Bus Processing Chain Table */}
+          {masterBus && masterBus.table && masterBus.table.length > 0 && (
+            <div className="logbook-master-table-container">
+              <div className="logbook-section-card-title" style={{ marginTop: '1.75rem', marginBottom: '0.75rem' }}>
+                <div className="logbook-card-title-left">
+                  <Cpu size={18} color="#34D399" />
+                  <span>Master Bus Processing & Final Mastering Chain ({currentDaw})</span>
+                </div>
+                <span className="logbook-section-pill">{masterBus.table.length} Stages</span>
+              </div>
+
+              <div className="table-wrapper">
+                <table className="logbook-master-table">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '180px' }}>Processing Stage</th>
+                      <th style={{ width: '220px' }}>Plugin / Processor</th>
+                      <th>Exact Parameter Settings</th>
+                      <th>Technical Objective</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {masterBus.table.map((row, rIdx) => (
+                      <tr key={rIdx}>
+                        <td><strong style={{ color: '#F8FAFC' }}>{row.stage}</strong></td>
+                        <td style={{ color: '#38BDF8', fontWeight: 600 }}>{row.processor}</td>
+                        <td>{renderSettingsBadge(row.settings)}</td>
+                        <td style={{ color: '#CBD5E1', fontSize: '0.84rem' }}>{row.objective}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Master Bus Legacy Fallback Grid */}
+          {(!masterBus?.table || masterBus.table.length === 0) && masterBus && (masterBus.mixBusChain || masterBus.limiting) && (
+            <div className="logbook-master-grid" style={{ marginTop: '1.25rem' }}>
+              {masterBus.mixBusChain && (
+                <div className="logbook-master-card">
+                  <div className="logbook-master-card-title">Mix Bus Insert Chain & Glue Compression</div>
+                  <div className="logbook-master-body">
+                    {masterBus.mixBusChain.split('\n').map((line, lIdx) => (
+                      <p key={lIdx} style={{ margin: '0.35rem 0' }}>{line.replace(/^\*\s+/, '')}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {masterBus.limiting && (
+                <div className="logbook-master-card">
+                  <div className="logbook-master-card-title">Master Limiting, Ceiling & Target Headroom</div>
+                  <div className="logbook-master-body">
+                    {masterBus.limiting.split('\n').map((line, lIdx) => (
+                      <p key={lIdx} style={{ margin: '0.35rem 0' }}>{line.replace(/^\*\s+/, '')}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Coursework Compliance & Loudness Targets */}
+          <div className="logbook-compliance-banner">
+            <div className="logbook-compliance-header">
+              <CheckCircle2 size={16} color="#34D399" />
+              <span>Pearson Edexcel Component 1 Coursework Loudness & Dynamic Range Compliance</span>
+            </div>
+            <div className="logbook-compliance-grid">
+              <div className="logbook-compliance-item">
+                <span className="logbook-comp-label">TRUE PEAK CEILING</span>
+                <span className="logbook-comp-val" style={{ color: '#38BDF8' }}>-1.0 dBFS True Peak</span>
+                <span className="logbook-comp-sub">Guarantees zero inter-sample clipping on DAC moderation playback</span>
+              </div>
+              <div className="logbook-compliance-item">
+                <span className="logbook-comp-label">INTEGRATED LOUDNESS</span>
+                <span className="logbook-comp-val" style={{ color: '#FBBF24' }}>-14 to -16 LUFS Integrated</span>
+                <span className="logbook-comp-sub">Preserves natural acoustic dynamics required for high-band AO2 marks</span>
+              </div>
+              <div className="logbook-compliance-item">
+                <span className="logbook-comp-label">MONO COMPATIBILITY</span>
+                <span className="logbook-comp-val" style={{ color: '#34D399' }}>Phase Correlation +0.7 to +1.0</span>
+                <span className="logbook-comp-sub">Monitored via Correlation Meter; sub-bass mono below 100 Hz</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -221,25 +221,79 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
           </div>
         ` : ""}
 
-        <!-- Master Bus & Verification -->
+        <!-- Comprehensive Mix Strategy & Master Bus Processing -->
         <div class="pdf-section pdf-avoid-break">
-          <div class="pdf-section-title">4. Mixdown, Master Bus & Authentication</div>
-          <div class="pdf-grid-2">
-            <div class="pdf-card">
+          <div class="pdf-section-title">4. Mix Strategy, Master Bus & Final Mastering Suite</div>
+
+          ${data.mixStrategy && (data.mixStrategy.philosophy || data.mixStrategy.frequencySeparation || data.mixStrategy.dynamicControl || data.mixStrategy.spatialDepth || data.mixStrategy.automation) ? `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+              ${data.mixStrategy.philosophy ? `
+                <div class="pdf-card" style="padding: 6px 10px;">
+                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #0284c7;">Mix Philosophy & Fader Hierarchy</div>
+                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.philosophy}</p>
+                </div>
+              ` : ""}
+              ${data.mixStrategy.frequencySeparation ? `
+                <div class="pdf-card" style="padding: 6px 10px;">
+                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #7c3aed;">Frequency Masking & Separation</div>
+                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.frequencySeparation}</p>
+                </div>
+              ` : ""}
+              ${data.mixStrategy.dynamicControl ? `
+                <div class="pdf-card" style="padding: 6px 10px;">
+                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #d97706;">Dynamic Control & Subgroups</div>
+                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.dynamicControl}</p>
+                </div>
+              ` : ""}
+              ${data.mixStrategy.spatialDepth ? `
+                <div class="pdf-card" style="padding: 6px 10px;">
+                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #059669;">Spatial Depth & Time-Based FX</div>
+                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.spatialDepth}</p>
+                </div>
+              ` : ""}
+              ${data.mixStrategy.automation ? `
+                <div class="pdf-card" style="padding: 6px 10px; grid-column: span 2;">
+                  <div class="pdf-card-title" style="font-size: 8.5pt; color: #db2777;">Automation Passes & Fader Rides</div>
+                  <p style="font-size: 7.5pt; margin: 2px 0;">${data.mixStrategy.automation}</p>
+                </div>
+              ` : ""}
+            </div>
+          ` : ""}
+
+          ${data.masterBus?.table && data.masterBus.table.length > 0 ? `
+            <table class="pdf-table" style="margin-bottom: 10px;">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">Processing Stage</th>
+                  <th style="width: 160px;">Plugin / Processor</th>
+                  <th>Dialled Settings / Parameters</th>
+                  <th>Technical Objective</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.masterBus.table.map(row => `
+                  <tr>
+                    <td style="font-weight: bold;">${row.stage}</td>
+                    <td style="color: #0369a1;">${row.processor}</td>
+                    <td style="font-family: monospace; font-size: 7pt; color: #1e40af;">${row.settings}</td>
+                    <td style="color: #334155; font-size: 7pt;">${row.objective}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          ` : `
+            <div class="pdf-card" style="margin-bottom: 10px;">
               <div class="pdf-card-title">Mix Bus Processing & Metering</div>
               <p>${data.masterBus?.mixBusChain || "Bus EQ, gentle glue compression (2:1 ratio), subtle tape saturation, and stereo width alignment."}</p>
               <p><strong>Master Limiting:</strong> ${data.masterBus?.limiting || "Ceiling set to -1.0 dBFS True Peak. Target Integrated Loudness: -14 to -16 LUFS."}</p>
             </div>
-            <div class="pdf-card">
-              <div class="pdf-card-title">Student & Teacher Authentication</div>
-              <p style="font-size: 0.85rem; font-style: italic; color: #475569;">
-                "I confirm that this recording represents my own independent practical work, including all capture, sequencing, editing, mixing, and mastering in ${effectiveDaw} in accordance with Pearson Edexcel Component 1 regulations."
-              </p>
-              <div style="margin-top: 1.5rem; display: flex; justify-content: space-between;">
-                <div style="border-top: 1px solid #94a3b8; width: 45%; padding-top: 4px; font-size: 0.78rem;">Student Signature / Date</div>
-                <div style="border-top: 1px solid #94a3b8; width: 45%; padding-top: 4px; font-size: 0.78rem;">Teacher Verification / Date</div>
-              </div>
-            </div>
+          `}
+
+          <!-- Loudness & Specification Compliance -->
+          <div style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px; padding: 6px 10px; font-size: 7.5pt; color: #166534; display: flex; justify-content: space-between;">
+            <div><strong>True Peak Ceiling:</strong> -1.0 dBFS True Peak</div>
+            <div><strong>Integrated Loudness:</strong> -14 to -16 LUFS Integrated</div>
+            <div><strong>Phase Coherence:</strong> Correlation +0.7 to +1.0</div>
           </div>
         </div>
 
