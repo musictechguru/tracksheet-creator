@@ -87,6 +87,7 @@ export function parseHistoricalTracksheet(markdown) {
   const lines = markdown.split('\n');
   let currentSection = 0; // 1: Metadata, 2: Personnel, 3: Studio, 4: Musicology, 5: Signal Chains, 6: Mixdown, 7: References, 8: JSON
   let currentInstrument = null;
+  let currentMusicologyField = null;
   const scoresCollected = [];
 
   // 1. Extract Main Title (e.g. # TRACKSHEET: What Do You Want From Me by Pink Floyd)
@@ -251,36 +252,85 @@ export function parseHistoricalTracksheet(markdown) {
 
     // SECTION 4: Musical & Structural Analysis
     else if (currentSection === 4) {
-      const bulletMatch = trimmed.match(/^\*\s+\*\*([^:]+):\*\*\s*(.*)$/);
-      if (bulletMatch) {
-        const key = bulletMatch[1].trim().toLowerCase();
-        const rawVal = bulletMatch[2].trim();
+      const isIndented = /^\s{2,}\*/.test(line);
+      const bulletMatch = trimmed.match(/^\*\s+\*\*([^*]+)\*\*\s*(.*)$/);
+
+      if (bulletMatch && !isIndented) {
+        const key = bulletMatch[1].replace(/:$/, '').trim().toLowerCase();
+        const rawVal = bulletMatch[2].replace(/^:\s*/, '').trim();
         const parsed = extractScoreAndSource(rawVal);
         if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
 
         if (key.includes('form') || key.includes('structure')) {
-          const parts = parsed.value.split(/->|→/);
-          if (parts.length > 1) {
-            result.musicology.formBreakdown = parts.map(p => p.trim()).filter(Boolean);
-          } else {
-            result.musicology.formBreakdown = [parsed.value];
+          currentMusicologyField = 'form';
+          if (parsed.value) {
+            const parts = parsed.value.split(/->|→/).map(p => p.trim()).filter(Boolean);
+            if (parts.length > 0) {
+              result.musicology.formBreakdown = parts;
+            }
           }
         } else if (key.includes('key') || key.includes('tempo') || key.includes('modulation')) {
-          const text = parsed.value;
-          const keyMatch = text.match(/(?:Root Key of|Key of|in|Key:?)\s*([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
-          if (keyMatch) result.musicology.key = keyMatch[1].trim();
-          else result.musicology.key = text.split('.')[0];
+          currentMusicologyField = 'key_tempo';
+          if (parsed.value) {
+            const text = parsed.value;
+            const keyMatch = text.match(/(?:Root Key of|Key of|in|Key:?)\s*([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
+            if (keyMatch) result.musicology.key = keyMatch[1].trim();
+            else result.musicology.key = text.split('.')[0];
 
-          const bpmMatch = text.match(/(\d{2,3})\s*BPM/i);
-          if (bpmMatch) {
+            const bpmMatch = text.match(/(\d{2,3})\s*BPM/i);
+            if (bpmMatch) {
+              result.musicology.bpm = bpmMatch[1];
+              result.musicology.tempo = `${bpmMatch[1]} BPM`;
+            }
+
+            const timeMatch = text.match(/(\d\/\d)/);
+            if (timeMatch) result.musicology.timeSignature = timeMatch[1];
+          }
+        } else if (key.includes('arrangement') || key.includes('production')) {
+          currentMusicologyField = 'arrangement';
+          if (parsed.value) {
+            result.musicology.arrangementTechniques = parsed.value;
+          }
+        } else {
+          currentMusicologyField = null;
+        }
+      } else if (bulletMatch && isIndented && currentMusicologyField) {
+        // Sub-bullet under an active Section 4 heading
+        const subKey = bulletMatch[1].replace(/:$/, '').trim();
+        const subRawVal = bulletMatch[2].replace(/^:\s*/, '').trim();
+        const parsed = extractScoreAndSource(subRawVal);
+        if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
+
+        if (currentMusicologyField === 'form') {
+          // Format as "Intro (0:00 - 0:13)" or clean title
+          const label = subKey || parsed.value;
+          if (label && !result.musicology.formBreakdown.includes(label)) {
+            result.musicology.formBreakdown.push(label);
+          }
+        } else if (currentMusicologyField === 'key_tempo') {
+          const combined = `${subKey}: ${parsed.value}`;
+          const keyMatch = combined.match(/(?:Root Key of|Key of|Key:?)\s*([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
+          if (keyMatch && !result.musicology.key) result.musicology.key = keyMatch[1].trim();
+          else if (!result.musicology.key && subKey.toLowerCase().includes('key') && parsed.value) {
+            const directKey = parsed.value.match(/([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
+            if (directKey) result.musicology.key = directKey[1].trim();
+          }
+
+          const bpmMatch = combined.match(/(\d{2,3})\s*BPM/i);
+          if (bpmMatch && !result.musicology.bpm) {
             result.musicology.bpm = bpmMatch[1];
             result.musicology.tempo = `${bpmMatch[1]} BPM`;
           }
 
-          const timeMatch = text.match(/(\d\/\d)/);
+          const timeMatch = combined.match(/(\d\/\d)/);
           if (timeMatch) result.musicology.timeSignature = timeMatch[1];
-        } else if (key.includes('arrangement') || key.includes('production')) {
-          result.musicology.arrangementTechniques = parsed.value;
+        } else if (currentMusicologyField === 'arrangement') {
+          const phrase = subKey ? `${subKey}: ${parsed.value}` : parsed.value;
+          if (phrase) {
+            result.musicology.arrangementTechniques = result.musicology.arrangementTechniques
+              ? `${result.musicology.arrangementTechniques} ${phrase}`
+              : phrase;
+          }
         }
       }
     }

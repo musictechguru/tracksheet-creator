@@ -9,7 +9,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './App.css';
-import { TRACKSHEET_ACTIVITY_PHRASES, DAW_ACTIVITY_PHRASES, getSolutionEngineeringPhrases } from './activityPhrases';
+import { TRACKSHEET_ACTIVITY_PHRASES, getTracksheetActivityPhrases, getSolutionEngineeringPhrases } from './activityPhrases';
 import DossierView from './components/DossierView';
 import LogbookDossierView from './components/LogbookDossierView';
 import { parseHistoricalTracksheet } from './tracksheetParser';
@@ -170,6 +170,7 @@ function App() {
   const [result, setResult] = useState(null);
   const [currentTrackId, setCurrentTrackId] = useState(null);
   const [history, setHistory] = useState([]);
+  const [tracksheetPhrases, setTracksheetPhrases] = useState([]);
 
   // Component 1 & Logbook state
   const [selectedDaw, setSelectedDaw] = useState('Logic Pro');
@@ -456,6 +457,8 @@ function App() {
 
     setLoading(true);
     setSearchActive(true);
+    const freshPhrases = getTracksheetActivityPhrases({ trackName, artistName });
+    setTracksheetPhrases(freshPhrases);
     setResult(null);
     setCurrentTrackId(null);
     setC1Solutions([]);
@@ -697,7 +700,11 @@ function App() {
                   ACTIVITY MONITOR
                 </span>
                 <div className="activity-phrase-container">
-                  <ActivityTypewriter phrases={TRACKSHEET_ACTIVITY_PHRASES} shuffle={true} />
+                  <ActivityTypewriter 
+                    phrases={tracksheetPhrases.length > 0 ? tracksheetPhrases : getTracksheetActivityPhrases({ trackName, artistName })} 
+                    shuffle={true}
+                    getFreshPhrases={() => getTracksheetActivityPhrases({ trackName, artistName })}
+                  />
                 </div>
               </div>
             </div>

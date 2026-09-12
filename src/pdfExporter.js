@@ -437,10 +437,25 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                 <div class="pdf-kv"><span>Tempo / BPM:</span> <strong>${data.musicology.bpm || data.musicology.tempo || "Fixed Tempo"}</strong></div>
                 <div class="pdf-kv"><span>Time Signature:</span> <strong>${data.musicology.timeSignature || "4/4"}</strong></div>
               </div>
+              ${data.musicology.formBreakdown && data.musicology.formBreakdown.length > 0 ? `
+                <div style="margin-top: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 0.6rem;">
+                  <div style="font-size: 8pt; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;">
+                    🎼 Musical Form & Structural Arrangement Roadmap (${data.musicology.formBreakdown.length} Sections):
+                  </div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                    ${data.musicology.formBreakdown.map((sec, idx) => `
+                      <span style="display: inline-flex; align-items: center; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 4px; padding: 2px 6px; font-size: 7.2pt; color: #0369a1; font-weight: 600;">
+                        <strong style="color: #0284c7; margin-right: 4px;">0${idx + 1}</strong> ${sec}
+                      </span>
+                      ${idx < data.musicology.formBreakdown.length - 1 ? `<span style="color: #94a3b8; font-size: 7.5pt; margin: 0 1px;">➔</span>` : ""}
+                    `).join("")}
+                  </div>
+                </div>
+              ` : ""}
               ${data.musicology.arrangementTechniques ? `
-                <div style="margin-top: 1rem; border-top: 1px solid #e2e8f0; padding-top: 0.75rem;">
-                  <strong>Arrangement & Production Signatures:</strong>
-                  <p style="margin: 0.25rem 0 0 0; font-size: 0.88rem; line-height: 1.5;">${data.musicology.arrangementTechniques}</p>
+                <div style="margin-top: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 0.6rem;">
+                  <strong style="font-size: 8pt; color: #475569;">Arrangement & Production Signatures:</strong>
+                  <p style="margin: 0.25rem 0 0 0; font-size: 8.2pt; line-height: 1.45; color: #1e293b;">${data.musicology.arrangementTechniques}</p>
                 </div>
               ` : ""}
             </div>

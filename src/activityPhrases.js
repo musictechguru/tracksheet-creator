@@ -1,225 +1,129 @@
-// Chronologically ordered activity phrases for Tracksheet search and DAW-specific Component 1 generation
-// 200 cultural, funny, accurate, studio-based phrases for generation monitor
+// Historical Tracksheet Activity Phrases: Archival research, checking down records, and tracking down equipment
 export const TRACKSHEET_ACTIVITY_PHRASES = [
-  // 1. Archival Ingest, Tape Vault Forensics & Splicing
-  'Blowing 40 years of mysterious magnetic dust off the 2-inch master tape boxes…',
-  'Deciphering engineer grease-pencil notes: coffee ring or assistant engineer tears from 1974?…',
-  'Baking sticky-shed Ampex 456 tape reels in a food dehydrator at 130°F and praying…',
-  'Aligning Studer A800 tape heads with an oscilloscope, a jeweller’s screwdriver, and sheer optimism…',
-  'Checking tape speed calibration: 15 ips, 30 ips, or whatever speed the capstan motor felt like running before lunch…',
-  'Auditing Dolby A noise reduction logs and praying nobody forgot to press the decode button…',
-  'Hunting down the razor blade and splicing block after the downbeat edit fell into the control room carpet…',
-  'Demagnetizing the tape heads while secretly terrified of wiping the entire multi-track reel…',
-  'Running tape azimuth calibration tones that have all the neighbourhood dogs howling in unison…',
-  'Inspecting 24-track 2-inch tape and hoping it hasn’t chemically bonded into strawberry marmalade…',
-  'Varispeeding the tape machine up 2% because the band drank too much lager the night before…',
-  'Flipping the 2-inch reel upside down to print reverse plate reverb on the lead guitar solo…',
-  'Finding a 1978 studio logbook note: \'Track 17 is blank because Keith kicked the mic stand over\'…',
-  'Listening for tape print-through on the acoustic intro and pretending it’s a deliberate artistic ghost echo…',
-  'Calibrating tape bias until the 10 kHz test tone gives the head engineer a ringing headache…',
-  'Rescuing a tangled reel of magnetic tape with a pencil, two cotton gloves, and deep breathing exercises…',
-  'Bouncing 16 vocal harmony tracks down to 2 tracks because we ran out of physical tape reels…',
-  'Checking the master tape leader: red tape for heads out, blue tape for tails out, masking tape for panic…',
-  'Cleaning pinch rollers with isopropyl alcohol until the Q-tip comes out pitch black…',
-  'Praying the tape machine capstan belt doesn’t disintegrate during the final chorus fadeout…',
+  // 1. Searching Tape Vaults, Basements & Record Company Archives
+  'Blowing 45 years of mysterious magnetic dust off the 2-inch master tape boxes…',
+  'Rummaging through subterranean Island Records tape vaults with a flickering flashlight and a lukewarm mug of tea…',
+  'Baking sticky-shed Ampex 456 tape reels in a food dehydrator at 130°F while whispering prayers to Studer…',
+  'Searching microfiche catalogs at Abbey Road to discover why the session reels were filed under the drummer\'s nickname…',
+  'Unearthing a water-damaged cardboard box labeled "HIT SINGLE MASTER - DO NOT THROW OUT" behind a broken radiator…',
+  'Dusting off an unlabelled Scotch 206 reel that smells distinctly of 1976 patchouli and stale control room coffee…',
+  'Checking the Atlantic Records tape archives: praying nobody recorded a 1982 radio jingle over the multitrack…',
+  'Prying open a corroded metal film canister containing 1/4-inch safety copies from Olympic Studios…',
+  'Interrogating the retired EMI vault manager with a packet of Hobnobs to locate the missing 1973 tape cartons…',
+  'Cross-referencing Olympic, Trident, and Sound Techniques vault manifests to find which studio actually kept the reels…',
+  'Rescuing magnetic tape reels from the damp boot of an ex-manager\'s 1985 Ford Capri…',
+  'Searching through Motown\'s Hitsville tape bins: finding 16 reels all simply labeled "JAM IN D MINOR"…',
+  'Shaking a tape box gently to verify the 2-inch reel hasn\'t chemically bonded into strawberry marmalade…',
+  'Sifting through uncataloged tape vaults in Burbank to locate the missing vocal outtake safety reels…',
+  'Finding a handwritten note inside a 1978 master box: "DO NOT PLAY - TAPE HEADS WILL CRY"…',
+  'Examining unlabelled 1-inch 8-track tapes with a magnifying glass, cotton gloves, and forensic curiosity…',
+  'Searching through damp basement archive shelves in Soho where tape boxes are filed by color and sheer luck…',
+  'Auditing Olympic Sound Studios tape dispatch manifests from October 1971…',
+  'Digging through tape storage lockers in Muscle Shoals: hoping the master didn\'t get melted by Alabama humidity…',
+  'Checking Abbey Road tape library index cards: cross-referencing EMI matrix numbers against session dates…',
+  'Wiping green mildew off a 16-track 2-inch master reel found in a retired producer\'s garden shed…',
+  'Tracking down safety copies shipped to Capitol Tower in Los Angeles that got lost in transit in 1977…',
+  'Deciphering tape vault catalog codes that look suspiciously like an assistant engineer\'s grocery list…',
+  'Searching the Decca archives: verifying whether the master was filed under the band name or the producer\'s yacht name…',
+  'Locating the lost 1/2-inch stereo mixdown tape: discovered propping up a wobbly control room coffee table…',
+  'Ransacking subterranean tape archives in Nashville looking for the missing session take sheets…',
+  'Sifting through Island Records Basing Street archive lockers for the original 24-track rhythm tracks…',
+  'Deciphering faded grease-pencil catalog numbers on a dented 1972 Scotch tape shipping carton…',
+  'Checking whether the master tape was archived "heads out" or "tails out" before hitting play…',
+  'Inspecting tape leader tape: red tape for heads out, blue tape for tails out, masking tape for absolute panic…',
+  'Searching Criteria Recording Studios vaults in Miami for Hurricane-surviving 2-inch multi-tracks…',
+  'Tracing an unlabelled 1970s tape box that traveled through 4 different continents and 7 record labels…',
 
-  // 2. Legendary Studios, Acoustic Rooms & Architectural Oddities
-  'Tracking down the tracking room: Abbey Road Studio Two, Sound City, or a damp basement in Soho…',
-  'Recreating the Motown Hitsville \'Snakepit\' vibe: 8 musicians jammed into a room the size of a broom closet…',
-  'Running a 100-foot XLR cable into the studio tiled bathroom for that authentic 1970s natural echo…',
-  'Checking the acoustics at Olympic Studios: where the Glyn Johns drum sound was born and tea was mandatory…',
-  'Channeling Sunset Sound Studio 1: where Van Halen parked their Marshall stacks in the echo chamber…',
-  'Inspecting the Trident A-Range console and ignoring the slight burning smell from Channel 14…',
-  'Investigating the live room floorboards at Muscle Shoals Sound Studio for swamp-funk resonance…',
-  'Tracking at Hansa by the Wall: opening the big hall doors so David Bowie’s vocal hits the back wall…',
-  'Blowing sage around Electric Lady Studios to appease the ghost of Jimi Hendrix’s fuzz pedal…',
-  'Searching for the acoustic sweet spot in a live room designed entirely with non-parallel cedar walls…',
-  'Checking the isolation booth glass to see if the drummer is still making face gestures at the producer…',
-  'Hunting down a 50 Hz mains hum caused by the studio mini-fridge kicking its compressor on…',
-  'Setting up room mics on the studio staircase and begging the receptionist not to walk down during take 4…',
-  'Wiping 30 years of spilled Earl Grey and tobacco ash off the vintage Neve console leather armrest…',
-  'Testing the studio echo chamber: shouting \'TESTING\' into an empty concrete bunker in the basement…',
-  'Checking the air conditioning rumble before the sub-bass mic picks up the building’s ventilation system…',
-  'Reconstructing the session timeline before the record label’s £50,000 recording budget evaporated…',
-  'Cross-referencing the patchbay with 250 tangled bantam patch cables resembling boiled spaghetti…',
-  'Discovering the legendary \'room sound\' was actually just a broken window rattling in the breeze…',
-  'Chasing farm animals away from the live room door at Rockfield Studios during vocal tracking…',
+  // 2. Checking Down Records, Session Sheets & Studio Documentation
+  'Deciphering engineer grease-pencil chicken scratch on the back of a 1972 track sheet: is that "Snare Top" or "Gary\'s Lunch"?…',
+  'Cross-referencing Musicians Union session logbooks to find out who actually played the uncredited cowbell on take 4…',
+  'Inspecting the coffee-ringed assistant engineer session card from June 14th, 1975…',
+  'Auditing session take sheets: 42 takes marked "False Start", 1 marked "Master", 5 marked "Singer Sulking"…',
+  'Verifying the 24-track track sheet chart: discovering Tracks 17 to 20 were wiped for 16 layers of handclaps…',
+  'Translating cryptic British studio slang in the logbook: "Gave the snare a bit of welly on Take 4"…',
+  'Tracking down the studio receptionist\'s 1977 desk diary to confirm what week the brass section actually showed up…',
+  'Cross-checking session ledger receipts: £450 for studio time, £1,800 for tea, tobacco, and emergency guitar strings…',
+  'Deciphering an illegible track assignment: "TK 9: SLOW BASS / TK 10: WEIRD NOISE / TK 11: DON\'T TOUCH"…',
+  'Comparing three conflicting session track sheets written by three different assistant engineers during a 36-hour shift…',
+  'Consulting the studio tape log to find out which track had the uncredited second guitar solo bounced onto it…',
+  'Investigating assistant engineer take notes: "Take 12 sounded brilliant until the drummer dropped his sandwich on the snare"…',
+  'Checking union card contracts to identify the mystery session harpist who refused to be credited on the sleeve…',
+  'Reading faded yellowed masking tape stuck to the 2-inch reel flange: "BOUNCE OF TRACKS 1-8 (WE THINK)"…',
+  'Matching session dates against UK weather records to explain why the tape machine varispeed was drifting wildly…',
+  'Cross-referencing tape dispatch notes to confirm the stereo master wasn\'t left in the back of a London black cab…',
+  'Inspecting the producer\'s session diary: discovering three whole days spent trying to get the right tambourine sound…',
+  'Deciphering studio log entry from 3:45 AM: "Guitarist fell asleep mid-solo; kept the feedback loop as intro"…',
+  'Checking down track sheet notes: "Track 8: Lead Vocal (Do NOT wipe, talent took 4 hours to coax into booth)"…',
+  'Cross-referencing take numbers against master acetate cutting logs to find the true definitive mix…',
+  'Reading faded pencil margin notes: "Replaced bassline after bassist admitted he was playing in the wrong key"…',
+  'Auditing the studio billing ledger: tracing who authorized 14 rolls of 2-inch tape for a 3-minute pop single…',
+  'Checking session paperwork for cue sheets: verifying which takes were spliced together with razor blades…',
+  'Deciphering a 1979 session sheet scribble: "Track 14 is silent because Keith tripped over the multicore snake"…',
+  'Auditing track sheet channel allocations: discovering the acoustic piano was spread across 6 tracks for no obvious reason…',
+  'Checking the assistant engineer\'s handwritten diary: "Producer insisted on recording vocals at 4:00 AM under a blanket"…',
+  'Reconciling conflicting studio logs between the London tracking session and the New York mixdown session…',
+  'Verifying the master session card: checking if the famous outro fadeout was executed on the fader or by walking away…',
+  'Checking the studio overtime logs: determining if the string section walked out at 10:01 PM on the dot…',
+  'Auditing engineer notes on Track 23: "Ghost acoustic guitar - do not erase, player has already left for the airport"…',
 
-  // 3. Microphones, Transducers & Placement Shenanigans
-  'Inspecting the vintage Neumann U47: handle with velvet gloves, whispered reverence, and insurance forms…',
-  'Rigging an AKG D112 inside the kick drum: affectionately known as \'the golden studio egg\'…',
-  'Angling the Shure SM57 45 degrees across the snare rim: the most reliable 4-inch distance in human history…',
-  'Duct-taping two SM57s together Fred Kevorkian style because one microphone simply isn\'t enough mid-range…',
-  'Placing a Coles 4038 ribbon mic as overhead and praying the boom arm clutch doesn\'t give up on life…',
-  'Accidentally feeding 48V phantom power into an irreplaceable vintage ribbon mic and seeing your soul flash…',
-  'Herding 6 backing vocalists around a single omnidirectional condenser without anyone elbowing the capsule…',
-  'Taping a PZM boundary microphone to the control room floorboards for ambient foot-tapping warmth…',
-  'Positioning a Shure SM7B two inches from the screamer’s mouth with the heavy-duty foam windscreen…',
-  'Aiming a small diaphragm condenser at the acoustic guitar 12th fret to avoid bottom-end boominess…',
-  'Positioning brass players 4 feet back from the ribbon mic so they don’t blast the corrugated ribbon into orbit…',
-  'Reminding the singer that the pop filter is a protective barrier, not an edible candy lollipop…',
-  'Miking the snare bottom with an inverted phase mic to catch the snappy rattle of the snare wires…',
-  'Balancing a heavy Neumann U67 on a counterweighted boom stand while eyeing the floor suspiciously…',
-  'Rigging an XY stereo pair with a ruler and protractor to avoid phase cancellation nightmares…',
-  'Stuffing an Electro-Voice RE20 down the bell of a baritone saxophone and hoping for the best…',
-  'Ransacking the mic locker for 4 microphone clips that aren’t held together by electrical tape and hope…',
-  'Putting a dynamic mic on the hi-hat only to immediately mute it in the mix forever…',
-  'Finding the cardioid null point to reject the drummer\'s squeaky kick pedal bearing…',
-  'Taping a boundary mic inside an acoustic piano lid with gaffer tape that was manufactured in 1983…',
+  // 3. Tracking Down Equipment, Microphones & Signal Chains
+  'Auditing vintage equipment logs: confirming whether Studio 2 had the Helios console or the Neve 8048 in 1974…',
+  'Hunting down the serial number of the EMT 140 plate reverb hidden in the studio basement concrete bunker…',
+  'Squinting at grainy black-and-white control room Polaroids to see which microphone was on the lead vocalist…',
+  'Tracking down whether the kick drum mic was an AKG D12, a Neumann U47 FET, or an Electro-Voice RE20…',
+  'Tracking down the vintage equipment rental invoice: checking which fuzz pedal was hired for the weekend…',
+  'Verifying which tape machine recorded the rhythm bed: 16-track 3M M56 or 24-track Studer A800…',
+  'Tracking down the bass signal chain: determining whether it was a direct BSS DI box or a cranked Ampeg SVT fridge…',
+  'Sleuthing through gear archives to find out if the snare had an inverted phase mic taped underneath…',
+  'Investigating whether the acoustic guitar was tracked with a pair of Neumann KM84s or a single Coles 4038 ribbon…',
+  'Digging into studio repair logs: discovering Channel 8 preamp was distorting because an engineer spilled tea in the gain pot…',
+  'Tracking down the console routing: finding out which tracks were slammed through the UREI 1176 in "All-Buttons-In" mode…',
+  'Confirming whether the lead vocal went through the Teletronix LA-2A optical cell or the Fairchild 670 tube limiter…',
+  'Checking whether the echo was a real concrete chamber, an EMT plate, or a tape delay loop on a Revox A77…',
+  'Tracking down the guitar amp: discovering the monster rock sound was actually a tiny 5-watt Fender Champ miked in a bathroom…',
+  'Identifying which microphone was used for the room sound: a pair of PZM boundary mics taped to the parquet floor…',
+  'Verifying the console EQ settings: checking if the famous top-end sheen was Pultec EQP-1A magic or just tape saturation…',
+  'Tracking down the Leslie rotary speaker cabinet model used on the Hammond organ overdub…',
+  'Checking microphone locker dispatch sheets to see if the U47 had a brass-ring M7 capsule or a K47…',
+  'Auditing DI box specs: determining if the bass used passive Jensen transformers or an active custom studio circuit…',
+  'Hunting down the tape bias calibration logs: finding out if the heads were calibrated for +6 dB or +9 dB high-output tape…',
+  'Tracking down which synthesizers were carted into the studio: checking if that pad was a Prophet-5, Minimoog, or Mellotron M400…',
+  'Hunting down the outboard gear patch sheet: discovering the lead vocal was routed through four compressors in series…',
+  'Checking the console talkback circuit schematic: discovering how the producer\'s accidental sneeze made it onto Track 15…',
+  'Tracking down the snare drum: confirming it was a 1968 Ludwig Supraphonic dampened with a hotel towel and a wallet…',
+  'Inspecting equipment hire receipts to see if the studio actually rented an Eventide H910 Harmonizer for the chorus vocal…',
+  'Verifying monitor speaker calibration: confirming the mix was checked on Auratone 5C sound cubes and Yamaha NS-10Ms…',
+  'Tracking down the vintage DI box: checking whether the direct bass sound came from a Countryman Type 85 or a BSS…',
+  'Checking Olympic Sound Studios electrical schematics: discovering custom transformer iron on the console summing bus…',
+  'Tracking down the vocal chain pop filter: discovering it was a wire coat hanger wrapped in the assistant\'s nylon tights…',
+  'Hunting down the tape machine maintenance log: checking when the Studer A800 capstan belt was last replaced…',
+  'Verifying the acoustic guitar microphone position: checking Polaroids to confirm 12th fret placement vs soundhole…',
+  'Tracking down whether the plate reverb was a stereo EMT 140 or a mono EMT 240 gold-foil foil unit…',
+  'Auditing the microphone preamps: confirming whether drums were routed through discrete Neve 1073s or console direct…',
 
-  // 4. Consoles, Preamps & Outboard Hardware
-  'Driving discrete Neve 1073 preamps into the sweet spot where transformer iron turns into pure rock \'n\' roll…',
-  'Engaging the SSL G-Master Bus compressor: watching the needle dance 2 to 4 dB in time with the groove…',
-  'Setting the UREI 1176 to \'All Buttons In\' mode: absolute British brickwall drum destruction unlocked…',
-  'Dialing the Pultec EQP-1A trick: simultaneously boosting and cutting 60 Hz to defy the laws of physics…',
-  'Waiting 45 minutes for the Teletronix LA-2A electro-optical tube cell to warm up and find its inner peace…',
-  'Warming up the Fairchild 670: 20 vacuum tubes heating the control room better than central heating…',
-  'Firing up the EMT 140 plate reverb: 600 pounds of steel sheet suspended in an iron frame in the basement…',
-  'Tapping the AKG BX20 spring reverb tank by accident and making the control room sound like an earthquake…',
-  'Sweeping the API 550A parametric EQ: adding 4 dB of 5 kHz punch that can cut through concrete…',
-  'Wiggling patch cord #47 in the TT bantam bay until the left channel audio magically reappears…',
-  'Setting hardware de-esser threshold: taming harsh vocal sibilance without turning the singer into Daffy Duck…',
-  'Checking discrete console summing bus headroom before the red overload LEDs permanently burn into retinas…',
-  'Calibrating an Eventide H910 Harmonizer: pitch-shifting by -9 cents and +9 cents for that 1980s vocal gloss…',
-  'Bypassing the outboard compressor to see if the producer can actually hear the difference (spoiler: they can\'t)…',
-  'Pushing an SSL channel VCA fader past +6 dB and blaming the distortion on \'vintage harmonic character\'…',
-  'Engaging the -20 dB pad on the audio interface because the snare drum transient is terrifying the converters…',
-  'Checking the console talkback circuit: discovering the studio live room heard every word of your critique…',
-  'Adjusting compressor attack time: fast enough to clamp the transient, slow enough to let the stick snap hit…',
-  'Tuning the compressor release time to the song tempo so the gain reduction meter breathes in 4/4 time…',
-  'Connecting a DBX 160X compressor to the bass guitar for that instantaneous, merciless VCA snap…',
-
-  // 5. The Drummer & Drum Tracking Realities
-  'Politely asking the drummer to stop playing paradiddles while the engineer is gain-staging the kick mic…',
-  'Stuffing a vintage sofa cushion and a hotel pillow inside the 22-inch bass drum shell…',
-  'Taping a thick leather wallet and two feminine hygiene pads to the snare head for peak 1975 dead thud…',
-  'Managing hi-hat spill before the cymbal bleed contaminates every microphone in the northern hemisphere…',
-  'Tightening a loose bass drum spur before the kick drum slowly marches across the studio floor…',
-  'Tuning the rack toms with a drum key, a tuning gauge, and three Hail Marys…',
-  'Discovering the squeak in the drum take wasn\'t the snare, but the drummer’s 30-year-old DW 5000 pedal hinge…',
-  'Setting up the 3:1 distance rule for drum overheads so the ride cymbal doesn’t sound like falling cutlery…',
-  'Flipping the snare bottom channel phase: discovering half the drum\'s low-end body was missing in action…',
-  'Asking the drummer if they can play the verse slightly softer, knowing they will play it exactly 15% louder…',
-  'Replacing the battered snare batter head that looks like it survived the Battle of the Somme…',
-  'Placing a sub-kick woofer mic in front of the bass drum for that 40 Hz subterranean chest rumble…',
-  'Gaffer-taping drumsticks together because the drummer broke their fourth pair during take 2…',
-  'Auditioning 7 different snare drums only to go back to the trusty Ludwig 1968 Supraphonic 400…',
-  'Muting the drummer’s headphones because the click track is bleeding into the vocal condenser 20 feet away…',
-  'Setting up a trash mic in the middle of the room crushed through an 1176 for instant John Bonham energy…',
-  'Realizing the drummer plays the hi-hat at 120 dB and the snare at 40 dB: initiating engineering prayer mode…',
-  'Checking the kick drum beater: swapping hard plastic for soft felt to save the microphone\'s capsule…',
-  'Begging the drummer not to hit the 18-inch China cymbal on the quiet acoustic breakdown…',
-  'Labeling the multitrack: Kick In, Kick Out, Sub Kick, Snare Top, Snare Btm, Hi-Hat, Tom 1, Tom 2, Floor, OH L, OH R, Room L, Room R…',
-
-  // 6. Guitars, Bass, Amps & The Headroom Wars
-  'Plugging the bass guitar into an active BSS AR-133 DI box and praying the battery isn\'t dead…',
-  'Flipping the DI ground lift switch: instantly banishing the demonic 50 Hz electrical hum back to hell…',
-  'Asking the bassist when they last changed their flatwound strings: \'Sometime during the Carter administration\'…',
-  'Miking an Ampeg SVT 8x10 fridge cabinet that is currently vibrating the engineer\'s coffee cup off the console…',
-  'Politely asking the guitarist why they brought two 100-watt Marshall full stacks to record a folk intro…',
-  'Forcing the guitarist to tune their G-string with an actual electronic strobe tuner instead of \'by ear\'…',
-  'Aiming the dynamic mic 2 inches off-axis from the speaker dust cap to skip the ice-pick treble beam…',
-  'Hunting down an elusive buzz across a 15-pedal pedalboard powered by 6 daisy-chained wall warts…',
-  'Isolating the guitar amp inside the studio vocal booth with two sleeping bags draped over the cabinet…',
-  'Tracking acoustic guitar: asking the player to remove their belt buckle, wristwatch, and noisy jacket…',
-  'Auditing guitar double-tracking: checking if the left and right takes are tight or a chaotic Flamenco duel…',
-  'Dialing the guitar amp volume knob to 11 while the assistant engineer dons military-grade ear defenders…',
-  'Setting up a clean DI guitar track for re-amping later when everyone admits the amp tone was terrible…',
-  'Slapping an optical compressor on the bass track to tame the bassist’s aggressive slap-thumb outbursts…',
-  'Tuning the electric guitar before every single take because the vintage vibrato bridge refuses to stay in pitch…',
-  'Miking a 1965 Fender Twin Reverb: pristine clean sparkle, ear-splitting volume, back-breaking weight…',
-  'Replacing the battery in an active EMG pickup after noticing the guitar solo sounded like a dying kazoo…',
-  'Blending the clean bass DI low end with a saturated SansAmp VT bass drive track for crunch and authority…',
-  'Checking guitar phase when blending two cabinet microphones: moving mic #2 by a quarter of an inch…',
-  'Reminding the lead guitarist that the song does not actually require a 3-minute tapping solo in the bridge…',
-
-  // 7. Vocals, Cans, Room Psychology & The Sweet Spot
-  'Adjusting the headphone mix: \'Can I have more me, less snare, no bass, and reverb that sounds like God?\'…',
-  'Reminding the singer to stand 6 inches back so proximity effect doesn\'t turn them into an earthquake…',
-  'Brewing a cauldron of boiling water, lemon slices, and organic Manuka honey for the anxious lead vocalist…',
-  'Engaging the reflection filter around the vocal mic to combat the acoustic reflections of a bedroom ceiling…',
-  'Coaxing the vocalist into the booth by dimming the control room lights and lighting a scented candle…',
-  'Checking the headphone cue amp: saving the singer’s eardrums from an accidental blast of 1 kHz test tone…',
-  'Comping 47 vocal takes to assemble one immaculate performance where every syllable is in tune and on time…',
-  'Fixing the vocalist\'s headphone leak before the high-pitched click track bleeds into the delicate acapella outro…',
-  'Telling the singer \'That take was fantastic, let\'s just do one more for safety\' (Take #28)…',
-  'Sweeping the vocal EQ notch filter: hunting down the 3.2 kHz nasal frequency that sounds like an angry bee…',
-  'Applying gentle optical leveling: shaving 3 dB off the peaks so the vocal sits right in front of the listener…',
-  'Setting up a stereo delay throw on the last word of the chorus: \'night… night… night…\'…',
-  'Calibrating the talkback microphone so you don’t deafen the talent when you say \'Great job, darling\'…',
-  'Aligning backing vocal doubles with manual audio edits so the \'S\' and \'T\' consonants don\'t sound like spray cans…',
-  'Reminding the singer that singing louder does not mean moving 3 feet closer to the microphone grille…',
-  'Placing a vintage ribbon mic on the lead vocal for that smoky, velvety 1950s jazz club intimacy…',
-  'Inserting a high-pass filter at 90 Hz on the vocal channel to eliminate footsteps and distant tube train rumble…',
-  'Dialing 25 ms of predelay on the vocal plate reverb so the singer’s dry words remain crystal clear…',
-  'Telling the vocalist the autotune plugin crashed so they will actually concentrate on hitting the high note…',
-  'Catching the singer yawning directly into the £5,000 vintage valve condenser capsule on track 1…',
-
-  // 8. Synths, Keys, Strings & Auxiliary Alchemy
-  'Warming up vintage analog synthesizers: waiting 30 minutes for the VCO oscillators to stop drifting out of tune…',
-  'Miking an acoustic grand piano with an ORTF stereo condenser pair tucked right over the soundboard hammers…',
-  'Miking a vintage Leslie rotary speaker cabinet: two mics on the spinning top horn, one on the low-end drum…',
-  'Praying the drive belt on the Hammond B3 organ\'s Leslie speaker doesn\'t snap in the middle of the crescendo…',
-  'Connecting MIDI cables between 5 vintage synths and diagnosing why Channel 1 is triggering the drum machine…',
-  'Humanizing quantized MIDI velocity curves so the piano ballad doesn\'t sound like a robotic typewriter…',
-  'Tuning the Minimoog oscillator bank: 3 oscillators slightly detuned for that monstrous, wall-shaking bass growl…',
-  'Miking a string quartet while politely asking the cellist not to squeak their antique wooden chair…',
-  'Dampening the acoustic grand piano damper pedal squeak with a can of WD-40 and a clean rag…',
-  'Tracking a vintage Mellotron: hoping the physical tape strips inside the keyboard don\'t jam or tear…',
-  'Summoning an army of shaker and tambourine overdubs to glue the rhythm section together…',
-  'Drawing CC11 Expression automation curves with a mouse until your index finger cramps completely…',
-  'Positioning a stereo pair of boundary mics inside an upright piano for that rustic, intimate indie record sound…',
-  'Calibrating analog tape flanging: pressing your thumb directly onto the tape reel flange during playback…',
-  'Filtering synth sub-bass below 30 Hz so the club sound system doesn\'t launch its subwoofers across the dancefloor…',
-  'Tracking a brass section: checking that the trumpet players haven\'t emptied their spit valves onto the floor cables…',
-  'Blending a real upright bass acoustic mic with its bridge piezo pickup for punch and organic woody tone…',
-  'Sequencing an analog arpeggiator synced to an analog clock pulse from an 808 rimshot trigger out…',
-  'Injecting subtle tape wow and flutter into the electric piano pad for that nostalgic, woozy vintage warmth…',
-  'Begging the percussionist not to bring their entire trunk of 50 different Latin percussion instruments into the booth…',
-
-  // 9. Producers, A&R, Control Room Lore & Studio Legends
-  'Drawing a Brian Eno Oblique Strategies card: \'Honor thy error as a hidden intention\'…',
-  'Channeling Rick Rubin: lying motionless on the control room sofa for 3 hours before saying \'Make it more soulful\'…',
-  'Pushing the famous \'dummy fader\' on the console to appease the record label executive\'s ego without changing anything…',
-  'The A&R executive walks in at 11:30 PM, eats all the catering grapes, and asks \'Where is the radio single?\'…',
-  'Steely Dan mode engaged: auditioning 6 different world-class session drummers for the exact same 16-bar groove…',
-  'Phil Spector Wall of Sound simulation: jamming 5 acoustic guitars and 3 pianos playing the exact same chord…',
-  'Running the sacred British studio tea rota: strict milk-first versus tea-first protocol currently being debated…',
-  'The tape op / runner dispatched on an emergency 3:30 AM mission for gaffer tape, energy drinks, and pizza…',
-  'The assistant engineer nodding along intently to the mix while secretly fighting off absolute sleep exhaustion…',
-  'Whispering the ancient recording studio prayer: \'We\'ll fix it in the mix\' at 4:15 AM…',
-  'Overcoming Red Light Fever: musician plays flawlessly for an hour, but chokes the millisecond RECORD is armed…',
-  'Deciphering producer mix notes: \'Can you make the chorus feel more purple, wider, and slightly less Wednesday?\'…',
-  'Checking the session budget ledger: £4,000 spent on studio time, £6,000 spent on catering and fancy coffee beans…',
-  'The band manager opens the door during the quietest acoustic take to ask where the studio WiFi password is…',
-  'Debating whether to keep the tape machine count-in and studio banter at the start of the song for indie credibility…',
-  'Consulting the studio acoustic designer\'s original 1972 blueprints to figure out why 120 Hz is ringing like a bell…',
-  'Reminding the band that the studio lounge pool table is not an auxiliary percussion instrument…',
-  'Banning the drummer\'s friend from sitting on the control room couch with their feet on the patchbay cables…',
-  'The producer requests \'more vibe\' in the chorus: subtly nudging the stereo bus fader up by 0.3 dB…',
-  'Discovering that the uncredited session guitarist on track 4 went on to become an international rock icon…',
-
-  // 10. Mixing, Mastering, The Red Light & Final Delivery
-  'Auratone 5C Sound Cubes engaged: if the mix sounds glorious on these 5-inch mono boxes, it sounds glorious anywhere…',
-  'Yamaha NS-10M tweeters ready: two squares of tissue paper taped over the drivers to save our eardrums…',
-  'Hitting the console mono switch: praying the chorus wide stereo guitars don\'t phase-cancel into thin air…',
-  'Carrying the test rough mix out to the assistant engineer’s beat-up 1998 hatchback for the sacred car stereo test…',
-  'Monitoring VU meter needles: pinned into the red, exactly as legendary 1970s rock engineers intended…',
-  'Checking mix bus headroom: peak signal sitting cleanly at -12 dBFS before the final analog master chain…',
-  'Sweeping the mix bus high-pass filter to 30 Hz: dumping subsonic speaker-rumble into the digital wastebasket…',
-  'Engaging brickwall limiter with true peak ceiling locked to -1.0 dBFS: protecting streaming listeners everywhere…',
-  'Checking integrated loudness: hitting the -14 LUFS target on the nose without crushing the life out of the snare…',
-  'De-essing the stereo master mix so the hi-hat and vocal consonants don\'t slice listeners\' ears in headphones…',
-  'Inspecting vinyl lacquer cutting notes: \'Keep sub-bass strictly mono below 100 Hz so the cutting stylus doesn\'t jump\'…',
-  'AB\'ing our drum sound against Steely Dan’s \'Aja\' and experiencing an immediate mild existential crisis…',
-  'Realizing after 14 hours of continuous mixing that the snare drum has been 4 dB too loud since lunchtime…',
-  'Saving the session file as: Mix_Final_v3_master_REAL_FINAL_useThisOne_v4_FINAL_OK.ptx…',
-  'Pressing Command+S (Save) five times in rapid succession out of pure digital audio workstation muscle memory…',
-  'Listening on £15 Apple earbuds: confirming the bassline cuts through even on terrible plastic headphones…',
-  'Exporting 24-bit / 96 kHz uncompressed master stems for archival immortality in the record label vaults…',
-  'Printing the analog 1/2-inch stereo tape master at 30 ips with high-output tape formulation…',
+  // 4. Forensic Audio Archaeology & Studio Detective Work
+  'Calling a retired 78-year-old tape operator who swears the acoustic guitar was miked on the fire escape…',
+  'Investigating acoustic room anomalies: discovering the low-end thud was a subterranean tube train passing under the studio…',
+  'Forensic tape listening: analyzing 15 seconds of silence before Take 1 to measure the room reverb decay time…',
+  'Deciphering faded grease-pencil notes on the console meter bridge: "CH 12: DO NOT TURN UP UNDER ANY CIRCUMSTANCES"…',
+  'Tracking down the mystery acoustic space: discovering the backing vocals were recorded in the Abbey Road ladies\' washroom…',
+  'Checking the electrical phase of the studio mains: ruling out 50 Hz transformer hum on the bass multitrack…',
+  'Consulting vintage studio floor plans to calculate the exact distance between the drum kit and the live room stone wall…',
+  'Identifying bleed on the vocal track: confirming the drummer\'s headphone click was loud enough to hear in the car park…',
+  'Cross-referencing session photos to see how many inches the pop filter was from the lead singer\'s microphone…',
+  'Detective work on the multitrack bounce: tracing where Tracks 1-4 disappeared to make room for four brass overdubs…',
+  'Investigating why Track 24 has no audio: discovering it was dedicated to an unstable SMPTE timecode pulse…',
+  'Checking whether the guitar solo was recorded at half-speed and played back an octave higher on the master reel…',
+  'Auditing studio maintenance records: checking when the console capacitors were last replaced before the session…',
+  'Sleuthing out the source of the mysterious hiss: tracing it to a vintage Echoplex tape cartridge running on its last legs…',
+  'Analyzing vocal mic spill into the drum overheads: calculating speed of sound across 22 feet of control room glass…',
+  'Investigating an uncredited whistle solo on Track 9: rumor says the tea runner whistled it while holding two mugs…',
+  'Checking tape leader colors: red tape for heads out, blue tape for tails out, masking tape for absolute panic…',
+  'Verifying tape azimuth calibration: making sure the stereo image doesn\'t collapse the moment mono is engaged…',
+  'Reconstructing the studio patchbay layout from a water-damaged napkin drawn at 4:00 AM…',
+  'Tracing the lineage of the master safety copy from London to New York to a climate-controlled salt mine in Kansas…',
   'Synthesizing decades of archival forensics, signal chains, and musicological lore into an airtight dossier…',
-  'Session wrapped, faders zeroed, tape heads demagnetized, and master tracksheet signed off before the sun comes up!',
+  'Session forensics complete: master reels verified, tape heads demagnetized, and historical track sheet ready!'
 ];
 
 export const DAW_ACTIVITY_PHRASES = {
@@ -741,4 +645,132 @@ export function getSolutionEngineeringPhrases(daw = 'Logic Pro', context = {}) {
   // 5. Return fully shuffled random order every time
   return shufflePhrases(combined);
 }
+
+// Dynamic procedural phrases for Historical Tracksheet search
+export function generateProceduralTracksheetPhrases(context = {}) {
+  const { trackName, artistName } = context;
+  const title = (trackName || 'session master').trim();
+  const artist = (artistName || '').trim();
+  const byArtist = artist ? ` by ${artist}` : '';
+  const forArtist = artist ? ` for ${artist}` : '';
+
+  const vaults = [
+    'EMI Hayes Archive Vault 4',
+    'Island Records Basing Street basement vaults',
+    'Abbey Road Studio subterranean tape vault',
+    'Olympic Sound Studios archive repository',
+    'Sunset Sound climate-controlled tape locker B',
+    'Trident Studios Soho storage vaults',
+    'Atlantic Records Iron Mountain vault',
+    'Motown Hitsville Snakepit tape library',
+    'Muscle Shoals Sound Studio tape bunker',
+    'Criteria Recording Studios Miami vaults',
+    'Decca West Hampstead tape archives',
+    'Capitol Records Tower tape library in Hollywood'
+  ];
+
+  const studios = [
+    'Abbey Road Studio Two',
+    'Olympic Sound Studios Studio A',
+    'Trident Studios Studio 1',
+    'Sound City Studio A',
+    'Electric Lady Studios Studio A',
+    'Rockfield Studios Quadrangle',
+    'Sunset Sound Studio 1',
+    'Muscle Shoals Sound Studio',
+    'Criteria Recording Studios'
+  ];
+
+  const consoles = [
+    'Neve 8048 custom console',
+    'Helios Type 69 wraparound desk',
+    'EMI TG12345 transistor desk',
+    'Trident A-Range 40-channel console',
+    'SSL 4000 E Series with Total Recall',
+    'discrete custom API console with 550A EQs',
+    'MCI JH-500 recording console'
+  ];
+
+  const mics = [
+    'vintage Neumann U47 tube mic',
+    'AKG C12 multi-pattern tube condenser',
+    'Telefunken ELA M 251 valve microphone',
+    'matched pair of Coles 4038 ribbons',
+    'Neumann U67 on heavy counterweight boom',
+    'Electro-Voice RE20 variable-D dynamic',
+    'AKG D12 vintage bass drum microphone',
+    'Neumann KM84 small diaphragm stereo pair',
+    'Shure SM57 angled 45° across the rim'
+  ];
+
+  const outboard = [
+    'Fairchild 670 stereo tube limiter',
+    'Teletronix LA-2A optical leveling amplifier',
+    'UREI 1176LN Blue Stripe peak limiter',
+    'Pultec EQP-1A tube program equalizer',
+    'EMT 140 600-pound plate reverb unit',
+    'Eventide H910 Harmonizer pitch processor',
+    'AKG BX20 dual-spring reverb tank',
+    'vintage dbx 160 VCA compressor'
+  ];
+
+  const tapeMachines = [
+    'Studer A800 24-track 2-inch tape machine',
+    '3M M56 16-track 2-inch tape recorder',
+    'Ampex MM1200 2-inch multi-track recorder',
+    'Studer J37 1-inch 4-track valve machine',
+    'MCI JH-24 24-track recorder'
+  ];
+
+  const years = [1968, 1971, 1973, 1975, 1977, 1979, 1982, 1985];
+  const tapeSpeeds = ['15 ips', '30 ips'];
+  const boxCodes = ['ARC', 'MST', 'SESS', 'VLT', 'REL', 'EMI', 'TRK'];
+
+  const randVault = vaults[Math.floor(Math.random() * vaults.length)];
+  const randStudio = studios[Math.floor(Math.random() * studios.length)];
+  const randConsole = consoles[Math.floor(Math.random() * consoles.length)];
+  const randMic = mics[Math.floor(Math.random() * mics.length)];
+  const randOutboard = outboard[Math.floor(Math.random() * outboard.length)];
+  const randTape = tapeMachines[Math.floor(Math.random() * tapeMachines.length)];
+  const randSpeed = tapeSpeeds[Math.floor(Math.random() * tapeSpeeds.length)];
+  const randYear = years[Math.floor(Math.random() * years.length)];
+  const randCode = `${boxCodes[Math.floor(Math.random() * boxCodes.length)]}-${Math.floor(Math.random() * 900) + 100}`;
+  const reelNum = Math.floor(Math.random() * 88) + 11;
+  const trackNum = Math.floor(Math.random() * 23) + 1;
+  const takeNum = Math.floor(Math.random() * 28) + 2;
+
+  return [
+    `Rummaging through ${randVault}: locating original master tape box [${randCode}] for "${title}"${byArtist}…`,
+    `Deciphering assistant engineer session card for "${title}": auditing 24-track tape allocation from ${randYear}…`,
+    `Tracking down the primary vocal chain for "${title}": cross-referencing ${randStudio} mic locker logs${forArtist}…`,
+    `Auditing equipment hire receipts from ${randYear}: tracking down which ${randOutboard} was patched into "${title}"…`,
+    `Inspecting 2-inch tape reel #${reelNum} for "${title}": checking head alignment and calibration at ${randSpeed}…`,
+    `Tracing session signal path for "${title}": verifying ${randConsole} routing and ${randMic} placement…`,
+    `Sleuthing out tape box notes on "${title}": deciphering grease-pencil scribble on Track ${trackNum}…`,
+    `Cross-referencing Musicians Union session logs: tracking down uncredited players and overdub dates on "${title}"…`,
+    `Tracking down the reverb source for "${title}": checking whether ${randStudio} used an EMT plate or live echo chamber…`,
+    `Forensic tape head inspection for "${title}": recovering high-frequency tape bias calibration records from ${randYear}…`,
+    `Checking take log sheets for "${title}": verifying whether Take ${takeNum} or Take ${takeNum + 1} was spliced as master…`,
+    `Cross-referencing studio maintenance logs: confirming 2-inch multitrack #${reelNum} was recorded on a ${randTape}…`,
+    `Tracking down vintage DI box records: verifying bass signal path into ${randConsole} Channel ${Math.floor(Math.random() * 8) + 1}…`,
+    `Auditing studio dispatch paperwork: tracing the definitive safety tape transfer of "${title}"${byArtist}…`
+  ];
+}
+
+// Master generator for Historical Tracksheet search & forensic monitor:
+// Returns a dynamically randomized, freshly shuffled pool of archival, record-checking, and equipment-tracking phrases!
+export function getTracksheetActivityPhrases(context = {}) {
+  // 1. Curated archival, record-checking and gear-tracking phrase pool
+  const basePool = [...TRACKSHEET_ACTIVITY_PHRASES];
+
+  // 2. Procedural dynamic phrases incorporating the actual track, artist, randomized vaults, consoles, mics, and reels
+  const proceduralPhrases = generateProceduralTracksheetPhrases(context);
+
+  // 3. Combine procedural + base pool
+  const combined = Array.from(new Set([...proceduralPhrases, ...basePool]));
+
+  // 4. Return fully shuffled random order every single run
+  return shufflePhrases(combined);
+}
+
 
