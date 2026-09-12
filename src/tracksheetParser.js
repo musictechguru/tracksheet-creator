@@ -70,6 +70,14 @@ export function parseHistoricalTracksheet(markdown) {
       arrangementTechniques: ''
     },
 
+    mixdown: {
+      architecture: '',
+      masterBusChain: '',
+      masterTape: '',
+      spatialStaging: '',
+      rawContent: ''
+    },
+
     instruments: [],
     references: [],
     structuredData: null,
@@ -77,7 +85,7 @@ export function parseHistoricalTracksheet(markdown) {
   };
 
   const lines = markdown.split('\n');
-  let currentSection = 0; // 1: Metadata, 2: Personnel, 3: Studio, 4: Musicology, 5: Signal Chains, 6: References, 7: JSON
+  let currentSection = 0; // 1: Metadata, 2: Personnel, 3: Studio, 4: Musicology, 5: Signal Chains, 6: Mixdown, 7: References, 8: JSON
   let currentInstrument = null;
   const scoresCollected = [];
 
@@ -106,14 +114,16 @@ export function parseHistoricalTracksheet(markdown) {
         currentSection = 2;
       } else if (lowerHeader.includes('3.') || lowerHeader.includes('location') || lowerHeader.includes('studio') || lowerHeader.includes('technical')) {
         currentSection = 3;
-      } else if (lowerHeader.includes('4.') || lowerHeader.includes('musical') || lowerHeader.includes('structural')) {
+      } else if (lowerHeader.includes('musical') || lowerHeader.includes('structural') || (lowerHeader.includes('4.') && !lowerHeader.includes('instrument') && !lowerHeader.includes('pathway') && !lowerHeader.includes('signal chain'))) {
         currentSection = 4;
-      } else if (lowerHeader.includes('5.') || lowerHeader.includes('pathway') || lowerHeader.includes('signal chain')) {
+      } else if (lowerHeader.includes('pathway') || lowerHeader.includes('signal chain') || lowerHeader.includes('recording pathway') || lowerHeader.includes('instrument') || lowerHeader.includes('track sheet') || lowerHeader.includes('5.')) {
         currentSection = 5;
-      } else if (lowerHeader.includes('6.') || lowerHeader.includes('reference') || lowerHeader.includes('source')) {
+      } else if (lowerHeader.includes('mixdown') || lowerHeader.includes('master bus') || (lowerHeader.includes('6.') && lowerHeader.includes('mix')) || lowerHeader.includes('stereo master tape')) {
         currentSection = 6;
-      } else if (lowerHeader.includes('7.') || lowerHeader.includes('structured data')) {
+      } else if (lowerHeader.includes('reference') || lowerHeader.includes('source') || lowerHeader.includes('authoritative') || lowerHeader.includes('7.')) {
         currentSection = 7;
+      } else if (lowerHeader.includes('structured data') || lowerHeader.includes('json') || lowerHeader.includes('8.')) {
+        currentSection = 8;
       } else {
         currentSection = 0;
       }
@@ -300,6 +310,11 @@ export function parseHistoricalTracksheet(markdown) {
           l.includes('multitrack tape') ||
           l.includes('allocation') ||
           l.includes('bouncing') ||
+          l.includes('mix balance') ||
+          l.includes('panning') ||
+          l.includes('mix processing') ||
+          l.includes('mixdown processing') ||
+          l.includes('outboard fx') ||
           l.includes('plugin') ||
           l.includes('score') ||
           l.includes('source')
@@ -336,7 +351,15 @@ export function parseHistoricalTracksheet(markdown) {
           const parsed = extractScoreAndSource(rawVal);
           if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
 
-          if (propKey.includes('backline') || propKey.includes('instrument')) {
+          if (propKey.includes('mix balance') || propKey.includes('panning') || propKey.includes('stereo placement') || propKey.includes('spatial placement')) {
+            currentInstrument.mixBalance = parsed.value;
+            currentInstrument.mixBalanceScore = parsed.score;
+            currentInstrument.mixBalanceSource = parsed.source;
+          } else if (propKey.includes('mix processing') || propKey.includes('outboard fx') || propKey.includes('mixdown processing') || propKey.includes('mix chain') || propKey.includes('reverb send')) {
+            currentInstrument.mixProcessing = parsed.value;
+            currentInstrument.mixProcessingScore = parsed.score;
+            currentInstrument.mixProcessingSource = parsed.source;
+          } else if (propKey.includes('backline') || propKey.includes('instrument')) {
             currentInstrument.backline = parsed.value;
             currentInstrument.backlineScore = parsed.score;
             currentInstrument.backlineSource = parsed.source;
@@ -384,8 +407,29 @@ export function parseHistoricalTracksheet(markdown) {
       }
     }
 
-    // SECTION 6: References
+    // SECTION 6: Historical Mixdown, Master Bus & Stereo Master Tape
     else if (currentSection === 6) {
+      const bulletMatch = trimmed.match(/^\*\s+\*\*([^:]+):\*\*\s*(.*)$/);
+      if (bulletMatch) {
+        const key = bulletMatch[1].trim().toLowerCase();
+        const rawVal = bulletMatch[2].trim();
+        const parsed = extractScoreAndSource(rawVal);
+        if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
+
+        if (key.includes('architecture') || key.includes('console routing') || key.includes('routing')) {
+          result.mixdown.architecture = parsed.value;
+        } else if (key.includes('master bus') || key.includes('bus chain') || key.includes('dynamics')) {
+          result.mixdown.masterBusChain = parsed.value;
+        } else if (key.includes('master tape') || key.includes('tape recorder') || key.includes('formulation')) {
+          result.mixdown.masterTape = parsed.value;
+        } else if (key.includes('spatial') || key.includes('staging') || key.includes('stereo vs') || key.includes('variants')) {
+          result.mixdown.spatialStaging = parsed.value;
+        }
+      }
+    }
+
+    // SECTION 7: References
+    else if (currentSection === 7 || currentSection === 6) {
       const refMatch = trimmed.match(/^\*\s+\[([^\]]+)\]\((https?:\/\/[^)]+)\)(?:\s*[-:]\s*(.*))?$/);
       if (refMatch) {
         result.references.push({
@@ -400,6 +444,39 @@ export function parseHistoricalTracksheet(markdown) {
   if (currentInstrument) {
     result.instruments.push(currentInstrument);
   }
+
+  // Ensure mixdown fields have intelligent historical defaults if not explicitly present in markdown
+  if (!result.mixdown.architecture && !result.mixdown.masterBusChain) {
+    const consoleName = result.studio.console || 'Studio Analog Console';
+    const studioMix = result.studio.mixingStudio || result.studio.trackingStudio || 'Studio Facility';
+    const tapeMachine = result.studio.tapeMachine || 'Analog Master Tape';
+    const mixEngineers = result.personnel.mixEngineers.map(m => m.name || m.value || m).join(', ') || 'Chief Recording Engineers';
+
+    result.mixdown.architecture = `Mixed on ${consoleName} at ${studioMix} by ${mixEngineers}. Channel faders assigned to stereo master bus with period analog summing.`;
+    result.mixdown.masterBusChain = Array.isArray(result.studio.outboard) && result.studio.outboard.length > 0
+      ? `Stereo bus compression and program equalization using ${result.studio.outboard.map(o => o.gear || o.value || (typeof o === 'string' ? o : o.category || 'Outboard')).slice(0, 3).join(', ')}.`
+      : 'Master bus VCA / tube compression and gentle high-frequency analog air equalization.';
+    result.mixdown.masterTape = `Mastered directly to 1/2-inch or 1/4-inch 2-track reel-to-reel tape (${tapeMachine}).`;
+    result.mixdown.spatialStaging = result.musicology.arrangementTechniques || 'Centered low frequencies (kick/bass) with discrete wide stereo separation for guitars and keyboards.';
+  }
+
+  // Fallback for instrument mix balances if not explicitly written
+  result.instruments.forEach(inst => {
+    if (!inst.mixBalance) {
+      const combined = `${inst.tapeAllocation} ${inst.signalChain} ${inst.placement}`.toLowerCase();
+      if (combined.includes('hard-panned') || combined.includes('hard left') || combined.includes('hard l/r') || combined.includes('wide stereo')) {
+        inst.mixBalance = 'Hard Left / Right Stereo Spread';
+      } else if (inst.name.toLowerCase().includes('kick') || inst.name.toLowerCase().includes('bass') || inst.name.toLowerCase().includes('lead vocal')) {
+        inst.mixBalance = 'Centered (C / Mono Core)';
+      } else if (inst.name.toLowerCase().includes('overhead') || inst.name.toLowerCase().includes('cymbal') || inst.stereoArray) {
+        inst.mixBalance = 'Wide Stereo Array (9 o\'clock / 3 o\'clock)';
+      } else if (inst.name.toLowerCase().includes('snare')) {
+        inst.mixBalance = 'Centered with Stereo Reverb Send';
+      } else {
+        inst.mixBalance = 'Balanced in Stereo Soundstage';
+      }
+    }
+  });
 
   const jsonMatch = markdown.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
   if (jsonMatch) {
@@ -432,6 +509,12 @@ function createInstrumentModel(name) {
     stereoArray: '',
     signalChain: '',
     tapeAllocation: '',
+    mixBalance: '',
+    mixBalanceScore: '',
+    mixBalanceSource: '',
+    mixProcessing: '',
+    mixProcessingScore: '',
+    mixProcessingSource: '',
     score: '',
     source: '',
     backlineScore: '',

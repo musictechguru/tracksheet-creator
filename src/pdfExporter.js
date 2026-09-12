@@ -65,14 +65,14 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
               <tbody>
                 ${data.trackTable.map(row => `
                   <tr>
-                    <td style="text-align: center; font-weight: bold;">${row.trackNum || "-"}</td>
+                    <td style="text-align: center; font-weight: bold;">${row.trackNo || row.trackNum || "-"}</td>
                     <td style="font-weight: 600;">${row.stem || "-"}</td>
                     <td><span class="pdf-badge ${row.pathway && row.pathway.includes("1") ? "badge-mic" : row.pathway && row.pathway.includes("2") ? "badge-di" : "badge-midi"}">${row.pathway || "Pathway 1"}</span></td>
-                    <td>${row.source || "-"}</td>
+                    <td>${row.inputSource || row.source || "-"}</td>
                     <td>${row.dawInput || "Audio Track"}</td>
                     <td style="text-align: center;">${row.pan || "C"}</td>
                     <td style="text-align: center;">${row.fader || "0.0 dB"}</td>
-                    <td style="text-align: center; font-family: monospace;">${row.headroom || "-12 dBFS"}</td>
+                    <td style="text-align: center; font-family: monospace;">${row.targetHeadroom || row.headroom || "-12 dBFS"}</td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -84,59 +84,140 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
         ${data.instruments && data.instruments.length > 0 ? `
           <div class="pdf-section">
             <div class="pdf-section-title">3. Instrument-by-Instrument Recording Log & 3-Pathway Solutions</div>
-            ${data.instruments.map(inst => `
-              <div class="pdf-instrument-card pdf-avoid-break">
-                <div class="pdf-inst-header">
-                  <div class="pdf-inst-title">
-                    <span class="pdf-inst-num">${inst.num || "#"}</span>
-                    ${inst.name}
+            ${data.instruments.map((inst, idx) => {
+              const p1 = inst.pathway1 || inst.pathways?.p1 || "Microphone capture detailed in full session log.";
+              const p2 = inst.pathway2 || inst.pathways?.p2 || "Direct injection & interface line input detailed in full session log.";
+              const p3 = inst.pathway3 || inst.pathways?.p3 || "Virtual instrument sequencing & velocity dynamics detailed in full log.";
+              const prefPathway = inst.preferredPathway || "";
+              const prefReason = inst.preferredJustification || inst.preferredReason || "";
+              const pitfalls = Array.isArray(inst.pitfalls) && inst.pitfalls.length > 0
+                ? inst.pitfalls
+                : (inst.examinerPitfall ? [inst.examinerPitfall] : []);
+
+              return `
+                <div class="pdf-instrument-card pdf-avoid-break">
+                  <div class="pdf-inst-header">
+                    <div class="pdf-inst-title">
+                      <span class="pdf-inst-num">${inst.num || (idx + 1)}</span>
+                      ${inst.name}
+                    </div>
+                    ${prefPathway ? `
+                      <div class="pdf-preferred-badge">
+                        ⭐ PREFERRED: ${prefPathway}
+                      </div>
+                    ` : ""}
                   </div>
-                  ${inst.preferredPathway ? `
-                    <div class="pdf-preferred-badge">
-                      ⭐ PREFERRED: ${inst.preferredPathway}
+
+                  ${prefReason ? `
+                    <div class="pdf-preferred-reason">
+                      <strong>Pearson Edexcel C1 Justification:</strong> ${prefReason}
+                    </div>
+                  ` : ""}
+
+                  <div class="pdf-dedicated-card pdf-preferred-card">
+                    <div class="pdf-dedicated-title" style="color: #15803d;">
+                      <span>⭐ PREFERRED COURSEWORK PATHWAY: ${prefPathway || "Selected Capture Solution"}</span>
+                      <span class="pdf-preferred-badge">Official Coursework Choice</span>
+                    </div>
+                    ${prefReason ? `
+                      <div class="pdf-preferred-reason">
+                        <strong>Pearson Edexcel C1 Mark Scheme Justification:</strong> ${prefReason}
+                      </div>
+                    ` : ""}
+                  </div>
+
+                  <!-- 3-Pathway Solutions Grid -->
+                  <div class="pdf-dedicated-card">
+                    <div class="pdf-dedicated-title" style="color: #4338ca;">
+                      <span>3-Pathway Instrumental Solutions & Capture Options</span>
+                    </div>
+                    <div class="pdf-pathways-grid">
+                      <div class="pdf-pathway-box">
+                        <div class="pdf-pathway-head">Pathway 1: Acoustic / Microphone</div>
+                        <div class="pdf-pathway-body">${p1}</div>
+                      </div>
+                      <div class="pdf-pathway-box">
+                        <div class="pdf-pathway-head">Pathway 2: Direct Injection (DI)</div>
+                        <div class="pdf-pathway-body">${p2}</div>
+                      </div>
+                      <div class="pdf-pathway-box">
+                        <div class="pdf-pathway-head">Pathway 3: Audio Instruments & MIDI</div>
+                        <div class="pdf-pathway-body">${p3}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Channel Strip Processing -->
+                  <div class="pdf-dedicated-card">
+                    <div class="pdf-dedicated-title" style="color: #0369a1;">
+                      <span>${effectiveDaw} Channel Strip Insert Processing: ${inst.name}</span>
+                    </div>
+                    ${inst.channelStrip && inst.channelStrip.length > 0 ? `
+                      <table class="pdf-table" style="margin-top: 4px;">
+                        <thead>
+                          <tr>
+                            <th style="width: 50px;">Slot</th>
+                            <th>Processor / Plugin</th>
+                            <th>Type & Circuit</th>
+                            <th>Settings / Parameters</th>
+                            <th>Objective</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${inst.channelStrip.map(cs => `
+                            <tr>
+                              <td style="font-weight: bold; text-align: center;">${cs.slot || 'Insert'}</td>
+                              <td style="font-weight: 600;">${cs.plugin || cs.name || 'Stock Plugin'}</td>
+                              <td style="color: #6b21a8;">${cs.type || 'DSP Processor'}</td>
+                              <td style="font-family: monospace; font-size: 7.5pt; color: #1e40af;">${cs.settings || 'Default'}</td>
+                              <td style="color: #334155;">${cs.objective || '-'}</td>
+                            </tr>
+                          `).join("")}
+                        </tbody>
+                      </table>
+                    ` : `
+                      <div class="pdf-processing-block">
+                        <div>${inst.processing?.eq ? `<em>EQ:</em> ${inst.processing.eq}` : ""}</div>
+                        <div>${inst.processing?.comp ? `<em>Dynamics:</em> ${inst.processing.comp}` : ""}</div>
+                        <div>${inst.processing?.raw || "Stock processing configured to session specifications."}</div>
+                      </div>
+                    `}
+                  </div>
+
+                  <!-- Dedicated Examiner Pitfalls Section -->
+                  ${pitfalls.length > 0 ? `
+                    <div class="pdf-dedicated-card pdf-pitfall-card">
+                      <div class="pdf-dedicated-title" style="color: #b91c1c;">
+                        <span>⚠️ CRUCIAL EXAMINER PITFALLS & MARKING TRAPS</span>
+                        <span class="pdf-badge" style="background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;">Marking Penalty Alert</span>
+                      </div>
+                      <div class="pdf-pitfall-body">
+                        <ul style="margin: 4px 0 0 16px; padding: 0;">
+                          ${pitfalls.map(p => `<li style="margin-bottom: 3px; font-size: 8.2pt; color: #7f1d1d;">${p}</li>`).join("")}
+                        </ul>
+                      </div>
+                    </div>
+                  ` : ""}
+
+                  <!-- Dedicated Modern 3rd-Party Alternatives Section -->
+                  ${inst.thirdParty && inst.thirdParty.length > 0 ? `
+                    <div class="pdf-dedicated-card pdf-alts-card">
+                      <div class="pdf-dedicated-title" style="color: #6b21a8;">
+                        <span>🔌 MODERN 3RD-PARTY PLUGIN ALTERNATIVES</span>
+                        <span class="pdf-badge" style="background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe;">Industry Standard Gear</span>
+                      </div>
+                      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+                        ${inst.thirdParty.map(tp => `
+                          <span class="pdf-tp-badge">
+                            ${typeof tp === 'string' ? tp : (tp.name || tp.gear || 'Plugin')}
+                          </span>
+                        `).join("")}
+                      </div>
                     </div>
                   ` : ""}
                 </div>
-
-                ${inst.preferredReason ? `
-                  <div class="pdf-preferred-reason">
-                    <strong>Pearson Edexcel C1 Justification:</strong> ${inst.preferredReason}
-                  </div>
-                ` : ""}
-
-                <div class="pdf-pathways-grid">
-                  <div class="pdf-pathway-box">
-                    <div class="pdf-pathway-head">Pathway 1: Acoustic / Microphone</div>
-                    <div class="pdf-pathway-body">${inst.pathways?.p1 || "Microphone capture detailed in full session log."}</div>
-                  </div>
-                  <div class="pdf-pathway-box">
-                    <div class="pdf-pathway-head">Pathway 2: Direct Injection (DI)</div>
-                    <div class="pdf-pathway-body">${inst.pathways?.p2 || "Direct injection & interface line input detailed in full session log."}</div>
-                  </div>
-                  <div class="pdf-pathway-box">
-                    <div class="pdf-pathway-head">Pathway 3: Audio Instruments & MIDI</div>
-                    <div class="pdf-pathway-body">${inst.pathways?.p3 || "Virtual instrument sequencing & velocity dynamics detailed in full log."}</div>
-                  </div>
-                </div>
-
-                <div class="pdf-processing-row">
-                  <div class="pdf-processing-block">
-                    <strong>${effectiveDaw} Stock Processing:</strong>
-                    <div>${inst.processing?.eq ? `<em>EQ:</em> ${inst.processing.eq}` : ""}</div>
-                    <div>${inst.processing?.comp ? `<em>Dynamics:</em> ${inst.processing.comp}` : ""}</div>
-                    <div>${inst.processing?.raw || ""}</div>
-                  </div>
-                  ${inst.pitfalls && inst.pitfalls.length > 0 ? `
-                    <div class="pdf-pitfalls-block">
-                      <strong>⚠️ Examiner Pitfalls & Traps:</strong>
-                      <ul>
-                        ${inst.pitfalls.map(p => `<li>${p}</li>`).join("")}
-                      </ul>
-                    </div>
-                  ` : ""}
-                </div>
-              </div>
-            `).join("")}
+              `;
+            }).join("")}
           </div>
         ` : ""}
 
@@ -203,7 +284,7 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
               <div class="pdf-card-title">Tape Format & Monitoring</div>
               <div class="pdf-kv"><span>Tape Machine:</span> <strong>${data.studio?.tapeMachine || "Multitrack Reel-to-Reel Tape"}</strong></div>
               <div class="pdf-kv"><span>Monitors:</span> <strong>${data.studio?.monitors || "Studio Reference Monitors"}</strong></div>
-              <div class="pdf-kv"><span>Key Outboard Units:</span> <strong>${Array.isArray(data.studio?.outboard) && data.studio.outboard.length > 0 ? data.studio.outboard.map(o => o.value || o).join(", ") : "Vintage compressors, plate reverbs & equalizers"}</strong></div>
+              <div class="pdf-kv"><span>Key Outboard Units:</span> <strong>${Array.isArray(data.studio?.outboard) && data.studio.outboard.length > 0 ? data.studio.outboard.map(o => o.gear || o.value || (typeof o === 'string' ? o : o.category || 'Outboard')).join(", ") : "Vintage compressors, plate reverbs & equalizers"}</strong></div>
             </div>
           </div>
         </div>
@@ -215,16 +296,16 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
             <div class="pdf-grid-2">
               <div class="pdf-card">
                 <div class="pdf-card-title">Production & Engineering Team</div>
-                <div class="pdf-kv"><span>Producer(s):</span> <strong>${data.personnel.producers?.map(p => p.value || p).join(", ") || "N/A"}</strong></div>
-                <div class="pdf-kv"><span>Chief Engineer(s):</span> <strong>${data.personnel.chiefEngineers?.map(e => e.value || e).join(", ") || "N/A"}</strong></div>
-                <div class="pdf-kv"><span>Mixing Engineer(s):</span> <strong>${data.personnel.mixEngineers?.map(m => m.value || m).join(", ") || "N/A"}</strong></div>
-                <div class="pdf-kv"><span>Mastering Engineer(s):</span> <strong>${data.personnel.masteringEngineers?.map(m => m.value || m).join(", ") || "N/A"}</strong></div>
+                <div class="pdf-kv"><span>Producer(s):</span> <strong>${data.personnel.producers?.map(p => p.name || p.value || (typeof p === 'string' ? p : p.role || 'Producer')).join(", ") || "N/A"}</strong></div>
+                <div class="pdf-kv"><span>Chief Engineer(s):</span> <strong>${data.personnel.chiefEngineers?.map(e => e.name || e.value || (typeof e === 'string' ? e : e.role || 'Engineer')).join(", ") || "N/A"}</strong></div>
+                <div class="pdf-kv"><span>Mixing Engineer(s):</span> <strong>${data.personnel.mixEngineers?.map(m => m.name || m.value || (typeof m === 'string' ? m : m.role || 'Mixer')).join(", ") || "N/A"}</strong></div>
+                <div class="pdf-kv"><span>Mastering Engineer(s):</span> <strong>${data.personnel.masteringEngineers?.map(m => m.name || m.value || (typeof m === 'string' ? m : m.role || 'Mastering')).join(", ") || "N/A"}</strong></div>
               </div>
               <div class="pdf-card">
                 <div class="pdf-card-title">Musicians & Session Performers</div>
                 ${data.personnel.musicians && data.personnel.musicians.length > 0 ? `
                   <ul class="pdf-compact-list">
-                    ${data.personnel.musicians.map(m => `<li><strong>${m.name || m.value || m}</strong> — ${m.instrument || m.role || "Performer"}</li>`).join("")}
+                    ${data.personnel.musicians.map(m => `<li><strong>${m.name || m.value || m}</strong> — ${m.instruments || m.instrument || m.role || "Performer"}</li>`).join("")}
                   </ul>
                 ` : "<p>Session credits documented in primary source discography.</p>"}
               </div>
@@ -255,7 +336,7 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
         <!-- Historical Recording Pathways & Session Signal Chains -->
         ${data.instruments && data.instruments.length > 0 ? `
           <div class="pdf-section">
-            <div class="pdf-section-title">4. Historical Recording Pathways & Session Signal Chains</div>
+            <div class="pdf-section-title">4. Historical Recording Pathways, Signal Chains & Mix Placement</div>
             ${data.instruments.map(inst => `
               <div class="pdf-instrument-card pdf-avoid-break">
                 <div class="pdf-inst-header">
@@ -271,7 +352,7 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                 </div>
 
                 ${inst.pathway ? `
-                  <div class="pdf-preferred-reason">
+                  <div class="pdf-preferred-reason" style="background: #f1f5f9; border-left-color: #3b82f6; color: #1e3a8a;">
                     <strong>Historical Pathway / Input Method:</strong> ${inst.pathway}
                   </div>
                 ` : ""}
@@ -311,18 +392,59 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                     <strong>Multitrack Tape Allocation:</strong> ${inst.tapeAllocation}
                   </div>
                 ` : ""}
+
+                <!-- Historical Mix Balance & Processing -->
+                ${(inst.mixBalance || inst.mixProcessing) ? `
+                  <div class="pdf-grid-2" style="margin-top: 8px;">
+                    ${inst.mixBalance ? `
+                      <div class="pdf-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                        <div class="pdf-card-title" style="color: #166534;">🎚️ Mix Balance & Spatial Panning</div>
+                        <p style="margin: 0; font-size: 0.83rem; color: #14532d;">${inst.mixBalance}</p>
+                        ${inst.mixBalanceSource ? `<div style="font-size: 0.73rem; color: #166534; margin-top: 4px;">Source: ${inst.mixBalanceSource}</div>` : ""}
+                      </div>
+                    ` : ""}
+                    ${inst.mixProcessing ? `
+                      <div class="pdf-card" style="background: #f5f3ff; border-color: #ddd6fe;">
+                        <div class="pdf-card-title" style="color: #5b21b6;">🎛️ Mixdown Processing & Outboard FX</div>
+                        <p style="margin: 0; font-size: 0.83rem; color: #4c1d95;">${inst.mixProcessing}</p>
+                        ${inst.mixProcessingSource ? `<div style="font-size: 0.73rem; color: #5b21b6; margin-top: 4px;">Source: ${inst.mixProcessingSource}</div>` : ""}
+                      </div>
+                    ` : ""}
+                  </div>
+                ` : ""}
               </div>
             `).join("")}
+          </div>
+        ` : ""}
+
+        <!-- Historical Mixdown, Master Bus & Stereo Master Tape -->
+        ${data.mixdown && (data.mixdown.architecture || data.mixdown.masterBusChain || data.mixdown.masterTape || data.mixdown.spatialStaging) ? `
+          <div class="pdf-section pdf-avoid-break">
+            <div class="pdf-section-title">5. Historical Mixdown, Master Bus & Stereo Master Tape</div>
+            <div class="pdf-grid-2">
+              <div class="pdf-card">
+                <div class="pdf-card-title">🎚️ Console Mixdown Routing & Architecture</div>
+                <p style="font-size: 0.85rem; margin: 0 0 10px 0;">${data.mixdown.architecture || "Direct console channel fader routing to stereo summing bus with analog summing amplifier."}</p>
+                <div class="pdf-card-title">🎛️ Master Bus Processing & Analog Dynamics</div>
+                <p style="font-size: 0.85rem; margin: 0;">${data.mixdown.masterBusChain || "Stereo program equalizer and gentle glue compression."}</p>
+              </div>
+              <div class="pdf-card">
+                <div class="pdf-card-title">📼 Stereo Master Tape Machine & Formulation</div>
+                <p style="font-size: 0.85rem; margin: 0 0 10px 0;">${data.mixdown.masterTape || "1/4\" or 1/2\" two-track tape recorder running at 15 or 30 ips."}</p>
+                <div class="pdf-card-title">🎧 Spatial Staging & Stereo vs Mono Mixes</div>
+                <p style="font-size: 0.85rem; margin: 0;">${data.mixdown.spatialStaging || "Historical panning spread and front-to-back depth staging."}</p>
+              </div>
+            </div>
           </div>
         ` : ""}
 
         <!-- References -->
         ${data.references && data.references.length > 0 ? `
           <div class="pdf-section pdf-avoid-break">
-            <div class="pdf-section-title">5. Authoritative Verification Sources</div>
+            <div class="pdf-section-title">${data.mixdown ? "6" : "5"}. Authoritative Verification Sources</div>
             <div class="pdf-card">
               <ul class="pdf-compact-list">
-                ${data.references.map(ref => `<li><strong>${ref.name || "Source"}</strong>: ${ref.note || ref.url || "Verified Session Log"}</li>`).join("")}
+                ${data.references.map(ref => `<li><strong>${ref.title || ref.name || "Source"}</strong>: ${ref.description || ref.note || ref.url || "Verified Session Log"}</li>`).join("")}
               </ul>
             </div>
           </div>
@@ -635,6 +757,52 @@ export const PDF_STYLES = `
     padding: 0;
   }
 
+  /* Dedicated PDF Cards (Logbook & Tracksheet) */
+  .pdf-dedicated-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .pdf-dedicated-title {
+    font-size: 8.8pt;
+    font-weight: 800;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .pdf-preferred-card {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+  }
+
+  .pdf-pitfall-card {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+
+  .pdf-alts-card {
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+  }
+
+  .pdf-tp-badge {
+    background: #ede9fe;
+    color: #6b21a8;
+    border: 1px solid #ddd6fe;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 7.5pt;
+    font-weight: 600;
+  }
+
   .pdf-compact-list {
     margin: 0;
     padding-left: 16px;
@@ -661,18 +829,36 @@ export const PDF_STYLES = `
  * Main export function to generate and download a good-looking PDF
  */
 export async function downloadGoodLookingPdf({ type, content, trackName, artistName, daw }) {
+  if (!content) {
+    console.warn("downloadGoodLookingPdf: No content provided");
+    return;
+  }
+
   const htmlContent = generatePdfHtml({ type, content, trackName, artistName, daw });
 
-  // Create temporary container
+  // Ensure styles are attached to document head for html2canvas to inherit
+  let styleEl = document.getElementById("pdf-export-styles");
+  if (!styleEl) {
+    styleEl = document.createElement("style");
+    styleEl.id = "pdf-export-styles";
+    styleEl.innerHTML = PDF_STYLES;
+    document.head.appendChild(styleEl);
+  }
+
+  // Create temporary container offscreen
   const wrapper = document.createElement("div");
-  wrapper.style.position = "fixed";
+  wrapper.className = "pdf-export-temp-wrapper";
+  wrapper.style.position = "absolute";
   wrapper.style.left = "-9999px";
   wrapper.style.top = "0";
   wrapper.style.width = "210mm";
   wrapper.innerHTML = `<style>${PDF_STYLES}</style>${htmlContent}`;
   document.body.appendChild(wrapper);
 
-  const cleanFilename = `${(artistName || "Artist").replace(/[^a-z0-9]/gi, "_")}_${(trackName || "Track").replace(/[^a-z0-9]/gi, "_")}_${type === "logbook" || type === "c1" ? `Component1_Logbook_${daw || "LogicPro"}` : "Tracksheet"}.pdf`;
+  // Target the rendered container instead of firstElementChild (which is <style>)
+  const target = wrapper.querySelector(".pdf-container") || wrapper;
+
+  const cleanFilename = `${(artistName || "Artist").replace(/[^a-z0-9]/gi, "_")}_${(trackName || "Track").replace(/[^a-z0-9]/gi, "_")}_${type === "logbook" || type === "c1" ? `Component1_Logbook_${(daw || "LogicPro").replace(/[^a-z0-9]/gi, "_")}` : "Tracksheet"}.pdf`;
 
   const opt = {
     margin: [0, 0, 0, 0],
@@ -682,8 +868,7 @@ export async function downloadGoodLookingPdf({ type, content, trackName, artistN
       scale: 2,
       useCORS: true,
       logging: false,
-      letterRendering: true,
-      windowWidth: 1000
+      letterRendering: true
     },
     jsPDF: {
       unit: "mm",
@@ -698,7 +883,7 @@ export async function downloadGoodLookingPdf({ type, content, trackName, artistN
   try {
     const html2pdfModule = await import("html2pdf.js");
     const html2pdf = html2pdfModule.default || html2pdfModule;
-    const worker = html2pdf().from(wrapper.firstElementChild).set(opt);
+    const worker = html2pdf().from(target).set(opt);
     await worker.save();
   } catch (error) {
     console.error("Failed to generate PDF via html2pdf:", error);

@@ -168,71 +168,90 @@ export default function LogbookDossierView({ data, daw }) {
             ))}
           </div>
 
-          {/* Active Instrument 3-Pathway Display */}
+          {/* Active Instrument Dedicated Sections */}
           {activeInstrument && (
             <div className="logbook-inst-hub">
-              {/* Preferred Exam Pathway Callout */}
+              {/* 1. Dedicated Section: Preferred Coursework Pathway */}
               {activeInstrument.preferredPathway && (
-                <div className="logbook-preferred-banner">
-                  <div className="logbook-pref-header">
-                    <Star size={18} fill="#FBBF24" color="#FBBF24" />
-                    <span className="logbook-pref-title">
-                      ⭐ PREFERRED COURSEWORK PATHWAY: <strong>{activeInstrument.preferredPathway}</strong>
-                    </span>
+                <div className="logbook-dedicated-section preferred-section">
+                  <div className="logbook-section-card-title">
+                    <div className="logbook-card-title-left">
+                      <Star size={18} fill="#FBBF24" color="#FBBF24" />
+                      <span>PREFERRED COURSEWORK PATHWAY: {activeInstrument.name}</span>
+                    </div>
+                    <span className="logbook-badge-pref">⭐ Official Coursework Choice</span>
                   </div>
-                  {activeInstrument.preferredJustification && (
-                    <p className="logbook-pref-desc">
-                      <strong>Mark Scheme Justification:</strong> {activeInstrument.preferredJustification}
-                    </p>
-                  )}
+                  <div className="logbook-preferred-card-body">
+                    <div className="logbook-preferred-title-highlight">
+                      Selected Pathway: <strong>{activeInstrument.preferredPathway}</strong>
+                    </div>
+                    {activeInstrument.preferredJustification && (
+                      <div className="logbook-preferred-justification-block">
+                        <span className="logbook-justification-label">Pearson Edexcel Component 1 Mark Scheme Justification:</span>
+                        <p className="logbook-justification-text">{activeInstrument.preferredJustification}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* 3 Pathways Comparison Grid */}
-              <div className="logbook-pathways-grid">
-                {activeInstrument.pathway1 && (
-                  <div className="logbook-pathway-card">
-                    <div className="logbook-p-header p1">
-                      <Mic2 size={16} />
-                      <span>Pathway 1: Acoustic / Microphone Capture</span>
-                    </div>
-                    <div className="logbook-p-body">
-                      {activeInstrument.pathway1}
-                    </div>
+              {/* 2. Dedicated Section: 3-Pathway Instrumental Solutions */}
+              <div className="logbook-dedicated-section pathways-section">
+                <div className="logbook-section-card-title">
+                  <div className="logbook-card-title-left">
+                    <Layers size={18} color="#C084FC" />
+                    <span>3-Pathway Instrumental Solutions & Capture Options</span>
                   </div>
-                )}
+                  <span className="logbook-section-pill">Capture Methodology</span>
+                </div>
+                <div className="logbook-pathways-grid">
+                  {activeInstrument.pathway1 && (
+                    <div className="logbook-pathway-card">
+                      <div className="logbook-p-header p1">
+                        <Mic2 size={16} />
+                        <span>Pathway 1: Acoustic / Microphone Capture</span>
+                      </div>
+                      <div className="logbook-p-body">
+                        {activeInstrument.pathway1}
+                      </div>
+                    </div>
+                  )}
 
-                {activeInstrument.pathway2 && (
-                  <div className="logbook-pathway-card">
-                    <div className="logbook-p-header p2">
-                      <Zap size={16} />
-                      <span>Pathway 2: Direct Injection (DI) & Line Input</span>
+                  {activeInstrument.pathway2 && (
+                    <div className="logbook-pathway-card">
+                      <div className="logbook-p-header p2">
+                        <Zap size={16} />
+                        <span>Pathway 2: Direct Injection (DI) & Line Input</span>
+                      </div>
+                      <div className="logbook-p-body">
+                        {activeInstrument.pathway2}
+                      </div>
                     </div>
-                    <div className="logbook-p-body">
-                      {activeInstrument.pathway2}
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {activeInstrument.pathway3 && (
-                  <div className="logbook-pathway-card">
-                    <div className="logbook-p-header p3">
-                      <Radio size={16} />
-                      <span>Pathway 3: Audio Instruments & MIDI</span>
+                  {activeInstrument.pathway3 && (
+                    <div className="logbook-pathway-card">
+                      <div className="logbook-p-header p3">
+                        <Radio size={16} />
+                        <span>Pathway 3: Audio Instruments & MIDI</span>
+                      </div>
+                      <div className="logbook-p-body">
+                        {activeInstrument.pathway3}
+                      </div>
                     </div>
-                    <div className="logbook-p-body">
-                      {activeInstrument.pathway3}
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              {/* Channel Strip Insert Chain Table */}
+              {/* 3. Dedicated Section: Channel Strip Insert Chain Table */}
               {activeInstrument.channelStrip && activeInstrument.channelStrip.length > 0 && (
-                <div className="logbook-channel-strip-box">
-                  <div className="logbook-box-title">
-                    <Sliders size={16} color="#38BDF8" />
-                    <span>{currentDaw} Channel Strip Insert Chain: {activeInstrument.name}</span>
+                <div className="logbook-dedicated-section channel-strip-section">
+                  <div className="logbook-section-card-title">
+                    <div className="logbook-card-title-left">
+                      <Sliders size={18} color="#38BDF8" />
+                      <span>{currentDaw} Channel Strip Insert Chain: {activeInstrument.name}</span>
+                    </div>
+                    <span className="logbook-section-pill">{activeInstrument.channelStrip.length} Inserts</span>
                   </div>
 
                   <div className="table-wrapper" style={{ margin: '0.75rem 0' }}>
@@ -262,11 +281,33 @@ export default function LogbookDossierView({ data, daw }) {
                 </div>
               )}
 
-              {/* 3rd-Party Alternatives & Examiner Pitfall Footer */}
-              <div className="logbook-inst-footer">
-                {activeInstrument.thirdParty && activeInstrument.thirdParty.length > 0 && (
-                  <div className="logbook-thirdparty-box">
-                    <span className="logbook-footer-label">Recommended 3rd-Party Alternatives:</span>
+              {/* 4. Dedicated Section: Crucial Examiner Pitfall & Marking Traps */}
+              {activeInstrument.examinerPitfall && (
+                <div className="logbook-dedicated-section pitfall-section">
+                  <div className="logbook-section-card-title pitfall-title">
+                    <div className="logbook-card-title-left">
+                      <AlertTriangle size={18} color="#EF4444" />
+                      <span>CRUCIAL EXAMINER PITFALLS & MARKING TRAPS</span>
+                    </div>
+                    <span className="logbook-badge-pitfall">Edexcel Marking Penalty Alert</span>
+                  </div>
+                  <div className="logbook-pitfall-body-card">
+                    <p className="logbook-pitfall-text">{activeInstrument.examinerPitfall}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* 5. Dedicated Section: Modern 3rd-Party Alternatives */}
+              {activeInstrument.thirdParty && activeInstrument.thirdParty.length > 0 && (
+                <div className="logbook-dedicated-section modern-alts-section">
+                  <div className="logbook-section-card-title alts-title">
+                    <div className="logbook-card-title-left">
+                      <Zap size={18} color="#A855F7" />
+                      <span>MODERN 3RD-PARTY PLUGIN ALTERNATIVES</span>
+                    </div>
+                    <span className="logbook-badge-alts">Industry Standard Gear</span>
+                  </div>
+                  <div className="logbook-alts-body-card">
                     <div className="logbook-tp-links">
                       {activeInstrument.thirdParty.map((tp, tpIdx) => (
                         tp.url ? (
@@ -279,18 +320,8 @@ export default function LogbookDossierView({ data, daw }) {
                       ))}
                     </div>
                   </div>
-                )}
-
-                {activeInstrument.examinerPitfall && (
-                  <div className="logbook-pitfall-box">
-                    <div className="logbook-pitfall-header">
-                      <AlertTriangle size={16} color="#F87171" />
-                      <span>CRUCIAL EXAMINER PITFALL & MARKING TRAP</span>
-                    </div>
-                    <p className="logbook-pitfall-text">{activeInstrument.examinerPitfall}</p>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </div>

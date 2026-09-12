@@ -273,14 +273,22 @@ For EACH instrument/stem, provide:
 *   **Stereo / Multi-Mic Array (if applicable):** [e.g. A/B Spaced Pair, X/Y Coincident, Blumlein, ORTF, Mid-Side, or Glyn Johns drum technique; phase alignment measures] - Score: [X/10] (Source: [Note])
 *   **Analog Tracking Signal Chain & Hardware Processing:** [Console channel mic preamp, console EQ settings, hardware tracking compressors/limiters (e.g. Fairchild 660/670, UREI 1176, Teletronix LA-2A, Altec RS124), tape machine input saturation, hardware plate/spring reverb, or tape slapback/ADT routing] - Score: [X/10] (Source: [Note])
 *   **Multitrack Tape Allocation & Bouncing History:** [Original track assignment on the 4-track, 8-track, 16-track, or 24-track tape reel, including track bounces/reductions and overdub layers] - Score: [X/10] (Source: [Note])
+*   **Historical Mix Balance, Panning & Spatial Placement:** [Exact stereo pan position in the final mix (e.g. Center, Hard Left/Right, 9 o'clock / 3 o'clock, mono sum), relative fader balance in the mix, front-to-back acoustic depth] - Score: [X/10] (Source: [Note])
+*   **Historical Mixdown Processing & Outboard FX:** [Console channel mix EQ, mixdown hardware compression, auxiliary reverb sends (e.g. EMT 140 plate, Lexicon 480L, live echo chamber), delay/ADT, tape flanging/phasing, fader ride automation] - Score: [X/10] (Source: [Note])
 
-## 6. References
+## 6. Historical Mixdown, Master Bus & Stereo Master Tape
+*   **Mixdown Architecture & Console Routing:** [Console used for final mixdown (e.g. Neve 8048 / SSL 4000E), automation systems (e.g. NECAM, SSL Total Recall, or manual fader passes), group/subgroup buses, monitoring levels] - Score: [X/10] (Source: [Note])
+*   **Master Bus Signal Chain & Dynamics:** [Stereo master bus compression (e.g. SSL G-Master Bus compressor 4:1 ratio 30ms attack, Fairchild 670, Neve 33609), program equalization (e.g. Pultec EQP-1A, Lang PEQ-2), analog tape saturation] - Score: [X/10] (Source: [Note])
+*   **Stereo Master Tape Recorder & Tape Formulation:** [Specific 2-track master tape recorder (e.g. Ampex ATR-102 1/2-inch 30 IPS, Studer A80, EMI BTR), tape stock (e.g. 3M 996, Ampex 456 Grand Master), Dolby A / SR noise reduction] - Score: [X/10] (Source: [Note])
+*   **Mixdown Spatial Staging & Stereo vs. Mono Variants:** [Stereo width, center image anchoring, mono compatibility, differences between original mono single mix vs. stereo album mix] - Score: [X/10] (Source: [Note])
+
+## 7. References
 Provide exactly three to five authoritative historical and technical sources where you retrieved or verified the information. Format as markdown bullet points with working links:
 *   [[Source Name]]([URL]) - [Brief description of the historical or technical data sourced from here]
 *   [[Source Name]]([URL]) - [Brief description of the historical or technical data sourced from here]
 *   [[Source Name]]([URL]) - [Brief description of the historical or technical data sourced from here]
 
-## 7. Structured Data
+## 8. Structured Data
 Please append a final section with a valid JSON block enclosed in \`\`\`json containing the core entities extracted from this tracksheet. Use this exact schema:
 \`\`\`json
 {

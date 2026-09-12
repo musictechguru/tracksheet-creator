@@ -23,7 +23,8 @@ export default function DossierView({ data }) {
     musicology,
     instruments,
     references,
-    overallConfidence
+    overallConfidence,
+    mixdown
   } = data;
 
   const activeInstrument = instruments && instruments.length > 0 ? instruments[activeInstIdx] : null;
@@ -366,12 +367,81 @@ export default function DossierView({ data }) {
                   <p className="dossier-tape-text">{activeInstrument.tapeAllocation}</p>
                 </div>
               )}
+
+              {/* Historical Mix Balance, Panning & Spatial FX */}
+              {(activeInstrument.mixBalance || activeInstrument.mixProcessing) && (
+                <div className="dossier-mix-stage-box">
+                  <div className="dossier-box-label" style={{ color: '#38BDF8' }}>
+                    <Sliders size={14} color="#38BDF8" /> HISTORICAL MIX BALANCE, PANNING & SPATIAL FX
+                  </div>
+                  <div className="dossier-mix-grid">
+                    {activeInstrument.mixBalance && (
+                      <div className="dossier-mix-card">
+                        <span className="dossier-mix-subtitle">Stereo Panning & Soundstage:</span>
+                        <p className="dossier-mix-text">{activeInstrument.mixBalance}</p>
+                        {activeInstrument.mixBalanceSource && (
+                          <span className="dossier-spec-source">Source: {activeInstrument.mixBalanceSource}</span>
+                        )}
+                      </div>
+                    )}
+                    {activeInstrument.mixProcessing && (
+                      <div className="dossier-mix-card">
+                        <span className="dossier-mix-subtitle">Mixdown Console EQ & Outboard FX:</span>
+                        <p className="dossier-mix-text">{activeInstrument.mixProcessing}</p>
+                        {activeInstrument.mixProcessingSource && (
+                          <span className="dossier-spec-source">Source: {activeInstrument.mixProcessingSource}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       )}
 
-      {/* 5. Session Personnel & Musicians Roster */}
+      {/* 5. Historical Mixdown, Master Bus & Stereo Master Tape */}
+      {mixdown && (mixdown.architecture || mixdown.masterBusChain || mixdown.masterTape || mixdown.spatialStaging) && (
+        <div className="dossier-section-card glass-panel">
+          <div className="dossier-section-header">
+            <div className="dossier-section-title-wrap">
+              <Cpu size={20} color="#38BDF8" />
+              <h3 className="dossier-section-title">Historical Mixdown, Master Bus & Stereo Master Tape</h3>
+            </div>
+            <span className="dossier-section-pill">Analog Summing & Mastering</span>
+          </div>
+
+          <div className="dossier-mixdown-grid">
+            {mixdown.architecture && (
+              <div className="dossier-mixdown-card">
+                <div className="dossier-mixdown-card-title">Mixdown Architecture & Console Routing</div>
+                <p className="dossier-mixdown-card-body">{mixdown.architecture}</p>
+              </div>
+            )}
+            {mixdown.masterBusChain && (
+              <div className="dossier-mixdown-card">
+                <div className="dossier-mixdown-card-title">Master Bus Dynamics & Program EQ</div>
+                <p className="dossier-mixdown-card-body">{mixdown.masterBusChain}</p>
+              </div>
+            )}
+            {mixdown.masterTape && (
+              <div className="dossier-mixdown-card">
+                <div className="dossier-mixdown-card-title">Stereo Master Tape Recorder & Stock</div>
+                <p className="dossier-mixdown-card-body">{mixdown.masterTape}</p>
+              </div>
+            )}
+            {mixdown.spatialStaging && (
+              <div className="dossier-mixdown-card">
+                <div className="dossier-mixdown-card-title">Stereo Spatial Staging & Mix Variants</div>
+                <p className="dossier-mixdown-card-body">{mixdown.spatialStaging}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. Session Personnel & Musicians Roster */}
       <div className="dossier-section-card glass-panel">
         <div className="dossier-section-header">
           <div className="dossier-section-title-wrap">

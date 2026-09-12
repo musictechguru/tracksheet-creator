@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   Sparkles, Music, Mic2, Database, History, Sliders, 
   FileText, Download, Copy, Check, Printer, Disc, CheckCircle2,
@@ -74,22 +74,37 @@ const formatDate = (isoString) => {
   }
 };
 
-function ActivityTypewriter({ phrases }) {
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function ActivityTypewriter({ phrases, shuffle = false }) {
+  const [deck, setDeck] = useState(() => (shuffle && phrases ? shuffleArray(phrases) : (phrases || [])));
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // When phrases prop changes (e.g., switched DAW or search restarted), start from beginning
+  // When phrases prop changes (e.g. search restarted), reset deck with fresh non-repeating shuffle
   useEffect(() => {
+    if (!phrases || phrases.length === 0) {
+      setDeck([]);
+      return;
+    }
+    setDeck(shuffle ? shuffleArray(phrases) : [...phrases]);
     setPhraseIdx(0);
     setDisplayText('');
     setIsDeleting(false);
-  }, [phrases]);
+  }, [phrases, shuffle]);
 
   useEffect(() => {
-    if (!phrases || phrases.length === 0) return;
+    if (!deck || deck.length === 0) return;
 
-    const currentPhrase = phrases[phraseIdx % phrases.length];
+    const currentPhrase = deck[phraseIdx % deck.length];
     let timer;
 
     if (!isDeleting) {
@@ -100,10 +115,10 @@ function ActivityTypewriter({ phrases }) {
           setDisplayText(currentPhrase.slice(0, displayText.length + 1));
         }, typeSpeed);
       } else {
-        // Once full phrase is typed, hold for 2.2s so user can read comfortably
+        // Once full phrase is typed, hold for 2.6s so user can read comfortably
         timer = setTimeout(() => {
           setIsDeleting(true);
-        }, 2200);
+        }, 2600);
       }
     } else {
       if (displayText.length > 0) {
@@ -112,16 +127,24 @@ function ActivityTypewriter({ phrases }) {
           setDisplayText(currentPhrase.slice(0, displayText.length - 1));
         }, 18);
       } else {
-        // Brief pause before typing next chronological phrase in the sequence
+        // Brief pause before typing next non-repeating phrase in the sequence
         timer = setTimeout(() => {
           setIsDeleting(false);
-          setPhraseIdx((prev) => (prev + 1) % phrases.length);
+          setPhraseIdx((prev) => {
+            const next = prev + 1;
+            // When full 200 deck has played without repeating, reshuffle if shuffle enabled
+            if (next >= deck.length && shuffle) {
+              setDeck(shuffleArray(phrases));
+              return 0;
+            }
+            return next % deck.length;
+          });
         }, 350);
       }
     }
 
     return () => clearTimeout(timer);
-  }, [displayText, isDeleting, phraseIdx, phrases]);
+  }, [displayText, isDeleting, phraseIdx, deck, shuffle, phrases]);
 
   return (
     <span className="typewriter-container">
@@ -147,6 +170,22 @@ function App() {
   const [copyNotification, setCopyNotification] = useState('');
 
   const [searchActive, setSearchActive] = useState(false);
+
+  // Smooth-scroll activity monitor into view on mobile when generation commences
+  const activityRef = useRef(null);
+  const c1ActivityRef = useRef(null);
+
+  useEffect(() => {
+    if (loading && searchActive && activityRef.current) {
+      activityRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [loading, searchActive]);
+
+  useEffect(() => {
+    if (c1Loading && c1ActivityRef.current) {
+      c1ActivityRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, [c1Loading]);
 
   // Dev Mode state - hidden by default unless unlocked via secret shortcut (Ctrl+Shift+D), ?dev=true, or 5 clicks on title
   const [devUnlocked, setDevUnlocked] = useState(() => {
@@ -587,24 +626,22 @@ function App() {
         <div className="glass-panel">
           <form onSubmit={handleGenerate}>
             <div className="input-group">
-              <div style={{ flex: 1, position: 'relative' }}>
-                <Music size={20} color="var(--text-muted)" style={{ position: 'absolute', top: '16px', left: '16px' }} />
+              <div className="input-field-wrapper">
+                <Music size={20} color="var(--text-muted)" className="input-icon" />
                 <input 
                   type="text" 
-                  className="input-field" 
-                  style={{ paddingLeft: '3rem', width: 'calc(100% - 4.5rem)' }}
+                  className="input-field has-icon" 
                   placeholder="Track Name (e.g. Fame)" 
                   value={trackName}
                   onChange={(e) => setTrackName(e.target.value)}
                   required
                 />
               </div>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <Mic2 size={20} color="var(--text-muted)" style={{ position: 'absolute', top: '16px', left: '16px' }} />
+              <div className="input-field-wrapper">
+                <Mic2 size={20} color="var(--text-muted)" className="input-icon" />
                 <input 
                   type="text" 
-                  className="input-field"
-                  style={{ paddingLeft: '3rem', width: 'calc(100% - 4.5rem)' }}
+                  className="input-field has-icon"
                   placeholder="Artist (e.g. David Bowie)" 
                   value={artistName}
                   onChange={(e) => setArtistName(e.target.value)}
@@ -628,7 +665,7 @@ function App() {
 
         {/* Real-time Activity Monitor (Single Line Replaced) */}
         {loading && searchActive && (
-          <div className="glass-panel activity-monitor-panel">
+          <div ref={activityRef} className="glass-panel activity-monitor-panel">
             <div className="activity-monitor-inner">
               <div className="activity-icon-wrap">
                 <div className="activity-radar-ring"></div>
@@ -640,7 +677,7 @@ function App() {
                   ACTIVITY MONITOR
                 </span>
                 <div className="activity-phrase-container">
-                  <ActivityTypewriter phrases={TRACKSHEET_ACTIVITY_PHRASES} />
+                  <ActivityTypewriter phrases={TRACKSHEET_ACTIVITY_PHRASES} shuffle={true} />
                 </div>
               </div>
             </div>
@@ -1086,7 +1123,7 @@ function App() {
 
             {/* Real-time Component 1 Activity Monitor (Single Line Replaced) */}
             {c1Loading && (
-              <div className="glass-panel activity-monitor-panel c1-activity-panel">
+              <div ref={c1ActivityRef} className="glass-panel activity-monitor-panel c1-activity-panel">
                 <div className="activity-monitor-inner">
                   <div className="activity-icon-wrap">
                     <div className="activity-radar-ring c1-radar"></div>
