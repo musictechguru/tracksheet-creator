@@ -126,26 +126,50 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                     ` : ""}
                   </div>
 
-                  <!-- 3-Pathway Solutions Grid -->
-                  <div class="pdf-dedicated-card">
-                    <div class="pdf-dedicated-title" style="color: #4338ca;">
-                      <span>3-Pathway Instrumental Solutions & Capture Options</span>
-                    </div>
-                    <div class="pdf-pathways-grid">
-                      <div class="pdf-pathway-box">
-                        <div class="pdf-pathway-head">Pathway 1: Acoustic / Microphone</div>
-                        <div class="pdf-pathway-body">${p1}</div>
+                  <!-- Selected Capture Solution (Single Chosen Pathway from Track List) -->
+                  ${(() => {
+                    let pathwayStr = '';
+                    if (data.trackTable && Array.isArray(data.trackTable)) {
+                      const matchedRow = data.trackTable.find(r => {
+                        const stemNorm = (r.stem || '').toLowerCase();
+                        const instNorm = (inst.name || '').toLowerCase();
+                        return stemNorm.includes(instNorm) || instNorm.includes(stemNorm);
+                      });
+                      if (matchedRow && matchedRow.pathway) {
+                        pathwayStr = matchedRow.pathway;
+                      }
+                    }
+                    if (!pathwayStr && prefPathway) {
+                      pathwayStr = prefPathway;
+                    }
+                    const norm = pathwayStr.toLowerCase();
+
+                    let activeTitle = 'Pathway 1: Acoustic / Microphone Capture';
+                    let activeBody = p1;
+                    let badgeClass = 'badge-mic';
+
+                    if (norm.includes('pathway 2') || norm.includes('direct') || norm.includes('di') || norm.includes('line') || norm.includes('p2')) {
+                      activeTitle = 'Pathway 2: Direct Injection (DI) & Line Input';
+                      activeBody = p2;
+                      badgeClass = 'badge-di';
+                    } else if (norm.includes('pathway 3') || norm.includes('midi') || norm.includes('software') || norm.includes('audio instrument') || norm.includes('p3')) {
+                      activeTitle = 'Pathway 3: Audio Instruments & MIDI';
+                      activeBody = p3;
+                      badgeClass = 'badge-midi';
+                    }
+
+                    return `
+                      <div class="pdf-dedicated-card">
+                        <div class="pdf-dedicated-title" style="color: #4338ca; display: flex; justify-content: space-between; align-items: center;">
+                          <span>Active Instrumental Capture Solution (${activeTitle})</span>
+                          <span class="pdf-badge ${badgeClass}" style="font-size: 7.5pt;">Selected from Track List</span>
+                        </div>
+                        <div style="font-size: 8.2pt; line-height: 1.5; color: #1e293b; padding: 4px 6px;">
+                          ${activeBody.split('\n').map(l => `<p style="margin: 3px 0;">${l.replace(/^\s*[•*]\s*/, '• ')}</p>`).join('')}
+                        </div>
                       </div>
-                      <div class="pdf-pathway-box">
-                        <div class="pdf-pathway-head">Pathway 2: Direct Injection (DI)</div>
-                        <div class="pdf-pathway-body">${p2}</div>
-                      </div>
-                      <div class="pdf-pathway-box">
-                        <div class="pdf-pathway-head">Pathway 3: Audio Instruments & MIDI</div>
-                        <div class="pdf-pathway-body">${p3}</div>
-                      </div>
-                    </div>
-                  </div>
+                    `;
+                  })()}
 
                   <!-- Channel Strip Processing -->
                   <div class="pdf-dedicated-card">

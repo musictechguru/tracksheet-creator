@@ -52,6 +52,61 @@ export default function LogbookDossierView({ data, daw }) {
     return <span style={{ color: '#38BDF8' }}>{settingsStr}</span>;
   };
 
+  // Helper to determine the specific capture pathway being used from the track list
+  const getSelectedCaptureSolution = (inst) => {
+    if (!inst) return null;
+
+    // 1. Look up this instrument in the Section 2 trackTable
+    let pathwayStr = '';
+    if (trackTable && Array.isArray(trackTable)) {
+      const matchedRow = trackTable.find(r => {
+        const stemNorm = (r.stem || '').toLowerCase();
+        const instNorm = (inst.name || '').toLowerCase();
+        return stemNorm.includes(instNorm) || instNorm.includes(stemNorm);
+      });
+      if (matchedRow && matchedRow.pathway) {
+        pathwayStr = matchedRow.pathway;
+      }
+    }
+
+    // 2. Fall back to inst.preferredPathway if not found in trackTable
+    if (!pathwayStr && inst.preferredPathway) {
+      pathwayStr = inst.preferredPathway;
+    }
+
+    const norm = pathwayStr.toLowerCase();
+
+    // Determine Pathway 1, 2, or 3
+    if (norm.includes('pathway 1') || norm.includes('acoustic') || norm.includes('mic') || norm.includes('p1')) {
+      return {
+        num: 1,
+        title: 'Pathway 1: Acoustic / Microphone Capture',
+        body: inst.pathway1 || inst.pathway2 || inst.pathway3
+      };
+    }
+    if (norm.includes('pathway 2') || norm.includes('direct') || norm.includes('di') || norm.includes('line') || norm.includes('p2')) {
+      return {
+        num: 2,
+        title: 'Pathway 2: Direct Injection (DI) & Line Input',
+        body: inst.pathway2 || inst.pathway1 || inst.pathway3
+      };
+    }
+    if (norm.includes('pathway 3') || norm.includes('midi') || norm.includes('software') || norm.includes('audio instrument') || norm.includes('p3')) {
+      return {
+        num: 3,
+        title: 'Pathway 3: Audio Instruments & MIDI',
+        body: inst.pathway3 || inst.pathway2 || inst.pathway1
+      };
+    }
+
+    // Default fallback: Preferred pathway or whichever pathway has content
+    if (inst.pathway1) return { num: 1, title: 'Pathway 1: Acoustic / Microphone Capture', body: inst.pathway1 };
+    if (inst.pathway2) return { num: 2, title: 'Pathway 2: Direct Injection (DI) & Line Input', body: inst.pathway2 };
+    if (inst.pathway3) return { num: 3, title: 'Pathway 3: Audio Instruments & MIDI', body: inst.pathway3 };
+
+    return null;
+  };
+
   return (
     <div className="logbook-dossier-container">
       {/* 1. Hero Examination & Production Metadata Card */}
@@ -196,61 +251,41 @@ export default function LogbookDossierView({ data, daw }) {
                 </div>
               )}
 
-              {/* 2. Dedicated Section: 3-Pathway Instrumental Solutions */}
-              {(activeInstrument.pathway1 || activeInstrument.pathway2 || activeInstrument.pathway3) && (
-                <div className="logbook-dedicated-section pathways-section">
-                  <div className="logbook-section-card-title">
-                    <div className="logbook-card-title-left">
-                      <Layers size={18} color="#C084FC" />
-                      <span>3-Pathway Instrumental Solutions & Capture Options</span>
+              {/* 2. Dedicated Section: Selected Capture Solution (Single Chosen Pathway from Track List) */}
+              {(() => {
+                const selected = getSelectedCaptureSolution(activeInstrument);
+                if (!selected || !selected.body) return null;
+
+                const headerClass = selected.num === 1 ? 'p1' : selected.num === 2 ? 'p2' : 'p3';
+                const HeaderIcon = selected.num === 1 ? Mic2 : selected.num === 2 ? Zap : Radio;
+
+                return (
+                  <div className="logbook-dedicated-section pathways-section">
+                    <div className="logbook-section-card-title">
+                      <div className="logbook-card-title-left">
+                        <Layers size={18} color="#C084FC" />
+                        <span>Active Instrumental Capture Solution ({selected.title})</span>
+                      </div>
+                      <span className="logbook-section-pill">Selected from Track List</span>
                     </div>
-                    <span className="logbook-section-pill">Capture Methodology</span>
-                  </div>
-                  <div className="logbook-pathways-grid">
-                    {activeInstrument.pathway1 && (
-                      <div className="logbook-pathway-card">
-                        <div className="logbook-p-header p1">
-                          <Mic2 size={16} />
-                          <span>Pathway 1: Acoustic / Microphone Capture</span>
-                        </div>
-                        <div className="logbook-p-body">
-                          {activeInstrument.pathway1.split('\n').map((line, lIdx) => (
-                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
 
-                    {activeInstrument.pathway2 && (
-                      <div className="logbook-pathway-card">
-                        <div className="logbook-p-header p2">
-                          <Zap size={16} />
-                          <span>Pathway 2: Direct Injection (DI) & Line Input</span>
-                        </div>
-                        <div className="logbook-p-body">
-                          {activeInstrument.pathway2.split('\n').map((line, lIdx) => (
-                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                          ))}
-                        </div>
+                    <div className="logbook-pathway-card single-active-pathway" style={{ maxWidth: '100%' }}>
+                      <div className={`logbook-p-header ${headerClass}`}>
+                        <HeaderIcon size={18} />
+                        <span style={{ fontSize: '0.95rem' }}>{selected.title}</span>
+                        <span className="logbook-badge-pref" style={{ marginLeft: 'auto', fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}>
+                          ✓ In Use
+                        </span>
                       </div>
-                    )}
-
-                    {activeInstrument.pathway3 && (
-                      <div className="logbook-pathway-card">
-                        <div className="logbook-p-header p3">
-                          <Radio size={16} />
-                          <span>Pathway 3: Audio Instruments & MIDI</span>
-                        </div>
-                        <div className="logbook-p-body">
-                          {activeInstrument.pathway3.split('\n').map((line, lIdx) => (
-                            <p key={lIdx} style={{ margin: '0.25rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
-                          ))}
-                        </div>
+                      <div className="logbook-p-body" style={{ fontSize: '0.9rem', lineHeight: '1.7' }}>
+                        {selected.body.split('\n').map((line, lIdx) => (
+                          <p key={lIdx} style={{ margin: '0.4rem 0' }}>{line.replace(/^\s*[•*]\s*/, '• ')}</p>
+                        ))}
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* 3. Dedicated Section: Channel Strip Insert Chain Table */}
               {activeInstrument.channelStrip && activeInstrument.channelStrip.length > 0 && (
