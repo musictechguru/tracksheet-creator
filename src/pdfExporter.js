@@ -437,6 +437,11 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                 <div class="pdf-kv"><span>Tempo / BPM:</span> <strong>${data.musicology.bpm || data.musicology.tempo || "Fixed Tempo"}</strong></div>
                 <div class="pdf-kv"><span>Time Signature:</span> <strong>${data.musicology.timeSignature || "4/4"}</strong></div>
               </div>
+              ${data.musicology.tuning ? `
+                <div style="margin-top: 5px; font-size: 7.5pt; color: #475569;">
+                  <strong>Instrument Tuning:</strong> <span style="color: #0f172a;">${data.musicology.tuning}</span>
+                </div>
+              ` : ""}
               ${data.musicology.formBreakdown && data.musicology.formBreakdown.length > 0 ? `
                 <div style="margin-top: 0.75rem; border-top: 1px solid #e2e8f0; padding-top: 0.6rem;">
                   <div style="font-size: 8pt; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px;">

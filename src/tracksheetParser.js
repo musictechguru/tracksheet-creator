@@ -58,7 +58,8 @@ export function parseHistoricalTracksheet(markdown) {
       console: '',
       tapeMachine: '',
       monitors: '',
-      outboard: []
+      outboard: [],
+      rawContent: ''
     },
 
     musicology: {
@@ -67,9 +68,11 @@ export function parseHistoricalTracksheet(markdown) {
       key: '',
       tempo: '',
       bpm: '',
+      tuning: '',
       timeSignature: '4/4',
       arrangementTechniques: '',
-      arrangementPoints: []
+      arrangementPoints: [],
+      rawContent: ''
     },
 
     mixdown: {
@@ -117,9 +120,9 @@ export function parseHistoricalTracksheet(markdown) {
         currentSection = 2;
       } else if (lowerHeader.includes('3.') || lowerHeader.includes('location') || lowerHeader.includes('studio') || lowerHeader.includes('technical')) {
         currentSection = 3;
-      } else if (lowerHeader.includes('musical') || lowerHeader.includes('structural') || (lowerHeader.includes('4.') && !lowerHeader.includes('instrument') && !lowerHeader.includes('pathway') && !lowerHeader.includes('signal chain'))) {
+      } else if (lowerHeader.includes('musical') || lowerHeader.includes('structural') || (lowerHeader.includes('4.') && !lowerHeader.includes('instrument') && !lowerHeader.includes('pathway') && !lowerHeader.includes('signal chain') && !lowerHeader.includes('reference'))) {
         currentSection = 4;
-      } else if (lowerHeader.includes('pathway') || lowerHeader.includes('signal chain') || lowerHeader.includes('recording pathway') || lowerHeader.includes('instrument') || lowerHeader.includes('track sheet') || lowerHeader.includes('5.')) {
+      } else if (lowerHeader.includes('pathway') || lowerHeader.includes('signal chain') || lowerHeader.includes('recording pathway') || lowerHeader.includes('instrument') || lowerHeader.includes('track sheet') || (lowerHeader.includes('5.') && !lowerHeader.includes('reference'))) {
         currentSection = 5;
       } else if (lowerHeader.includes('mixdown') || lowerHeader.includes('master bus') || (lowerHeader.includes('6.') && lowerHeader.includes('mix')) || lowerHeader.includes('stereo master tape')) {
         currentSection = 6;
@@ -131,6 +134,20 @@ export function parseHistoricalTracksheet(markdown) {
         currentSection = 0;
       }
       continue;
+    }
+
+    if (currentSection === 3) {
+      if (trimmed) {
+        result.studio.rawContent = result.studio.rawContent ? `${result.studio.rawContent}\n${trimmed}` : trimmed;
+      }
+    } else if (currentSection === 4) {
+      if (trimmed) {
+        result.musicology.rawContent = result.musicology.rawContent ? `${result.musicology.rawContent}\n${trimmed}` : trimmed;
+      }
+    } else if (currentSection === 6) {
+      if (trimmed) {
+        result.mixdown.rawContent = result.mixdown.rawContent ? `${result.mixdown.rawContent}\n${trimmed}` : trimmed;
+      }
     }
 
     // SECTION 1: General Metadata
@@ -257,6 +274,42 @@ export function parseHistoricalTracksheet(markdown) {
       const isIndented = /^\s{2,}\*/.test(line);
       const bulletMatch = trimmed.match(/^\*\s+(?:\*\*([^*]+)\*\*|\*([^*]+)\*)\s*(.*)$/);
 
+      // Check for inline Key, Tempo, Tuning, Meter anywhere in Section 4
+      const textToScan = trimmed;
+      const cleanLineNoFractions = textToScan.replace(/\b1\/2\s*step\b/gi, '').replace(/\b1\/2\s*tone\b/gi, '').replace(/\b1\/2\s*inch\b/gi, '');
+
+      // Key detection
+      if (!result.musicology.key) {
+        const keyMatch = textToScan.match(/(?:\*?\*?Key\*?\*?:?|\bRoot Key of\b|\bin the key of\b|\bKey of\b)\s*([A-G][b#♭♯]?(?:-flat|-sharp)?(?:\s+(?:Major|Minor|Aeolian|Dorian|Mixolydian|pentatonic|blues))?)/i);
+        if (keyMatch) {
+          result.musicology.key = keyMatch[1].trim();
+        }
+      }
+
+      // Tempo / BPM detection
+      if (!result.musicology.bpm) {
+        const bpmMatch = textToScan.match(/(?:~|approx\.?|approximately\s*)?(\d{2,3})(?:\s*-\s*\d{2,3})?\s*BPM/i);
+        if (bpmMatch) {
+          result.musicology.bpm = bpmMatch[1];
+          result.musicology.tempo = `${bpmMatch[1]} BPM`;
+        }
+      }
+
+      // Tuning detection (explicit bullet or labeled specification)
+      if (!result.musicology.tuning) {
+        const tuningMatch = textToScan.match(/(?:^\s*\*\s+(?:\*|\*)?Tuning(?:\*|\*)?:|\b(?:Instrument\s+)?Tuning:\s*|\bTuned(?:\s+to)?:\s*)([^\n\r]+)/i);
+        if (tuningMatch) {
+          const parsed = extractScoreAndSource(tuningMatch[1]);
+          result.musicology.tuning = parsed.value.replace(/^[*:\s]+/, '').replace(/[-:*]\s*$/, '').trim();
+        }
+      }
+
+      // Time signature / Meter detection (constrained to valid meter patterns)
+      const meterMatch = cleanLineNoFractions.match(/\b([234567]\/[48]|\b12\/8\b|\b9\/8\b|\b6\/8\b)\b/);
+      if (meterMatch && (!result.musicology.timeSignature || result.musicology.timeSignature === '4/4' || result.musicology.timeSignature === '1/2')) {
+        result.musicology.timeSignature = meterMatch[1];
+      }
+
       if (bulletMatch && !isIndented) {
         const rawHeading = (bulletMatch[1] || bulletMatch[2]).replace(/:$/, '').trim().toLowerCase();
         const rawVal = bulletMatch[3].replace(/^:\s*/, '').trim();
@@ -282,17 +335,14 @@ export function parseHistoricalTracksheet(markdown) {
           if (parsed.value) {
             const text = parsed.value;
             const keyMatch = text.match(/(?:Root Key of|Key of|in|Key:?)\s*([A-G][b#]?(?:\s*(?:Major|Minor|Aeolian|Dorian|Mixolydian))?)/i);
-            if (keyMatch) result.musicology.key = keyMatch[1].trim();
-            else result.musicology.key = text.split('.')[0];
+            if (keyMatch && !result.musicology.key) result.musicology.key = keyMatch[1].trim();
+            else if (!result.musicology.key) result.musicology.key = text.split('.')[0];
 
             const bpmMatch = text.match(/(\d{2,3})\s*BPM/i);
-            if (bpmMatch) {
+            if (bpmMatch && !result.musicology.bpm) {
               result.musicology.bpm = bpmMatch[1];
               result.musicology.tempo = `${bpmMatch[1]} BPM`;
             }
-
-            const timeMatch = text.match(/(\d\/\d)/);
-            if (timeMatch) result.musicology.timeSignature = timeMatch[1];
           }
         } else if (rawHeading.includes('arrangement') || rawHeading.includes('production')) {
           currentMusicologyField = 'arrangement';
@@ -336,9 +386,6 @@ export function parseHistoricalTracksheet(markdown) {
             result.musicology.bpm = bpmMatch[1];
             result.musicology.tempo = `${bpmMatch[1]} BPM`;
           }
-
-          const timeMatch = combined.match(/(\d\/\d)/);
-          if (timeMatch) result.musicology.timeSignature = timeMatch[1];
         } else if (currentMusicologyField === 'arrangement') {
           const title = subKey || '';
           const desc = parsed.value || '';
@@ -483,6 +530,8 @@ export function parseHistoricalTracksheet(markdown) {
     // SECTION 6: Historical Mixdown, Master Bus & Stereo Master Tape
     else if (currentSection === 6) {
       const bulletMatch = trimmed.match(/^\*\s+\*\*([^:]+):\*\*\s*(.*)$/);
+      const subBullet = trimmed.match(/^\s*\*\s+\*([^:]+):\*\s*(.*)$/);
+
       if (bulletMatch) {
         const key = bulletMatch[1].trim().toLowerCase();
         const rawVal = bulletMatch[2].trim();
@@ -498,12 +547,20 @@ export function parseHistoricalTracksheet(markdown) {
         } else if (key.includes('spatial') || key.includes('staging') || key.includes('stereo vs') || key.includes('variants')) {
           result.mixdown.spatialStaging = parsed.value;
         }
+      } else if (subBullet) {
+        const title = subBullet[1].trim();
+        const parsed = extractScoreAndSource(subBullet[2].trim());
+        if (parsed.scoreNum) scoresCollected.push(parsed.scoreNum);
+        const item = `${title}: ${parsed.value}`;
+        result.mixdown.spatialStaging = result.mixdown.spatialStaging 
+          ? `${result.mixdown.spatialStaging}\n• ${item}`
+          : `• ${item}`;
       }
     }
 
     // SECTION 7: References
     else if (currentSection === 7 || currentSection === 6) {
-      const refMatch = trimmed.match(/^\*\s+\[([^\]]+)\]\((https?:\/\/[^)]+)\)(?:\s*[-:]\s*(.*))?$/);
+      const refMatch = trimmed.match(/^\*\s+\[+([^\]]+)\]+\(\[?(https?:\/\/[^\])]+)\]?\)(?:\s*[-:]\s*\[?(.*?)\]?)?$/);
       if (refMatch) {
         result.references.push({
           title: refMatch[1].trim(),

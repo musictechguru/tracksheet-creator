@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Music, Disc, Mic2, Radio, Play, ExternalLink, Sliders, ShieldCheck, 
-  Layers, Volume2, Cpu, FileText, CheckCircle2, ChevronRight, User, Award
+  Layers, Volume2, Cpu, FileText, CheckCircle2, ChevronRight, ChevronDown, ChevronUp, User, Award
 } from 'lucide-react';
 
 export default function DossierView({ data }) {
@@ -9,6 +9,7 @@ export default function DossierView({ data }) {
 
   const [activeInstIdx, setActiveInstIdx] = useState(0);
   const [selectedSectionIdx, setSelectedSectionIdx] = useState(null);
+  const [showExtendedNotes, setShowExtendedNotes] = useState(false);
 
   const {
     song,
@@ -96,6 +97,14 @@ export default function DossierView({ data }) {
                   <span className="dossier-tag-val" style={{ color: '#34D399' }}>{musicology.timeSignature}</span>
                 </div>
               )}
+              {musicology.tuning && (
+                <div className="dossier-tag" title={musicology.tuning}>
+                  <span className="dossier-tag-label">TUNING</span>
+                  <span className="dossier-tag-val" style={{ color: '#FBBF24' }}>
+                    {musicology.tuning.length > 28 ? `${musicology.tuning.substring(0, 26)}…` : musicology.tuning}
+                  </span>
+                </div>
+              )}
               {youtubeUrl && (
                 <a 
                   href={youtubeUrl} 
@@ -138,37 +147,43 @@ export default function DossierView({ data }) {
       </div>
 
       {/* 2. Song Form & Structural Roadmap */}
-      {musicology.formBreakdown && musicology.formBreakdown.length > 0 && (
+      {(musicology.formBreakdown?.length > 0 || musicology.arrangementTechniques || musicology.arrangementPoints?.length > 0 || musicology.rawContent || musicology.key || musicology.bpm) && (
         <div className="dossier-section-card glass-panel">
           <div className="dossier-section-header">
             <div className="dossier-section-title-wrap">
               <Layers size={20} color="#38BDF8" />
               <h3 className="dossier-section-title">Musical Form & Arrangement Roadmap</h3>
             </div>
-            <span className="dossier-section-pill">{musicology.formBreakdown.length} Sections</span>
+            {musicology.formBreakdown && musicology.formBreakdown.length > 0 ? (
+              <span className="dossier-section-pill">{musicology.formBreakdown.length} Sections</span>
+            ) : (
+              <span className="dossier-section-pill">Harmonic & Arrangement Analysis</span>
+            )}
           </div>
 
           {/* Interactive Form Timeline */}
-          <div className="dossier-form-timeline">
-            {musicology.formBreakdown.map((sec, idx) => {
-              const secDetail = musicology.formSections && musicology.formSections[idx];
-              const hasDetail = secDetail && secDetail.description;
-              return (
-                <div 
-                  key={idx} 
-                  className={`dossier-form-step ${selectedSectionIdx === idx ? 'active' : ''} ${hasDetail ? 'has-detail' : ''}`}
-                  onClick={() => setSelectedSectionIdx(selectedSectionIdx === idx ? null : idx)}
-                  title={hasDetail ? "Click to view musical analysis & timing breakdown" : undefined}
-                >
-                  <span className="dossier-form-step-num">0{idx + 1}</span>
-                  <span className="dossier-form-step-name">{sec}</span>
-                  {idx < musicology.formBreakdown.length - 1 && (
-                    <ChevronRight size={14} className="dossier-form-step-arrow" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          {musicology.formBreakdown && musicology.formBreakdown.length > 0 && (
+            <div className="dossier-form-timeline">
+              {musicology.formBreakdown.map((sec, idx) => {
+                const secDetail = musicology.formSections && musicology.formSections[idx];
+                const hasDetail = secDetail && secDetail.description;
+                return (
+                  <div 
+                    key={idx} 
+                    className={`dossier-form-step ${selectedSectionIdx === idx ? 'active' : ''} ${hasDetail ? 'has-detail' : ''}`}
+                    onClick={() => setSelectedSectionIdx(selectedSectionIdx === idx ? null : idx)}
+                    title={hasDetail ? "Click to view musical analysis & timing breakdown" : undefined}
+                  >
+                    <span className="dossier-form-step-num">0{idx + 1}</span>
+                    <span className="dossier-form-step-name">{sec}</span>
+                    {idx < musicology.formBreakdown.length - 1 && (
+                      <ChevronRight size={14} className="dossier-form-step-arrow" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Selected Section Forensic Detail Card (Revealed on click) */}
           {selectedSectionIdx !== null && musicology.formSections && musicology.formSections[selectedSectionIdx] && (
@@ -240,7 +255,18 @@ export default function DossierView({ data }) {
               <div className="dossier-box-label">
                 <Radio size={14} color="#C084FC" /> PRODUCTION & ARRANGEMENT FORENSICS
               </div>
-              <p className="dossier-box-text">{musicology.arrangementTechniques}</p>
+              <p className="dossier-box-text" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                {musicology.arrangementTechniques}
+              </p>
+            </div>
+          ) : musicology.rawContent ? (
+            <div className="dossier-arrangement-box">
+              <div className="dossier-box-label">
+                <Radio size={14} color="#C084FC" /> EXTENDED MUSICAL & HARMONIC FORENSICS
+              </div>
+              <p className="dossier-box-text" style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                {musicology.rawContent}
+              </p>
             </div>
           ) : null}
         </div>
@@ -612,6 +638,57 @@ export default function DossierView({ data }) {
               </a>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* 7. Extended Archival Session Documentation & Verbatim Notes Drawer */}
+      {(musicology?.rawContent || studio?.rawContent || mixdown?.rawContent) && (
+        <div className="dossier-section-card glass-panel dossier-notes-accordion">
+          <button 
+            type="button" 
+            className="dossier-accordion-btn"
+            onClick={() => setShowExtendedNotes(prev => !prev)}
+          >
+            <div className="dossier-section-title-wrap">
+              <FileText size={18} color="#94A3B8" />
+              <h4 className="dossier-notes-title">Extended Archival Forensics & Session Transcripts</h4>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94A3B8', fontSize: '0.8rem' }}>
+              <span>{showExtendedNotes ? 'Hide Full Text' : 'View Full Text'}</span>
+              {showExtendedNotes ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </div>
+          </button>
+
+          {showExtendedNotes && (
+            <div className="dossier-accordion-content">
+              {musicology?.rawContent && (
+                <div className="dossier-extended-block">
+                  <div className="dossier-box-label" style={{ color: '#38BDF8', marginBottom: '0.5rem' }}>
+                    <Layers size={14} color="#38BDF8" /> MUSICAL & HARMONIC TRANSCRIPT
+                  </div>
+                  <pre className="dossier-raw-pre">{musicology.rawContent}</pre>
+                </div>
+              )}
+
+              {studio?.rawContent && (
+                <div className="dossier-extended-block">
+                  <div className="dossier-box-label" style={{ color: '#F472B6', marginBottom: '0.5rem' }}>
+                    <Sliders size={14} color="#F472B6" /> STUDIO ENVIRONMENT & OUTBOARD LOGS
+                  </div>
+                  <pre className="dossier-raw-pre">{studio.rawContent}</pre>
+                </div>
+              )}
+
+              {mixdown?.rawContent && (
+                <div className="dossier-extended-block">
+                  <div className="dossier-box-label" style={{ color: '#C084FC', marginBottom: '0.5rem' }}>
+                    <Cpu size={14} color="#C084FC" /> MIXDOWN & MASTER BUS ARCHITECTURE
+                  </div>
+                  <pre className="dossier-raw-pre">{mixdown.rawContent}</pre>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

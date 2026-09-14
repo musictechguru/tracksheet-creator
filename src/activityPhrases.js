@@ -1,130 +1,143 @@
 // Historical Tracksheet Activity Phrases: Archival research, checking down records, and tracking down equipment
-export const TRACKSHEET_ACTIVITY_PHRASES = [
-  // 1. Searching Tape Vaults, Basements & Record Company Archives
-  'Blowing 45 years of mysterious magnetic dust off the 2-inch master tape boxes…',
-  'Rummaging through subterranean Island Records tape vaults with a flickering flashlight and a lukewarm mug of tea…',
-  'Baking sticky-shed Ampex 456 tape reels in a food dehydrator at 130°F while whispering prayers to Studer…',
-  'Searching microfiche catalogs at Abbey Road to discover why the session reels were filed under the drummer\'s nickname…',
-  'Unearthing a water-damaged cardboard box labeled "HIT SINGLE MASTER - DO NOT THROW OUT" behind a broken radiator…',
-  'Dusting off an unlabelled Scotch 206 reel that smells distinctly of 1976 patchouli and stale control room coffee…',
-  'Checking the Atlantic Records tape archives: praying nobody recorded a 1982 radio jingle over the multitrack…',
-  'Prying open a corroded metal film canister containing 1/4-inch safety copies from Olympic Studios…',
-  'Interrogating the retired EMI vault manager with a packet of Hobnobs to locate the missing 1973 tape cartons…',
-  'Cross-referencing Olympic, Trident, and Sound Techniques vault manifests to find which studio actually kept the reels…',
-  'Rescuing magnetic tape reels from the damp boot of an ex-manager\'s 1985 Ford Capri…',
-  'Searching through Motown\'s Hitsville tape bins: finding 16 reels all simply labeled "JAM IN D MINOR"…',
-  'Shaking a tape box gently to verify the 2-inch reel hasn\'t chemically bonded into strawberry marmalade…',
-  'Sifting through uncataloged tape vaults in Burbank to locate the missing vocal outtake safety reels…',
-  'Finding a handwritten note inside a 1978 master box: "DO NOT PLAY - TAPE HEADS WILL CRY"…',
-  'Examining unlabelled 1-inch 8-track tapes with a magnifying glass, cotton gloves, and forensic curiosity…',
-  'Searching through damp basement archive shelves in Soho where tape boxes are filed by color and sheer luck…',
-  'Auditing Olympic Sound Studios tape dispatch manifests from October 1971…',
-  'Digging through tape storage lockers in Muscle Shoals: hoping the master didn\'t get melted by Alabama humidity…',
-  'Checking Abbey Road tape library index cards: cross-referencing EMI matrix numbers against session dates…',
-  'Wiping green mildew off a 16-track 2-inch master reel found in a retired producer\'s garden shed…',
-  'Tracking down safety copies shipped to Capitol Tower in Los Angeles that got lost in transit in 1977…',
-  'Deciphering tape vault catalog codes that look suspiciously like an assistant engineer\'s grocery list…',
-  'Searching the Decca archives: verifying whether the master was filed under the band name or the producer\'s yacht name…',
-  'Locating the lost 1/2-inch stereo mixdown tape: discovered propping up a wobbly control room coffee table…',
-  'Ransacking subterranean tape archives in Nashville looking for the missing session take sheets…',
-  'Sifting through Island Records Basing Street archive lockers for the original 24-track rhythm tracks…',
-  'Deciphering faded grease-pencil catalog numbers on a dented 1972 Scotch tape shipping carton…',
-  'Checking whether the master tape was archived "heads out" or "tails out" before hitting play…',
-  'Inspecting tape leader tape: red tape for heads out, blue tape for tails out, masking tape for absolute panic…',
-  'Searching Criteria Recording Studios vaults in Miami for Hurricane-surviving 2-inch multi-tracks…',
-  'Tracing an unlabelled 1970s tape box that traveled through 4 different continents and 7 record labels…',
+// Dynamically connected to the specific track and artist being searched for or created!
+export function buildConnectedTracksheetPhrases(context = {}) {
+  const { trackName, artistName } = context;
+  const rawTitle = (trackName || 'the track').trim();
+  const title = rawTitle.replace(/^["']|["']$/g, '').trim() || 'the track';
+  const rawArtist = (artistName || '').trim();
+  const artist = rawArtist.replace(/^["']|["']$/g, '').trim();
+  const byArtist = artist ? ` by ${artist}` : '';
+  const forArtist = artist ? ` for ${artist}` : '';
 
-  // 2. Checking Down Records, Session Sheets & Studio Documentation
-  'Deciphering engineer grease-pencil chicken scratch on the back of a 1972 track sheet: is that "Snare Top" or "Gary\'s Lunch"?…',
-  'Cross-referencing Musicians Union session logbooks to find out who actually played the uncredited cowbell on take 4…',
-  'Inspecting the coffee-ringed assistant engineer session card from June 14th, 1975…',
-  'Auditing session take sheets: 42 takes marked "False Start", 1 marked "Master", 5 marked "Singer Sulking"…',
-  'Verifying the 24-track track sheet chart: discovering Tracks 17 to 20 were wiped for 16 layers of handclaps…',
-  'Translating cryptic British studio slang in the logbook: "Gave the snare a bit of welly on Take 4"…',
-  'Tracking down the studio receptionist\'s 1977 desk diary to confirm what week the brass section actually showed up…',
-  'Cross-checking session ledger receipts: £450 for studio time, £1,800 for tea, tobacco, and emergency guitar strings…',
-  'Deciphering an illegible track assignment: "TK 9: SLOW BASS / TK 10: WEIRD NOISE / TK 11: DON\'T TOUCH"…',
-  'Comparing three conflicting session track sheets written by three different assistant engineers during a 36-hour shift…',
-  'Consulting the studio tape log to find out which track had the uncredited second guitar solo bounced onto it…',
-  'Investigating assistant engineer take notes: "Take 12 sounded brilliant until the drummer dropped his sandwich on the snare"…',
-  'Checking union card contracts to identify the mystery session harpist who refused to be credited on the sleeve…',
-  'Reading faded yellowed masking tape stuck to the 2-inch reel flange: "BOUNCE OF TRACKS 1-8 (WE THINK)"…',
-  'Matching session dates against UK weather records to explain why the tape machine varispeed was drifting wildly…',
-  'Cross-referencing tape dispatch notes to confirm the stereo master wasn\'t left in the back of a London black cab…',
-  'Inspecting the producer\'s session diary: discovering three whole days spent trying to get the right tambourine sound…',
-  'Deciphering studio log entry from 3:45 AM: "Guitarist fell asleep mid-solo; kept the feedback loop as intro"…',
-  'Checking down track sheet notes: "Track 8: Lead Vocal (Do NOT wipe, talent took 4 hours to coax into booth)"…',
-  'Cross-referencing take numbers against master acetate cutting logs to find the true definitive mix…',
-  'Reading faded pencil margin notes: "Replaced bassline after bassist admitted he was playing in the wrong key"…',
-  'Auditing the studio billing ledger: tracing who authorized 14 rolls of 2-inch tape for a 3-minute pop single…',
-  'Checking session paperwork for cue sheets: verifying which takes were spliced together with razor blades…',
-  'Deciphering a 1979 session sheet scribble: "Track 14 is silent because Keith tripped over the multicore snake"…',
-  'Auditing track sheet channel allocations: discovering the acoustic piano was spread across 6 tracks for no obvious reason…',
-  'Checking the assistant engineer\'s handwritten diary: "Producer insisted on recording vocals at 4:00 AM under a blanket"…',
-  'Reconciling conflicting studio logs between the London tracking session and the New York mixdown session…',
-  'Verifying the master session card: checking if the famous outro fadeout was executed on the fader or by walking away…',
-  'Checking the studio overtime logs: determining if the string section walked out at 10:01 PM on the dot…',
-  'Auditing engineer notes on Track 23: "Ghost acoustic guitar - do not erase, player has already left for the airport"…',
+  return [
+    // 1. Searching Tape Vaults, Basements & Record Company Archives
+    `Blowing 45 years of mysterious magnetic dust off the 2-inch master tape boxes for "${title}"…`,
+    `Rummaging through subterranean Island Records tape vaults for "${title}"${byArtist}: flashlight flickering, tea lukewarm…`,
+    `Baking sticky-shed Ampex 456 tape reels for "${title}" in a food dehydrator at 130°F while whispering prayers to Studer…`,
+    `Searching microfiche catalogs at Abbey Road: why were the "${title}" reels filed under the drummer's nickname?…`,
+    `Unearthing a water-damaged cardboard box labeled "${title} MASTER - DO NOT THROW OUT" behind a studio radiator…`,
+    `Dusting off an unlabelled Scotch 206 reel of "${title}": smells distinctly of 1976 patchouli and stale control room coffee…`,
+    `Checking the Atlantic Records tape archives: praying nobody recorded a 1982 radio jingle over the multitrack of "${title}"…`,
+    `Prying open a corroded metal film canister containing 1/4-inch safety copies for "${title}"…`,
+    `Interrogating the retired EMI vault manager with a packet of Hobnobs to locate the missing "${title}" tape cartons…`,
+    `Cross-referencing Olympic, Trident, and Sound Techniques vault manifests for the master reels of "${title}"…`,
+    `Rescuing "${title}" master tape reels from the damp boot of an ex-manager's 1985 Ford Capri…`,
+    `Searching through Motown's Hitsville tape bins: finding 16 reels for "${title}" all simply labeled "JAM IN D MINOR"…`,
+    `Shaking the 2-inch tape box for "${title}" gently to verify the reel hasn't chemically bonded into strawberry marmalade…`,
+    `Sifting through uncataloged tape vaults in Burbank to locate the missing vocal outtake safety reels for "${title}"…`,
+    `Finding a handwritten note inside the "${title}" master box: "DO NOT PLAY - TAPE HEADS WILL CRY"…`,
+    `Examining unlabelled 1-inch 8-track tapes with a magnifying glass to confirm "${title}" session take numbers…`,
+    `Searching damp basement archive shelves in Soho where tape boxes for "${title}" were filed by sheer luck…`,
+    `Auditing tape dispatch manifests from the original recording sessions for "${title}"…`,
+    `Digging through tape storage lockers in Muscle Shoals: hoping "${title}" master tapes survived Alabama humidity…`,
+    `Checking Abbey Road tape library index cards: cross-referencing EMI matrix numbers for "${title}"…`,
+    `Wiping green mildew off a 16-track 2-inch master reel of "${title}" found in a retired producer's garden shed…`,
+    `Tracking down safety copies of "${title}" shipped to Capitol Tower in Los Angeles that got lost in transit in 1977…`,
+    `Deciphering tape vault catalog codes for "${title}" that look suspiciously like an assistant engineer's grocery list…`,
+    `Searching the Decca archives: verifying whether "${title}" was filed under the band name or the producer's yacht name…`,
+    `Locating the lost 1/2-inch stereo mixdown tape for "${title}": discovered propping up a wobbly coffee table…`,
+    `Ransacking subterranean tape archives in Nashville looking for the missing session take sheets for "${title}"…`,
+    `Sifting through Island Records Basing Street archive lockers for the original 24-track rhythm tracks of "${title}"…`,
+    `Deciphering faded grease-pencil catalog numbers on the tape shipping carton for "${title}"…`,
+    `Checking whether the master tape for "${title}" was archived "heads out" or "tails out" before hitting play…`,
+    `Inspecting leader tape on "${title}": red tape for heads out, blue tape for tails out, masking tape for absolute panic…`,
+    `Searching Criteria Recording Studios vaults in Miami for Hurricane-surviving 2-inch multi-tracks of "${title}"…`,
+    `Tracing an unlabelled tape box of "${title}" that traveled through 4 different continents and 7 record labels…`,
 
-  // 3. Tracking Down Equipment, Microphones & Signal Chains
-  'Auditing vintage equipment logs: confirming whether Studio 2 had the Helios console or the Neve 8048 in 1974…',
-  'Hunting down the serial number of the EMT 140 plate reverb hidden in the studio basement concrete bunker…',
-  'Squinting at grainy black-and-white control room Polaroids to see which microphone was on the lead vocalist…',
-  'Tracking down whether the kick drum mic was an AKG D12, a Neumann U47 FET, or an Electro-Voice RE20…',
-  'Tracking down the vintage equipment rental invoice: checking which fuzz pedal was hired for the weekend…',
-  'Verifying which tape machine recorded the rhythm bed: 16-track 3M M56 or 24-track Studer A800…',
-  'Tracking down the bass signal chain: determining whether it was a direct BSS DI box or a cranked Ampeg SVT fridge…',
-  'Sleuthing through gear archives to find out if the snare had an inverted phase mic taped underneath…',
-  'Investigating whether the acoustic guitar was tracked with a pair of Neumann KM84s or a single Coles 4038 ribbon…',
-  'Digging into studio repair logs: discovering Channel 8 preamp was distorting because an engineer spilled tea in the gain pot…',
-  'Tracking down the console routing: finding out which tracks were slammed through the UREI 1176 in "All-Buttons-In" mode…',
-  'Confirming whether the lead vocal went through the Teletronix LA-2A optical cell or the Fairchild 670 tube limiter…',
-  'Checking whether the echo was a real concrete chamber, an EMT plate, or a tape delay loop on a Revox A77…',
-  'Tracking down the guitar amp: discovering the monster rock sound was actually a tiny 5-watt Fender Champ miked in a bathroom…',
-  'Identifying which microphone was used for the room sound: a pair of PZM boundary mics taped to the parquet floor…',
-  'Verifying the console EQ settings: checking if the famous top-end sheen was Pultec EQP-1A magic or just tape saturation…',
-  'Tracking down the Leslie rotary speaker cabinet model used on the Hammond organ overdub…',
-  'Checking microphone locker dispatch sheets to see if the U47 had a brass-ring M7 capsule or a K47…',
-  'Auditing DI box specs: determining if the bass used passive Jensen transformers or an active custom studio circuit…',
-  'Hunting down the tape bias calibration logs: finding out if the heads were calibrated for +6 dB or +9 dB high-output tape…',
-  'Tracking down which synthesizers were carted into the studio: checking if that pad was a Prophet-5, Minimoog, or Mellotron M400…',
-  'Hunting down the outboard gear patch sheet: discovering the lead vocal was routed through four compressors in series…',
-  'Checking the console talkback circuit schematic: discovering how the producer\'s accidental sneeze made it onto Track 15…',
-  'Tracking down the snare drum: confirming it was a 1968 Ludwig Supraphonic dampened with a hotel towel and a wallet…',
-  'Inspecting equipment hire receipts to see if the studio actually rented an Eventide H910 Harmonizer for the chorus vocal…',
-  'Verifying monitor speaker calibration: confirming the mix was checked on Auratone 5C sound cubes and Yamaha NS-10Ms…',
-  'Tracking down the vintage DI box: checking whether the direct bass sound came from a Countryman Type 85 or a BSS…',
-  'Checking Olympic Sound Studios electrical schematics: discovering custom transformer iron on the console summing bus…',
-  'Tracking down the vocal chain pop filter: discovering it was a wire coat hanger wrapped in the assistant\'s nylon tights…',
-  'Hunting down the tape machine maintenance log: checking when the Studer A800 capstan belt was last replaced…',
-  'Verifying the acoustic guitar microphone position: checking Polaroids to confirm 12th fret placement vs soundhole…',
-  'Tracking down whether the plate reverb was a stereo EMT 140 or a mono EMT 240 gold-foil foil unit…',
-  'Auditing the microphone preamps: confirming whether drums were routed through discrete Neve 1073s or console direct…',
+    // 2. Checking Down Records, Session Sheets & Studio Documentation
+    `Deciphering engineer grease-pencil chicken scratch on the "${title}" track sheet: is that "Snare Top" or "Gary's Lunch"?…`,
+    `Cross-referencing Musicians Union session logbooks to find out who actually played the uncredited cowbell on "${title}"…`,
+    `Inspecting the coffee-ringed assistant engineer session card from the tracking date of "${title}"…`,
+    `Auditing session take sheets for "${title}": 42 takes marked "False Start", 1 marked "Master", 5 marked "Singer Sulking"…`,
+    `Verifying the 24-track track sheet for "${title}": discovering Tracks 17 to 20 were wiped for 16 layers of handclaps…`,
+    `Translating cryptic British studio slang in the "${title}" logbook: "Gave the snare a bit of welly on Take 4"…`,
+    `Tracking down the studio receptionist's desk diary to confirm what week the "${title}" session actually took place…`,
+    `Cross-checking session ledger receipts for "${title}": £450 for studio time, £1,800 for tea, tobacco, and emergency guitar strings…`,
+    `Deciphering an illegible track assignment on "${title}": "TK 9: SLOW BASS / TK 10: WEIRD NOISE / TK 11: DON'T TOUCH"…`,
+    `Comparing three conflicting session track sheets for "${title}" written by three exhausted assistant engineers…`,
+    `Consulting the studio tape log to find which track of "${title}" had the uncredited second guitar solo bounced onto it…`,
+    `Investigating assistant engineer take notes on "${title}": "Take 12 sounded brilliant until the drummer dropped his sandwich on the snare"…`,
+    `Checking union card contracts to identify the mystery session harpist on "${title}" who refused album credit…`,
+    `Reading faded masking tape stuck to the 2-inch reel flange for "${title}": "BOUNCE OF TRACKS 1-8 (WE THINK)"…`,
+    `Matching session dates for "${title}" against UK weather records to explain why the tape machine varispeed was drifting…`,
+    `Cross-referencing tape dispatch notes to confirm the stereo master of "${title}" wasn't left in the back of a London black cab…`,
+    `Inspecting the producer's session diary: discovering three whole days spent trying to get the "${title}" tambourine sound…`,
+    `Deciphering "${title}" studio log entry from 3:45 AM: "Guitarist fell asleep mid-solo; kept feedback loop as intro"…`,
+    `Checking track sheet notes on "${title}": "Track 8: Lead Vocal (Do NOT wipe, talent took 4 hours to coax into booth)"…`,
+    `Cross-referencing take numbers for "${title}" against master acetate cutting logs to find the true definitive mix…`,
+    `Reading faded pencil margin notes on "${title}": "Replaced bassline after bassist admitted he was playing in the wrong key"…`,
+    `Auditing the studio billing ledger: tracing who authorized 14 rolls of 2-inch tape for "${title}"…`,
+    `Checking session paperwork for cue sheets: verifying which takes of "${title}" were spliced together with razor blades…`,
+    `Deciphering a session sheet scribble on "${title}": "Track 14 is silent because Keith tripped over the multicore snake"…`,
+    `Auditing track allocations for "${title}": discovering the acoustic piano was spread across 6 tracks for no obvious reason…`,
+    `Checking the assistant engineer's diary: "Producer insisted on recording "${title}" vocals at 4:00 AM under a blanket"…`,
+    `Reconciling conflicting studio logs between the London tracking session and the New York mixdown session of "${title}"…`,
+    `Verifying the master session card for "${title}": checking if the famous outro fadeout was executed on the fader or by walking away…`,
+    `Checking studio overtime logs for "${title}": determining if the string section walked out at 10:01 PM on the dot…`,
+    `Auditing engineer notes on "${title}" Track 23: "Ghost acoustic guitar - do not erase, player has left for the airport"…`,
 
-  // 4. Forensic Audio Archaeology & Studio Detective Work
-  'Calling a retired 78-year-old tape operator who swears the acoustic guitar was miked on the fire escape…',
-  'Investigating acoustic room anomalies: discovering the low-end thud was a subterranean tube train passing under the studio…',
-  'Forensic tape listening: analyzing 15 seconds of silence before Take 1 to measure the room reverb decay time…',
-  'Deciphering faded grease-pencil notes on the console meter bridge: "CH 12: DO NOT TURN UP UNDER ANY CIRCUMSTANCES"…',
-  'Tracking down the mystery acoustic space: discovering the backing vocals were recorded in the Abbey Road ladies\' washroom…',
-  'Checking the electrical phase of the studio mains: ruling out 50 Hz transformer hum on the bass multitrack…',
-  'Consulting vintage studio floor plans to calculate the exact distance between the drum kit and the live room stone wall…',
-  'Identifying bleed on the vocal track: confirming the drummer\'s headphone click was loud enough to hear in the car park…',
-  'Cross-referencing session photos to see how many inches the pop filter was from the lead singer\'s microphone…',
-  'Detective work on the multitrack bounce: tracing where Tracks 1-4 disappeared to make room for four brass overdubs…',
-  'Investigating why Track 24 has no audio: discovering it was dedicated to an unstable SMPTE timecode pulse…',
-  'Checking whether the guitar solo was recorded at half-speed and played back an octave higher on the master reel…',
-  'Auditing studio maintenance records: checking when the console capacitors were last replaced before the session…',
-  'Sleuthing out the source of the mysterious hiss: tracing it to a vintage Echoplex tape cartridge running on its last legs…',
-  'Analyzing vocal mic spill into the drum overheads: calculating speed of sound across 22 feet of control room glass…',
-  'Investigating an uncredited whistle solo on Track 9: rumor says the tea runner whistled it while holding two mugs…',
-  'Checking tape leader colors: red tape for heads out, blue tape for tails out, masking tape for absolute panic…',
-  'Verifying tape azimuth calibration: making sure the stereo image doesn\'t collapse the moment mono is engaged…',
-  'Reconstructing the studio patchbay layout from a water-damaged napkin drawn at 4:00 AM…',
-  'Tracing the lineage of the master safety copy from London to New York to a climate-controlled salt mine in Kansas…',
-  'Synthesizing decades of archival forensics, signal chains, and musicological lore into an airtight dossier…',
-  'Session forensics complete: master reels verified, tape heads demagnetized, and historical track sheet ready!'
-];
+    // 3. Tracking Down Equipment, Microphones & Signal Chains
+    `Auditing vintage equipment logs: confirming which console recorded the rhythm beds for "${title}"…`,
+    `Hunting down the serial number of the EMT 140 plate reverb used for the iconic vocal wash on "${title}"…`,
+    `Squinting at grainy black-and-white control room Polaroids to identify the vocal microphone used on "${title}"…`,
+    `Tracking down whether the kick drum mic on "${title}" was an AKG D12, a Neumann U47 FET, or an Electro-Voice RE20…`,
+    `Tracking down the vintage equipment rental invoice: checking which fuzz pedal was hired for "${title}"…`,
+    `Verifying which tape machine recorded "${title}": 16-track 3M M56 or 24-track Studer A800…`,
+    `Tracking down the bass signal chain for "${title}": determining whether it was a direct BSS DI box or a cranked Ampeg SVT…`,
+    `Sleuthing through gear archives to find out if the snare on "${title}" had an inverted phase mic taped underneath…`,
+    `Investigating whether "${title}" acoustic guitars were tracked with Neumann KM84s or Coles 4038 ribbons…`,
+    `Digging into studio repair logs: discovering a preamp channel on "${title}" was distorting from spilled tea in the pot…`,
+    `Tracking down the console routing: finding which tracks of "${title}" were slammed through the 1176 in All-Buttons mode…`,
+    `Confirming whether the lead vocal on "${title}" went through a Teletronix LA-2A or a Fairchild 670 tube limiter…`,
+    `Checking whether "${title}" echo was a real concrete chamber, an EMT plate, or a tape delay loop on a Revox A77…`,
+    `Tracking down the guitar amp on "${title}": was the massive tone actually a tiny 5-watt Fender Champ miked in a bathroom?…`,
+    `Identifying which microphone was used for the room sound on "${title}": checking if PZM boundary mics were taped to the parquet floor…`,
+    `Verifying console EQ settings on "${title}": was the top-end sheen Pultec EQP-1A magic or just tape saturation?…`,
+    `Tracking down the Leslie rotary speaker cabinet model used on the "${title}" organ overdub…`,
+    `Checking microphone locker dispatch sheets to see if the vocal mic on "${title}" had an M7 or K47 capsule…`,
+    `Auditing DI box specs for "${title}": determining if the bass used passive Jensen transformers or an active custom circuit…`,
+    `Hunting down tape bias calibration logs for "${title}": were heads aligned for +6 dB or +9 dB high-output tape?…`,
+    `Tracking down which synthesizers were carted into the studio for the signature hook on "${title}"…`,
+    `Hunting down the outboard gear patch sheet: discovering the lead vocal on "${title}" had four compressors in series…`,
+    `Checking console talkback circuit schematics: discovering how the producer's sneeze made it onto "${title}" Track 15…`,
+    `Tracking down the snare drum on "${title}": confirming a 1968 Ludwig Supraphonic dampened with a wallet and a towel…`,
+    `Inspecting equipment hire receipts: did the studio rent an Eventide H910 Harmonizer for the "${title}" chorus?…`,
+    `Verifying monitor speaker calibration: confirming "${title}" was checked on Auratone 5C sound cubes and Yamaha NS-10Ms…`,
+    `Tracking down the vintage DI box on "${title}": checking whether direct bass came from a Countryman Type 85 or a BSS…`,
+    `Checking studio electrical schematics: discovering custom transformer iron on the "${title}" summing bus…`,
+    `Tracking down the vocal pop filter on "${title}": discovering a wire coat hanger wrapped in assistant's nylon tights…`,
+    `Hunting down tape machine maintenance logs: checking when the Studer A800 capstan belt was replaced before "${title}"…`,
+    `Verifying "${title}" acoustic guitar mic position: checking Polaroids to confirm 12th fret placement vs soundhole…`,
+    `Tracking down whether the reverb on "${title}" was a stereo EMT 140 plate or a mono gold-foil EMT 240…`,
+    `Auditing microphone preamps on "${title}": were drums tracked through discrete Neve 1073s or console direct?…`,
+
+    // 4. Forensic Audio Archaeology & Studio Detective Work
+    `Calling a retired 78-year-old tape operator who swears the acoustic guitar on "${title}" was miked on the fire escape…`,
+    `Investigating acoustic room anomalies: discovering the low-end thud on "${title}" was a subterranean tube train…`,
+    `Forensic tape listening: analyzing 15 seconds of silence before Take 1 of "${title}" to measure room decay time…`,
+    `Deciphering faded notes on the console meter bridge for "${title}": "CH 12: DO NOT TURN UP UNDER ANY CIRCUMSTANCES"…`,
+    `Tracking down the mystery acoustic space: discovering "${title}" backing vocals were recorded in the ladies' washroom…`,
+    `Checking electrical phase of studio mains: ruling out 50 Hz transformer hum on the "${title}" bass multitrack…`,
+    `Consulting vintage studio floor plans to calculate distance between drums and live room stone wall on "${title}"…`,
+    `Identifying bleed on "${title}": confirming the drummer's headphone click was loud enough to hear in the car park…`,
+    `Cross-referencing session photos to measure how many inches the pop filter was from the lead singer on "${title}"…`,
+    `Detective work on the multitrack bounce: tracing where Tracks 1-4 of "${title}" went to make room for brass overdubs…`,
+    `Investigating why Track 24 of "${title}" has no audio: discovering it was dedicated to an unstable SMPTE timecode pulse…`,
+    `Checking whether the guitar solo on "${title}" was recorded at half-speed and played an octave higher on playback…`,
+    `Auditing studio maintenance records: checking when console capacitors were recapped before tracking "${title}"…`,
+    `Sleuthing out the source of hiss on "${title}": tracing it to a vintage Echoplex tape cartridge running on its last legs…`,
+    `Analyzing vocal mic spill into drum overheads on "${title}": calculating speed of sound across 22 feet of control room…`,
+    `Investigating uncredited whistle solo on "${title}": rumor says the tea runner whistled it while holding two mugs…`,
+    `Checking tape leader on "${title}": red for heads out, blue for tails out, masking tape for absolute panic…`,
+    `Verifying tape azimuth calibration on "${title}": making sure stereo image doesn't collapse when mono is engaged…`,
+    `Reconstructing the studio patchbay layout for "${title}" from a water-damaged napkin drawn at 4:00 AM…`,
+    `Tracing the lineage of the master safety copy of "${title}" from London to a climate-controlled salt mine in Kansas…`,
+    `Synthesizing decades of archival forensics, signal chains, and musicological lore for "${title}" into an airtight dossier…`,
+    `Session forensics complete: master reels for "${title}" verified, tape heads demagnetized, and track sheet ready!`
+  ];
+}
+
+export const TRACKSHEET_ACTIVITY_PHRASES = buildConnectedTracksheetPhrases({ trackName: 'the track', artistName: '' });
 
 export const DAW_ACTIVITY_PHRASES = {
   'Logic Pro': [
@@ -751,23 +764,24 @@ export function generateProceduralTracksheetPhrases(context = {}) {
     `Tracking down the reverb source for "${title}": checking whether ${randStudio} used an EMT plate or live echo chamber…`,
     `Forensic tape head inspection for "${title}": recovering high-frequency tape bias calibration records from ${randYear}…`,
     `Checking take log sheets for "${title}": verifying whether Take ${takeNum} or Take ${takeNum + 1} was spliced as master…`,
-    `Cross-referencing studio maintenance logs: confirming 2-inch multitrack #${reelNum} was recorded on a ${randTape}…`,
-    `Tracking down vintage DI box records: verifying bass signal path into ${randConsole} Channel ${Math.floor(Math.random() * 8) + 1}…`,
+    `Cross-referencing studio maintenance logs: confirming 2-inch multitrack #${reelNum} for "${title}" was recorded on a ${randTape}…`,
+    `Tracking down vintage DI box records for "${title}": verifying bass signal path into ${randConsole} Channel ${Math.floor(Math.random() * 8) + 1}…`,
     `Auditing studio dispatch paperwork: tracing the definitive safety tape transfer of "${title}"${byArtist}…`
   ];
 }
 
 // Master generator for Historical Tracksheet search & forensic monitor:
-// Returns a dynamically randomized, freshly shuffled pool of archival, record-checking, and equipment-tracking phrases!
+// Returns a dynamically randomized, freshly shuffled pool of archival, record-checking, and equipment-tracking phrases,
+// all connected directly to the specific track and artist being searched for or created!
 export function getTracksheetActivityPhrases(context = {}) {
-  // 1. Curated archival, record-checking and gear-tracking phrase pool
-  const basePool = [...TRACKSHEET_ACTIVITY_PHRASES];
+  // 1. Curated archival, record-checking and gear-tracking phrase pool dynamically customized to this track & artist
+  const connectedPool = buildConnectedTracksheetPhrases(context);
 
   // 2. Procedural dynamic phrases incorporating the actual track, artist, randomized vaults, consoles, mics, and reels
   const proceduralPhrases = generateProceduralTracksheetPhrases(context);
 
-  // 3. Combine procedural + base pool
-  const combined = Array.from(new Set([...proceduralPhrases, ...basePool]));
+  // 3. Combine procedural + connected pool
+  const combined = Array.from(new Set([...proceduralPhrases, ...connectedPool]));
 
   // 4. Return fully shuffled random order every single run
   return shufflePhrases(combined);
