@@ -257,9 +257,22 @@ For EVERY historical fact, instrument, microphone, and signal chain element, app
     *   [Compressors/Limiters, EQs, Plate/Spring Reverbs, Tape Delays] - Score: [X/10] (Source: [Note])
 
 ## 4. Musical & Structural Analysis
-*   **Form & Structural Breakdown:** [Bar-by-bar or section-by-section roadmap: Intro -> Verse -> Pre-Chorus -> Chorus -> Bridge -> Solo -> Outro] - Score: [X/10] (Source: [Note])
-*   **Key, Modulations & Tempo:** [Root key, harmonic shifts, exact BPM tempo map, time signature(s)] - Score: [X/10] (Source: [Note])
-*   **Arrangement & Production Techniques:** [Detailed analysis of layering, counter-melodies, dynamic contour, and period production signatures such as varispeed pitching, ADT, backwards tape, comb-filtered room ambience, etc.] - Score: [X/10] (Source: [Note])
+*   **Form & Structural Breakdown:** Provide an in-depth, section-by-section chronological roadmap of the song structure with exact timings/bar counts, musical details, and arrangement dynamics for every section:
+    *   **Intro ([Timings / Bar Count]):** [Detailed musical analysis of instrumentation, arrangement entry, harmonic movement, dynamic level] - Score: [X/10] (Source: [Note])
+    *   **Verse 1 ([Timings / Bar Count]):** [Detailed musical analysis of instrumentation, vocal delivery, arrangement texture] - Score: [X/10] (Source: [Note])
+    *   **Pre-Chorus ([Timings / Bar Count]):** [Detailed musical analysis of tension build, chordal movement, rhythmic changes] - Score: [X/10] (Source: [Note])
+    *   **Chorus ([Timings / Bar Count]):** [Detailed musical analysis of hook, arrangement layering, stereo dynamics] - Score: [X/10] (Source: [Note])
+    *   **Verse 2 ([Timings / Bar Count]):** [Detailed musical analysis of variations, added fills or instrumentation] - Score: [X/10] (Source: [Note])
+    *   **Bridge / Solo ([Timings / Bar Count]):** [Detailed musical analysis of modulations, solo techniques, rhythmic shifts] - Score: [X/10] (Source: [Note])
+    *   **Outro ([Timings / Bar Count]):** [Detailed musical analysis of resolution, vamp, fade-out or cold ending] - Score: [X/10] (Source: [Note])
+*   **Key, Modulations & Tempo:**
+    *   **Key:** [Root key, tonality, modes, modal interchange, harmonic shifts] - Score: [X/10] (Source: [Note])
+    *   **Tempo:** [Exact BPM tempo map, tempo fluctuations/human feel, click track vs. free time] - Score: [X/10] (Source: [Note])
+    *   **Time Signature & Meter:** [Meter, compound/simple, syncopation, polyrhythms] - Score: [X/10] (Source: [Note])
+*   **Arrangement & Production Techniques:**
+    *   **[Technique 1: e.g. Dynamic Staging / Vocal Layering]:** [Detailed analysis] - Score: [X/10] (Source: [Note])
+    *   **[Technique 2: e.g. Harmonic Counterpoint / Wall of Sound]:** [Detailed analysis] - Score: [X/10] (Source: [Note])
+    *   **[Technique 3: e.g. Period Production Signatures (Varispeed, ADT, Leslie, Reverse Tape)]:** [Detailed analysis] - Score: [X/10] (Source: [Note])
 
 ## 5. Historical Recording Pathways & Session Signal Chains
 Meticulously document the authentic historical recording pathways, capture techniques, and analog signal chains for EVERY individual instrument and vocal stem recorded during the session (e.g. Kick Drum, Snare Top/Bottom, Overheads, Bass, Rhythm Electric Guitar, Lead Electric Guitar, Acoustic Guitar, Lead Vocals, Backing Vocals, Keyboards/Organ/Piano/Synthesizers, Brass/Strings, Auxiliary Percussion).
@@ -549,7 +562,80 @@ function extractTracksheetScore(markdown) {
   return Math.min(100, Math.round(avg * 10));
 }
 
-// Get all tracksheets (enhanced with C1 solution counts, generated DAWs, and reliability scores)
+// Validate whether a tracksheet meets the latest 8-section criteria and reliability scoring framework
+function checkTracksheetMeetsModernCriteria(markdown) {
+  if (!markdown || typeof markdown !== 'string') {
+    return { compliant: false, scoreCount: 0, reasons: ['Empty or invalid tracksheet content'] };
+  }
+
+  const reasons = [];
+  if (!/##\s*1\.\s*General\s*Metadata/i.test(markdown)) reasons.push('Missing Section 1: General Metadata');
+  if (!/##\s*2\.\s*Personnel/i.test(markdown)) reasons.push('Missing Section 2: Personnel');
+  if (!/##\s*3\.\s*(Location|Studio\s*Technology)/i.test(markdown)) reasons.push('Missing Section 3: Location & Studio Technology');
+  if (!/##\s*4\.\s*Musical/i.test(markdown)) reasons.push('Missing Section 4: Musical & Structural Analysis');
+  if (!/##\s*5\.\s*(Historical\s*Recording\s*Pathways|Session\s*Signal\s*Chains|Signal\s*Chain)/i.test(markdown)) reasons.push('Missing Section 5: Historical Recording Pathways');
+  if (!/##\s*6\.\s*(Historical\s*Mixdown|Mixdown.*Master\s*Bus|Master\s*Bus|Stereo\s*Master)/i.test(markdown)) reasons.push('Missing Section 6: Historical Mixdown & Master Bus');
+  if (!/##\s*7\.\s*References/i.test(markdown)) reasons.push('Missing Section 7: References');
+
+  const scoreMatches = markdown.match(/(?:-\s*)?(?:Reliability\s*)?Score:\s*\[(\d+)(?:\/10)?\]/gi) || [];
+  if (scoreMatches.length < 15) {
+    reasons.push(`Low Reliability Score count (${scoreMatches.length}/15 minimum required)`);
+  }
+
+  return {
+    compliant: reasons.length === 0,
+    scoreCount: scoreMatches.length,
+    reasons
+  };
+}
+
+// Helper to execute fresh AI generation for a tracksheet with Gemini
+async function generateTracksheetWithGemini(trackName, artistName) {
+  const p1 = "AIzaSyD7Q4";
+  const p2 = "KkTSmN6XJ53-";
+  const p3 = "KZXS483e3Zgb16R44";
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || (p1 + p2 + p3));
+
+  const prompt = `Please create a tracksheet for the song "${trackName}" by ${artistName || 'Unknown'}. Please make sure you return the exact markdown format specified in the system prompt.`;
+  
+  let generatedContent = "";
+  try {
+    const primaryModel = genAI.getGenerativeModel({
+      model: "gemini-3.1-pro-preview",
+      systemInstruction: SYSTEM_PROMPT,
+    });
+    const result = await primaryModel.generateContent(prompt);
+    generatedContent = result.response.text();
+  } catch (primaryErr) {
+    console.warn("Primary model (gemini-3.1-pro-preview) error, trying gemini-pro-latest:", primaryErr.message);
+    try {
+      const fallbackModel = genAI.getGenerativeModel({
+        model: "gemini-pro-latest",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+      const result = await fallbackModel.generateContent(prompt);
+      generatedContent = result.response.text();
+    } catch (fallbackErr) {
+      console.warn("Secondary Pro model (gemini-pro-latest) error, trying gemini-3.6-flash:", fallbackErr.message);
+      const flashFallbackModel = genAI.getGenerativeModel({
+        model: "gemini-3.6-flash",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+      const result = await flashFallbackModel.generateContent(prompt);
+      generatedContent = result.response.text();
+    }
+  }
+
+  // Fallback: If the AI missed the YouTube link, append it to the end of the metadata or document
+  if (!generatedContent.includes('youtube.com')) {
+    const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(trackName + ' ' + (artistName || ''))}`;
+    generatedContent = generatedContent.replace('## 2. Personnel', `*   **YouTube Search:** [Listen on YouTube](${searchUrl})\n\n## 2. Personnel`);
+  }
+
+  return generatedContent;
+}
+
+// Get all tracksheets (enhanced with C1 solution counts, generated DAWs, reliability scores, and criteria compliance)
 app.get('/api/tracksheets', (req, res) => {
   const query = `
     SELECT t.id, t.track_name, t.artist_name, t.created_at, t.content,
@@ -566,10 +652,14 @@ app.get('/api/tracksheets', (req, res) => {
     }
     const enhanced = (rows || []).map(row => {
       const score = extractTracksheetScore(row.content);
+      const criteriaCheck = checkTracksheetMeetsModernCriteria(row.content);
       const { content, ...rest } = row;
       return {
         ...rest,
-        score
+        score,
+        is_compliant: criteriaCheck.compliant,
+        score_count: criteriaCheck.scoreCount,
+        missing_criteria: criteriaCheck.reasons
       };
     });
     res.json(enhanced);
@@ -799,7 +889,104 @@ app.get('/api/tracksheets/:id', (req, res) => {
   });
 });
 
-// Generate or retrieve a tracksheet (with archive check and regeneration support)
+// Audit all tracksheets against current 8-section criteria and reliability scoring framework
+app.get('/api/archive/audit', (req, res) => {
+  db.all('SELECT id, track_name, artist_name, content, created_at FROM tracksheets ORDER BY id ASC', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    const auditResults = (rows || []).map(r => {
+      const check = checkTracksheetMeetsModernCriteria(r.content);
+      const score = extractTracksheetScore(r.content);
+      return {
+        id: r.id,
+        track_name: r.track_name,
+        artist_name: r.artist_name,
+        score,
+        score_count: check.scoreCount,
+        is_compliant: check.compliant,
+        missing_criteria: check.reasons,
+        created_at: r.created_at
+      };
+    });
+
+    const compliantCount = auditResults.filter(r => r.is_compliant).length;
+    const outdatedCount = auditResults.length - compliantCount;
+
+    res.json({
+      total: auditResults.length,
+      compliant_count: compliantCount,
+      outdated_count: outdatedCount,
+      compliance_rate: Math.round((compliantCount / (auditResults.length || 1)) * 100) + '%',
+      tracks: auditResults
+    });
+  });
+});
+
+// Upgrade a specific tracksheet to the modern criteria
+app.post('/api/archive/upgrade/:id', async (req, res) => {
+  const trackId = Number(req.params.id);
+  db.get('SELECT * FROM tracksheets WHERE id = ?', [trackId], async (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'Tracksheet not found' });
+
+    try {
+      const updatedContent = await generateTracksheetWithGemini(row.track_name, row.artist_name);
+      const newScore = extractTracksheetScore(updatedContent);
+
+      let structuredData = { producers: [], musicians: [], engineers: [] };
+      const jsonMatch = updatedContent.match(/\`\`\`json\s*([\s\S]*?)\s*\`\`\`/);
+      if (jsonMatch && jsonMatch[1]) {
+        try { structuredData = JSON.parse(jsonMatch[1]); } catch {}
+      }
+
+      db.run(
+        'UPDATE tracksheets SET content = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [updatedContent, trackId],
+        function (updateErr) {
+          if (updateErr) return res.status(500).json({ error: updateErr.message });
+
+          const insertPersonnel = (tId, names, role) => {
+            if (!Array.isArray(names)) return;
+            names.forEach(name => {
+              if (!name) return;
+              db.run('INSERT OR IGNORE INTO personnel (name) VALUES (?)', [name], function(pErr) {
+                if (pErr) return console.error(pErr);
+                db.get('SELECT id FROM personnel WHERE name = ?', [name], (gErr, pRow) => {
+                  if (gErr || !pRow) return;
+                  db.run('INSERT INTO track_personnel (track_id, personnel_id, role) VALUES (?, ?, ?)', [tId, pRow.id, role]);
+                });
+              });
+            });
+          };
+
+          db.run('DELETE FROM track_personnel WHERE track_id = ?', [trackId], () => {
+            insertPersonnel(trackId, structuredData.producers, 'Producer');
+            insertPersonnel(trackId, structuredData.musicians, 'Musician');
+            insertPersonnel(trackId, structuredData.engineers, 'Engineer');
+          });
+
+          db.all('SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC', [trackId], (c1Err, c1Rows) => {
+            res.json({
+              success: true,
+              id: trackId,
+              track_name: row.track_name,
+              artist_name: row.artist_name,
+              content: updatedContent,
+              score: newScore,
+              is_compliant: true,
+              c1_solutions: c1Rows || []
+            });
+          });
+        }
+      );
+    } catch (genErr) {
+      console.error('Upgrade failed for ID ' + trackId, genErr);
+      res.status(500).json({ error: genErr.message });
+    }
+  });
+});
+
+// Generate or retrieve a tracksheet (with archive check, modern criteria validation, and regeneration support)
 app.post('/api/tracksheets/generate', async (req, res) => {
   const { track_name, artist_name, force_regenerate, existing_id } = req.body;
   if (!track_name) {
@@ -808,8 +995,9 @@ app.post('/api/tracksheets/generate', async (req, res) => {
 
   const cleanTrack = track_name.trim();
   const cleanArtist = artist_name ? artist_name.trim() : '';
+  let autoUpgradeExistingId = null;
 
-  // 1. If NOT force_regenerate, check if a matching tracksheet already exists in archive (ALWAYS KEEP THE HIGHEST SCORE)
+  // 1. If NOT force_regenerate, check if a matching tracksheet already exists in archive
   if (!force_regenerate) {
     const findExistingHighestScore = () => {
       return new Promise((resolve, reject) => {
@@ -861,77 +1049,44 @@ app.post('/api/tracksheets/generate', async (req, res) => {
       const match = await findExistingHighestScore();
       if (match && match.best) {
         const bestRow = match.best;
-        const allIds = match.allIds;
-        const idPlaceholders = allIds.map(() => '?').join(',');
-        return db.all(
-          `SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id IN (${idPlaceholders}) ORDER BY created_at DESC`,
-          allIds,
-          (err, c1Rows) => {
-            if (err) return res.status(500).json({ error: err.message });
-            return res.json({
-              id: bestRow.id,
-              track_name: bestRow.track_name,
-              artist_name: bestRow.artist_name,
-              content: bestRow.content,
-              score: extractTracksheetScore(bestRow.content),
-              created_at: bestRow.created_at,
-              is_existing: true,
-              c1_solutions: c1Rows || []
-            });
-          }
-        );
+        const criteriaCheck = checkTracksheetMeetsModernCriteria(bestRow.content);
+
+        // If the archived tracksheet fulfills all modern criteria, serve it directly
+        if (criteriaCheck.compliant) {
+          const allIds = match.allIds;
+          const idPlaceholders = allIds.map(() => '?').join(',');
+          return db.all(
+            `SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id IN (${idPlaceholders}) ORDER BY created_at DESC`,
+            allIds,
+            (err, c1Rows) => {
+              if (err) return res.status(500).json({ error: err.message });
+              return res.json({
+                id: bestRow.id,
+                track_name: bestRow.track_name,
+                artist_name: bestRow.artist_name,
+                content: bestRow.content,
+                score: extractTracksheetScore(bestRow.content),
+                created_at: bestRow.created_at,
+                is_existing: true,
+                is_compliant: true,
+                c1_solutions: c1Rows || []
+              });
+            }
+          );
+        }
+
+        // If the archived tracksheet has outdated criteria, upgrade it automatically!
+        console.log(`[Archive Auto-Upgrade] Track "${bestRow.track_name}" (ID ${bestRow.id}) has outdated criteria (${criteriaCheck.reasons.join(', ')}). Updating to latest criteria...`);
+        autoUpgradeExistingId = bestRow.id;
       }
     } catch (findErr) {
       console.error('Error checking archive for existing tracksheet:', findErr);
     }
   }
 
-  // 2. Perform fresh AI generation with Gemini
+  // 2. Perform fresh AI generation with Gemini (for new tracks, manual regeneration, or auto-upgrading outdated archive tracks)
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      console.warn("WARNING: GEMINI_API_KEY is not set in your environment.");
-    }
-
-    const p1 = "AIzaSyD7Q4";
-    const p2 = "KkTSmN6XJ53-";
-    const p3 = "KZXS483e3Zgb16R44";
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || (p1 + p2 + p3));
-
-    const prompt = `Please create a tracksheet for the song "${cleanTrack}" by ${cleanArtist || 'Unknown'}. Please make sure you return the exact markdown format specified in the system prompt.`;
-    
-    let generatedContent = "";
-    try {
-      const primaryModel = genAI.getGenerativeModel({
-        model: "gemini-3.1-pro-preview",
-        systemInstruction: SYSTEM_PROMPT,
-      });
-      const result = await primaryModel.generateContent(prompt);
-      generatedContent = result.response.text();
-    } catch (primaryErr) {
-      console.warn("Primary model (gemini-3.1-pro-preview) error, trying gemini-pro-latest:", primaryErr.message);
-      try {
-        const fallbackModel = genAI.getGenerativeModel({
-          model: "gemini-pro-latest",
-          systemInstruction: SYSTEM_PROMPT,
-        });
-        const result = await fallbackModel.generateContent(prompt);
-        generatedContent = result.response.text();
-      } catch (fallbackErr) {
-        console.warn("Secondary Pro model (gemini-pro-latest) error, trying gemini-3.6-flash:", fallbackErr.message);
-        const flashFallbackModel = genAI.getGenerativeModel({
-          model: "gemini-3.6-flash",
-          systemInstruction: SYSTEM_PROMPT,
-        });
-        const result = await flashFallbackModel.generateContent(prompt);
-        generatedContent = result.response.text();
-      }
-    }
-    
-    // Fallback: If the AI missed the YouTube link, append it to the end of the metadata or document
-    if (!generatedContent.includes('youtube.com')) {
-      const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanTrack + ' ' + cleanArtist)}`;
-      generatedContent = generatedContent.replace('## 2. Personnel', `*   **YouTube Search:** [Listen on YouTube](${searchUrl})\n\n## 2. Personnel`);
-    }
+    const generatedContent = await generateTracksheetWithGemini(cleanTrack, cleanArtist);
 
     // Extract JSON block if it exists
     let structuredData = { producers: [], musicians: [], engineers: [] };
@@ -988,15 +1143,27 @@ app.post('/api/tracksheets/generate', async (req, res) => {
       });
     };
 
-    const existingRow = await getExistingRecord(existing_id ? Number(existing_id) : null);
+    const existingRow = await getExistingRecord((existing_id ? Number(existing_id) : null) || autoUpgradeExistingId);
     const targetId = existingRow ? existingRow.id : null;
 
     if (targetId && existingRow) {
       const existingScore = extractTracksheetScore(existingRow.content);
+      const existingCheck = checkTracksheetMeetsModernCriteria(existingRow.content);
+      const newCheck = checkTracksheetMeetsModernCriteria(generatedContent);
 
-      // ALWAYS KEEP THE HISTORICAL TRACKSHEET THAT HAS THE HIGHEST SCORE!
-      // If existing historical tracksheet has a higher score than the new generation, keep existing!
-      if (existingScore > newScore) {
+      // ALWAYS KEEP THE HISTORICAL TRACKSHEET THAT HAS THE HIGHEST SCORE (among compliant versions)!
+      // 1. If existing meets modern criteria and new generation also meets modern criteria:
+      //    keep whichever has the higher score (favor existing if existingScore >= newScore).
+      // 2. If existing meets modern criteria but new generation does NOT:
+      //    keep existing!
+      // 3. If existing does NOT meet modern criteria, but new generation DOES:
+      //    UPGRADE to the new generation!
+      // 4. If neither meets modern criteria:
+      //    keep whichever has the higher score.
+      const shouldKeepExisting = (existingCheck.compliant && !newCheck.compliant) ||
+        (existingCheck.compliant === newCheck.compliant && existingScore > newScore);
+
+      if (shouldKeepExisting) {
         return db.all(
           'SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC',
           [targetId],
@@ -1010,13 +1177,14 @@ app.post('/api/tracksheets/generate', async (req, res) => {
               new_score: newScore,
               is_regenerated: true,
               kept_existing_highest: true,
+              is_compliant: existingCheck.compliant,
               c1_solutions: c1Rows || []
             });
           }
         );
       }
 
-      // New score is >= existing score: update record with higher scoring version
+      // New generation is compliant or has higher score: update record with improved version
       db.run(
         'UPDATE tracksheets SET content = ?, track_name = ?, artist_name = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?',
         [generatedContent, cleanTrack, cleanArtist, targetId],

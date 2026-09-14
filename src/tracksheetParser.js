@@ -321,13 +321,23 @@ export function parseHistoricalTracksheet(markdown) {
           if (parsed.value) {
             const parts = parsed.value.split(/->|→/).map(p => p.trim()).filter(Boolean);
             if (parts.length > 0) {
-              result.musicology.formBreakdown = parts;
-              result.musicology.formSections = parts.map(p => ({
-                title: p,
-                description: '',
-                score: parsed.score || '',
-                source: parsed.source || ''
-              }));
+              result.musicology.formBreakdown = [];
+              result.musicology.formSections = parts.map((p, idx) => {
+                const matchParen = p.match(/^([^(]+?)\s*\(([^)]+)\)$/);
+                let title = p;
+                let desc = '';
+                if (matchParen) {
+                  title = matchParen[1].trim();
+                  desc = matchParen[2].trim();
+                }
+                result.musicology.formBreakdown.push(title);
+                return {
+                  title,
+                  description: desc,
+                  score: parsed.score || '',
+                  source: parsed.source || ''
+                };
+              });
             }
           }
         } else if (rawHeading.includes('key') || rawHeading.includes('tempo') || rawHeading.includes('modulation')) {

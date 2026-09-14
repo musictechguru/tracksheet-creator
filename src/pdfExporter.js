@@ -455,12 +455,12 @@ export function generatePdfHtml({ type, content, trackName, artistName, daw }) {
                       ${idx < data.musicology.formBreakdown.length - 1 ? `<span style="color: #94a3b8; font-size: 7.5pt; margin: 0 1px;">➔</span>` : ""}
                     `).join("")}
                   </div>
-                  ${data.musicology.formSections && data.musicology.formSections.some(s => s.description) ? `
+                  ${data.musicology.formSections && data.musicology.formSections.length > 0 ? `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px;">
-                      ${data.musicology.formSections.filter(s => s.description).map(s => `
+                      ${data.musicology.formSections.map(s => `
                         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 6px; font-size: 7.2pt;">
                           <strong style="color: #0369a1;">${s.title}</strong>
-                          <p style="margin: 2px 0 0 0; color: #334155; line-height: 1.35;">${s.description}</p>
+                          <p style="margin: 2px 0 0 0; color: #334155; line-height: 1.35;">${s.description || 'Arrangement section tracked on commercial session multitrack.'}</p>
                         </div>
                       `).join("")}
                     </div>

@@ -3,7 +3,7 @@ import {
   Sparkles, Music, Mic2, Database, History, Sliders, 
   FileText, Download, Copy, Check, Printer, Disc, CheckCircle2,
   Terminal, Search, Eye, X, ArrowLeft, RefreshCw, LayoutTemplate,
-  FileDown, Loader2
+  FileDown, Loader2, Bot
 } from 'lucide-react';
 
 import ReactMarkdown from 'react-markdown';
@@ -12,6 +12,7 @@ import './App.css';
 import { TRACKSHEET_ACTIVITY_PHRASES, getTracksheetActivityPhrases, getSolutionEngineeringPhrases } from './activityPhrases';
 import DossierView from './components/DossierView';
 import LogbookDossierView from './components/LogbookDossierView';
+import DecadeBotPanel from './components/DecadeBotPanel';
 import { parseHistoricalTracksheet } from './tracksheetParser';
 import { parseLogbook } from './logbookParser';
 import { downloadGoodLookingPdf } from './pdfExporter';
@@ -265,11 +266,11 @@ function App() {
     }
   }, [c1Loading]);
 
-  // Dev Mode state - hidden by default unless unlocked via secret shortcut (Ctrl+Shift+D), ?dev=true, or 5 clicks on title
+  // Dev Mode state - accessible by tapping the star icon at top, top bar button, or ?dev=true
   const [devUnlocked, setDevUnlocked] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      return params.get('dev') === 'true' || params.get('admin') === '1';
+      return params.get('dev') === 'true' || params.get('admin') === '1' || localStorage.getItem('tracksheet_dev_mode') === 'true';
     }
     return false;
   });
@@ -277,12 +278,11 @@ function App() {
   const [devMode, setDevMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      return params.get('dev') === 'true' || params.get('admin') === '1';
+      return params.get('dev') === 'true' || params.get('admin') === '1' || localStorage.getItem('tracksheet_dev_mode') === 'true';
     }
     return false;
   });
-  const [logoClicks, setLogoClicks] = useState(0);
-  const [devTab, setDevTab] = useState('tracksheets'); // 'tracksheets' | 'c1'
+  const [devTab, setDevTab] = useState('decade-bot'); // 'decade-bot' | 'tracksheets' | 'c1'
   const [devSearch, setDevSearch] = useState('');
   const [devDawFilter, setDevDawFilter] = useState('ALL');
   const [devC1Filter, setDevC1Filter] = useState('ALL');
@@ -290,18 +290,14 @@ function App() {
   const [devStats, setDevStats] = useState(null);
   const [peekItem, setPeekItem] = useState(null); // { title, content, type, filename }
   const [showDevExplorer, setShowDevExplorer] = useState(true);
+  const [upgradingId, setUpgradingId] = useState(null);
 
-  // Keyboard shortcut listener for secret developer toggle: Ctrl+Shift+D or Cmd+Shift+D
+  // Keyboard shortcut listener for developer toggle: Ctrl+Shift+D or Cmd+Shift+D
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
         e.preventDefault();
-        setDevUnlocked(true);
-        setDevMode((prev) => {
-          const next = !prev;
-          if (next) fetchDevData();
-          return next;
-        });
+        toggleDevMode();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -309,19 +305,7 @@ function App() {
   }, []);
 
   const handleLogoClick = () => {
-    setLogoClicks((prev) => {
-      const next = prev + 1;
-      if (next >= 5) {
-        setDevUnlocked(true);
-        setDevMode((current) => {
-          const toggled = !current;
-          if (toggled) fetchDevData();
-          return toggled;
-        });
-        return 0;
-      }
-      return next;
-    });
+    toggleDevMode();
   };
 
   // Layout Mode state for Historical Tracksheet: 'dossier' | 'console' | 'text'
@@ -389,8 +373,12 @@ function App() {
   }, [devMode]);
 
   const toggleDevMode = () => {
+    setDevUnlocked(true);
     setDevMode((prev) => {
       const next = !prev;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('tracksheet_dev_mode', next ? 'true' : 'false');
+      }
       if (next) {
         fetchDevData();
       }
@@ -499,6 +487,30 @@ function App() {
       }
     } catch (e) {
       console.error('Failed to peek C1 logbook', e);
+    }
+  };
+
+  const handleUpgradeTracksheet = async (id) => {
+    try {
+      setUpgradingId(id);
+      const res = await fetch(`/api/archive/upgrade/${id}`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        await fetchDevData();
+        if (currentTrackId === id && result) {
+          setResult(data.content);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(`Upgrade failed: ${err.error || 'Server error'}`);
+      }
+    } catch (e) {
+      console.error('Failed to upgrade tracksheet', e);
+      alert('Upgrade failed due to network error.');
+    } finally {
+      setUpgradingId(null);
     }
   };
 
@@ -698,6 +710,8 @@ function App() {
       (item.artist_name && item.artist_name.toLowerCase().includes(devSearch.toLowerCase()));
     
     if (!matchesSearch) return false;
+    if (devC1Filter === 'COMPLIANT') return item.is_compliant;
+    if (devC1Filter === 'OUTDATED') return !item.is_compliant;
     if (devC1Filter === 'HAS_C1') return item.c1_count > 0;
     if (devC1Filter === 'NO_C1') return !item.c1_count || item.c1_count === 0;
     return true;
@@ -724,22 +738,39 @@ function App() {
       <div className="gradient-blob blob-2"></div>
 
       <header>
-        {devUnlocked && (
-          <div className="header-top-bar">
-            <button 
-              type="button" 
-              className={`dev-mode-btn ${devMode ? 'active' : ''}`}
-              onClick={toggleDevMode}
-              title={devMode ? "Dev Mode is ACTIVE: Click to switch to normal mode" : "Click to activate Dev Mode & access all archived track sheets and C1 solutions"}
-            >
-              <Terminal size={15} />
-              <span>Dev Mode</span>
-              <span className="dev-status-indicator">{devMode ? 'ON' : 'OFF'}</span>
-            </button>
-          </div>
-        )}
-        <h1 onClick={handleLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>
-          <Sparkles size={40} style={{ verticalAlign: 'middle', marginRight: '10px' }}/>
+        <div className="header-top-bar">
+          <button 
+            type="button" 
+            className={`dev-mode-btn ${devMode ? 'active' : ''}`}
+            onClick={toggleDevMode}
+            title={devMode ? "Dev Mode is ACTIVE: Click to switch to normal mode" : "Click to activate Dev Mode (Decade Bot & Dev Archive)"}
+          >
+            <Terminal size={15} />
+            <span>Dev Mode</span>
+            <span className="dev-status-indicator">{devMode ? 'ON' : 'OFF'}</span>
+          </button>
+        </div>
+
+        <h1 
+          onClick={handleLogoClick} 
+          style={{ cursor: 'pointer', userSelect: 'none' }}
+          title={devMode ? "Dev Mode is ON: Click to turn OFF" : "Click to activate Dev Mode & Decade Bot"}
+        >
+          <Sparkles 
+            size={40} 
+            className="header-star-icon"
+            style={{ 
+              verticalAlign: 'middle', 
+              marginRight: '10px', 
+              cursor: 'pointer',
+              filter: devMode ? 'drop-shadow(0 0 12px #34d399)' : 'drop-shadow(0 0 8px #c084fc)'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleDevMode();
+            }}
+            title={devMode ? "Dev Mode is ON - Click star to turn OFF" : "Click Star to activate Dev Mode & Decade Bot"}
+          />
           Tracksheet Creator
         </h1>
         <p className="subtitle">AI-Powered Musicological Analysis & Audio Engineering Archive</p>
@@ -951,10 +982,24 @@ function App() {
                 All Created C1 Solutions
                 <span className="dev-badge-count">{allC1Solutions.length}</span>
               </button>
+
+              <button 
+                type="button" 
+                className={`dev-repo-tab-btn ${devTab === 'decade-bot' ? 'active' : ''}`}
+                onClick={() => setDevTab('decade-bot')}
+              >
+                <Bot size={16} />
+                Decade Bot (1950s–2020s)
+                <span className="dev-badge-count" style={{ background: 'rgba(192, 132, 252, 0.3)', color: '#DDD6FE' }}>800 Songs</span>
+              </button>
             </div>
 
-            {/* Filter Bar */}
-            <div className="dev-filter-bar">
+            {devTab === 'decade-bot' ? (
+              <DecadeBotPanel onLoadTrack={(trackId) => loadHistoryItem(trackId)} />
+            ) : (
+              <>
+                {/* Filter Bar */}
+                <div className="dev-filter-bar">
               <div className="dev-search-wrap">
                 <Search className="dev-search-icon" size={16} />
                 <input 
@@ -977,17 +1022,31 @@ function App() {
                   </button>
                   <button 
                     type="button" 
+                    className={`dev-pill ${devC1Filter === 'COMPLIANT' ? 'active' : ''}`}
+                    onClick={() => setDevC1Filter('COMPLIANT')}
+                  >
+                    Compliant ({history.filter(h => h.is_compliant).length})
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`dev-pill ${devC1Filter === 'OUTDATED' ? 'active' : ''}`}
+                    onClick={() => setDevC1Filter('OUTDATED')}
+                  >
+                    Needs Upgrade ({history.filter(h => !h.is_compliant).length})
+                  </button>
+                  <button 
+                    type="button" 
                     className={`dev-pill ${devC1Filter === 'HAS_C1' ? 'active' : ''}`}
                     onClick={() => setDevC1Filter('HAS_C1')}
                   >
-                    Has C1 Solutions ({history.filter(h => h.c1_count > 0).length})
+                    Has C1 ({history.filter(h => h.c1_count > 0).length})
                   </button>
                   <button 
                     type="button" 
                     className={`dev-pill ${devC1Filter === 'NO_C1' ? 'active' : ''}`}
                     onClick={() => setDevC1Filter('NO_C1')}
                   >
-                    No C1 Yet ({history.filter(h => !h.c1_count || h.c1_count === 0).length})
+                    No C1 ({history.filter(h => !h.c1_count || h.c1_count === 0).length})
                   </button>
                 </div>
               ) : (
@@ -1042,13 +1101,27 @@ function App() {
                               <div className="dev-track-artist">{item.artist_name || 'Unknown Artist'}</div>
                             </td>
                             <td>
-                              {item.score > 0 ? (
-                                <span className="dev-score-pill" title={`Reliability Score: ${item.score}%`}>
-                                  {item.score}%
-                                </span>
-                              ) : (
-                                <span style={{ color: '#64748B', fontSize: '0.8rem' }}>—</span>
-                              )}
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', alignItems: 'flex-start' }}>
+                                {item.score > 0 ? (
+                                  <span className="dev-score-pill" title={`Reliability Score: ${item.score}%`}>
+                                    {item.score}%
+                                  </span>
+                                ) : (
+                                  <span style={{ color: '#64748B', fontSize: '0.8rem' }}>—</span>
+                                )}
+                                {item.is_compliant ? (
+                                  <span className="dev-criteria-badge compliant" title="Compliant with all 8 modern criteria sections">
+                                    8/8 Criteria
+                                  </span>
+                                ) : (
+                                  <span 
+                                    className="dev-criteria-badge outdated" 
+                                    title={`Outdated criteria. Missing: ${(item.missing_criteria || []).join(', ')}`}
+                                  >
+                                    Legacy Criteria
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td style={{ fontSize: '0.8rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
                               {formatDate(item.created_at)}
@@ -1074,8 +1147,27 @@ function App() {
                             </td>
                             <td style={{ textAlign: 'right' }}>
                               <div className="dev-action-btn-group" style={{ justifyContent: 'flex-end' }}>
+                                {!item.is_compliant && (
+                                  <button
+                                    type="button"
+                                    className="dev-action-btn upgrade"
+                                    onClick={() => handleUpgradeTracksheet(item.id)}
+                                    disabled={upgradingId === item.id}
+                                    title={`Upgrade to latest 8-section criteria and reliability framework. Missing: ${(item.missing_criteria || []).join(', ')}`}
+                                  >
+                                    {upgradingId === item.id ? (
+                                      <>
+                                        <Loader2 size={13} className="spin" /> Upgrading...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Sparkles size={13} /> Upgrade
+                                      </>
+                                    )}
+                                  </button>
+                                )}
                                 <button 
-                                  type="button"
+                                  type="button" 
                                   className="dev-action-btn primary"
                                   onClick={() => loadHistoryItem(item.id)}
                                   title="Open this track sheet in the workspace"
@@ -1083,7 +1175,7 @@ function App() {
                                   <FileText size={13} /> Open
                                 </button>
                                 <button 
-                                  type="button"
+                                  type="button" 
                                   className="dev-action-btn"
                                   onClick={() => handlePeekTracksheet(item.id, item.track_name, item.artist_name)}
                                   title="Quick peek without navigating away"
@@ -1167,8 +1259,10 @@ function App() {
                 </div>
               </div>
             )}
-          </div>
+          </>
         )}
+      </div>
+    )}
 
         {/* Active Document Result Panel */}
         {result && (!devMode || !showDevExplorer) && (
