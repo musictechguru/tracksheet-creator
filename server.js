@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import 'dotenv/config';
+import { getDecadeCoverageStatus, getDecadeSongsWithStatus, runDecadeHarvester } from './decade_bot.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -531,10 +532,27 @@ app.post('/api/daw-updates/refresh', async (req, res) => {
   }
 });
 
-// Get all tracksheets (enhanced with C1 solution counts and generated DAWs)
+// Calculate overall reliability score (0-100) from tracksheet markdown
+function extractTracksheetScore(markdown) {
+  if (!markdown) return 0;
+  const regex = /(?:-\s*)?(?:Reliability\s*)?Score:\s*\[(\d+)(?:\/10)?\]/gi;
+  let match;
+  const scores = [];
+  while ((match = regex.exec(markdown)) !== null) {
+    const val = parseInt(match[1], 10);
+    if (!isNaN(val) && val > 0 && val <= 10) {
+      scores.push(val);
+    }
+  }
+  if (scores.length === 0) return 0;
+  const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+  return Math.min(100, Math.round(avg * 10));
+}
+
+// Get all tracksheets (enhanced with C1 solution counts, generated DAWs, and reliability scores)
 app.get('/api/tracksheets', (req, res) => {
   const query = `
-    SELECT t.id, t.track_name, t.artist_name, t.created_at,
+    SELECT t.id, t.track_name, t.artist_name, t.created_at, t.content,
            COUNT(c.id) AS c1_count,
            GROUP_CONCAT(DISTINCT c.daw) AS c1_daws
     FROM tracksheets t
@@ -546,7 +564,15 @@ app.get('/api/tracksheets', (req, res) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
-    res.json(rows);
+    const enhanced = (rows || []).map(row => {
+      const score = extractTracksheetScore(row.content);
+      const { content, ...rest } = row;
+      return {
+        ...rest,
+        score
+      };
+    });
+    res.json(enhanced);
   });
 });
 
@@ -602,6 +628,155 @@ app.get('/api/dev/stats', (req, res) => {
   });
 });
 
+// ==========================================
+// DECADE TRACKSHEET BOT (Dev Mode Only)
+// ==========================================
+let activeBotJob = {
+  isRunning: false,
+  shouldStop: false,
+  decade: null,
+  currentSong: null,
+  processed: 0,
+  limit: 0,
+  generated: 0,
+  cached: 0,
+  failed: 0,
+  logs: []
+};
+
+// 1. Get status for all 8 decades
+app.get('/api/bot/decades', async (req, res) => {
+  try {
+    const stats = await getDecadeCoverageStatus(db);
+    res.json({ success: true, decades: stats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 2. Get top 100 songs for a specific decade with archive status
+app.get('/api/bot/decades/:decade', async (req, res) => {
+  try {
+    const data = await getDecadeSongsWithStatus(db, req.params.decade);
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3. Get current bot running status
+app.get('/api/bot/status', (req, res) => {
+  res.json(activeBotJob);
+});
+
+// 4. Start the Harvester Bot in the background
+app.post('/api/bot/start', async (req, res) => {
+  if (activeBotJob.isRunning) {
+    return res.status(409).json({ error: 'Bot is already running.', status: activeBotJob });
+  }
+
+  const { decade = '1950s', limit = 10, delayMs = 2000, force = false } = req.body || {};
+
+  activeBotJob = {
+    isRunning: true,
+    shouldStop: false,
+    decade,
+    currentSong: null,
+    processed: 0,
+    limit: limit === 'all' || limit === 0 ? Infinity : Number(limit),
+    generated: 0,
+    cached: 0,
+    failed: 0,
+    logs: [
+      {
+        time: new Date().toLocaleTimeString(),
+        message: `🚀 Decade Bot started for ${decade.toUpperCase()} (Limit: ${limit})`
+      }
+    ]
+  };
+
+  // Launch in background asynchronously
+  (async () => {
+    try {
+      await runDecadeHarvester({
+        decade,
+        limit: activeBotJob.limit,
+        delayMs: Number(delayMs) || 2000,
+        force: !!force,
+        shouldStop: () => activeBotJob.shouldStop,
+        onProgress: (evt) => {
+          const timestamp = new Date().toLocaleTimeString();
+          if (evt.type === 'START_SONG') {
+            activeBotJob.currentSong = {
+              rank: evt.song.rank,
+              title: evt.song.title,
+              artist: evt.song.artist,
+              decade: evt.decade
+            };
+            activeBotJob.logs.unshift({
+              time: timestamp,
+              message: `Searching: #${evt.song.rank} "${evt.song.title}" - ${evt.song.artist}`
+            });
+          } else if (evt.type === 'SONG_COMPLETE') {
+            activeBotJob.processed = evt.results.totalProcessed;
+            activeBotJob.generated = evt.results.generated;
+            activeBotJob.cached = evt.results.cached;
+            activeBotJob.failed = evt.results.failed;
+
+            const msg = evt.isCached
+              ? `⚡ Cached in DB: #${evt.song.rank} "${evt.song.title}" (ID: #${evt.id})`
+              : `✨ Generated Tracksheet: #${evt.song.rank} "${evt.song.title}" (ID: #${evt.id})`;
+            
+            activeBotJob.logs.unshift({ time: timestamp, message: msg });
+          } else if (evt.type === 'SONG_ERROR') {
+            activeBotJob.processed = evt.results.totalProcessed;
+            activeBotJob.failed = evt.results.failed;
+            activeBotJob.logs.unshift({
+              time: timestamp,
+              message: `❌ Failed #${evt.song.rank} "${evt.song.title}": ${evt.error}`
+            });
+          }
+
+          // Keep recent 50 logs
+          if (activeBotJob.logs.length > 50) {
+            activeBotJob.logs.length = 50;
+          }
+        }
+      });
+      activeBotJob.logs.unshift({
+        time: new Date().toLocaleTimeString(),
+        message: `🏁 Decade Bot run finished. Processed ${activeBotJob.processed} songs.`
+      });
+    } catch (botErr) {
+      console.error('Bot Harvester Error:', botErr);
+      activeBotJob.logs.unshift({
+        time: new Date().toLocaleTimeString(),
+        message: `💥 Fatal bot error: ${botErr.message}`
+      });
+    } finally {
+      activeBotJob.isRunning = false;
+      activeBotJob.currentSong = null;
+    }
+  })();
+
+  res.json({ success: true, message: 'Bot started in background', status: activeBotJob });
+});
+
+// 5. Stop the running bot
+app.post('/api/bot/stop', (req, res) => {
+  if (!activeBotJob.isRunning) {
+    return res.json({ success: true, message: 'Bot was not running.' });
+  }
+
+  activeBotJob.shouldStop = true;
+  activeBotJob.logs.unshift({
+    time: new Date().toLocaleTimeString(),
+    message: '🛑 Stop command received. Gracefully finishing current item...'
+  });
+  res.json({ success: true, message: 'Stop signal sent to bot.' });
+});
+
+
 // Get a specific tracksheet
 app.get('/api/tracksheets/:id', (req, res) => {
   db.get('SELECT * FROM tracksheets WHERE id = ?', [req.params.id], (err, row) => {
@@ -617,6 +792,7 @@ app.get('/api/tracksheets/:id', (req, res) => {
       }
       res.json({
         ...row,
+        score: extractTracksheetScore(row.content),
         c1_solutions: c1Rows || []
       });
     });
@@ -633,46 +809,48 @@ app.post('/api/tracksheets/generate', async (req, res) => {
   const cleanTrack = track_name.trim();
   const cleanArtist = artist_name ? artist_name.trim() : '';
 
-  // 1. If NOT force_regenerate, check if a matching tracksheet already exists in archive
+  // 1. If NOT force_regenerate, check if a matching tracksheet already exists in archive (ALWAYS KEEP THE HIGHEST SCORE)
   if (!force_regenerate) {
-    const findExisting = () => {
+    const findExistingHighestScore = () => {
       return new Promise((resolve, reject) => {
         if (cleanArtist) {
-          // Try exact track and artist match first
-          db.get(
+          db.all(
             `SELECT * FROM tracksheets 
              WHERE LOWER(TRIM(track_name)) = LOWER(?) 
-               AND LOWER(TRIM(artist_name)) = LOWER(?)
-             ORDER BY id DESC LIMIT 1`,
-            [cleanTrack, cleanArtist],
-            (err, row) => {
+               AND (LOWER(TRIM(artist_name)) = LOWER(?) OR LOWER(TRIM(artist_name)) LIKE LOWER(?) OR LOWER(?) LIKE '%' || LOWER(TRIM(artist_name)) || '%')`,
+            [cleanTrack, cleanArtist, `%${cleanArtist}%`, cleanArtist],
+            (err, rows) => {
               if (err) return reject(err);
-              if (row) return resolve(row);
-
-              // Substring or fallback match if artist was partially entered
-              db.get(
-                `SELECT * FROM tracksheets 
-                 WHERE LOWER(TRIM(track_name)) = LOWER(?)
-                   AND (LOWER(TRIM(artist_name)) LIKE LOWER(?) OR LOWER(?) LIKE '%' || LOWER(TRIM(artist_name)) || '%')
-                 ORDER BY id DESC LIMIT 1`,
-                [cleanTrack, `%${cleanArtist}%`, cleanArtist],
-                (err2, row2) => {
-                  if (err2) return reject(err2);
-                  resolve(row2 || null);
-                }
-              );
+              if (rows && rows.length > 0) {
+                // Sort descending by reliability score; tie-break on content length
+                rows.sort((a, b) => {
+                  const sA = extractTracksheetScore(a.content);
+                  const sB = extractTracksheetScore(b.content);
+                  if (sA !== sB) return sB - sA;
+                  return (b.content?.length || 0) - (a.content?.length || 0);
+                });
+                return resolve({ best: rows[0], allIds: rows.map(r => r.id) });
+              }
+              resolve(null);
             }
           );
         } else {
-          // If no artist supplied, match by track name
-          db.get(
+          db.all(
             `SELECT * FROM tracksheets 
-             WHERE LOWER(TRIM(track_name)) = LOWER(?)
-             ORDER BY id DESC LIMIT 1`,
+             WHERE LOWER(TRIM(track_name)) = LOWER(?)`,
             [cleanTrack],
-            (err, row) => {
+            (err, rows) => {
               if (err) return reject(err);
-              resolve(row || null);
+              if (rows && rows.length > 0) {
+                rows.sort((a, b) => {
+                  const sA = extractTracksheetScore(a.content);
+                  const sB = extractTracksheetScore(b.content);
+                  if (sA !== sB) return sB - sA;
+                  return (b.content?.length || 0) - (a.content?.length || 0);
+                });
+                return resolve({ best: rows[0], allIds: rows.map(r => r.id) });
+              }
+              resolve(null);
             }
           );
         }
@@ -680,19 +858,23 @@ app.post('/api/tracksheets/generate', async (req, res) => {
     };
 
     try {
-      const existing = await findExisting();
-      if (existing) {
+      const match = await findExistingHighestScore();
+      if (match && match.best) {
+        const bestRow = match.best;
+        const allIds = match.allIds;
+        const idPlaceholders = allIds.map(() => '?').join(',');
         return db.all(
-          'SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC',
-          [existing.id],
+          `SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id IN (${idPlaceholders}) ORDER BY created_at DESC`,
+          allIds,
           (err, c1Rows) => {
             if (err) return res.status(500).json({ error: err.message });
             return res.json({
-              id: existing.id,
-              track_name: existing.track_name,
-              artist_name: existing.artist_name,
-              content: existing.content,
-              created_at: existing.created_at,
+              id: bestRow.id,
+              track_name: bestRow.track_name,
+              artist_name: bestRow.artist_name,
+              content: bestRow.content,
+              score: extractTracksheetScore(bestRow.content),
+              created_at: bestRow.created_at,
               is_existing: true,
               c1_solutions: c1Rows || []
             });
@@ -768,9 +950,63 @@ app.post('/api/tracksheets/generate', async (req, res) => {
       });
     };
 
-    // If existing_id was provided (or regenerating an existing track), update existing record
-    const targetId = existing_id ? Number(existing_id) : null;
-    if (targetId) {
+    const newScore = extractTracksheetScore(generatedContent);
+
+    // Helper to check existing record for target ID or matching track
+    const getExistingRecord = (idToLookup) => {
+      return new Promise((resolve) => {
+        if (idToLookup) {
+          db.get('SELECT * FROM tracksheets WHERE id = ?', [idToLookup], (err, row) => {
+            resolve(row || null);
+          });
+        } else {
+          // Check by track name if no explicit id provided
+          db.all(
+            `SELECT * FROM tracksheets WHERE LOWER(TRIM(track_name)) = LOWER(?)`,
+            [cleanTrack],
+            (err, rows) => {
+              if (!rows || rows.length === 0) return resolve(null);
+              rows.sort((a, b) => {
+                const sA = extractTracksheetScore(a.content);
+                const sB = extractTracksheetScore(b.content);
+                return sB - sA;
+              });
+              resolve(rows[0]);
+            }
+          );
+        }
+      });
+    };
+
+    const existingRow = await getExistingRecord(existing_id ? Number(existing_id) : null);
+    const targetId = existingRow ? existingRow.id : null;
+
+    if (targetId && existingRow) {
+      const existingScore = extractTracksheetScore(existingRow.content);
+
+      // ALWAYS KEEP THE HISTORICAL TRACKSHEET THAT HAS THE HIGHEST SCORE!
+      // If existing historical tracksheet has a higher score than the new generation, keep existing!
+      if (existingScore > newScore) {
+        return db.all(
+          'SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC',
+          [targetId],
+          (err, c1Rows) => {
+            res.json({
+              id: targetId,
+              track_name: existingRow.track_name,
+              artist_name: existingRow.artist_name,
+              content: existingRow.content,
+              score: existingScore,
+              new_score: newScore,
+              is_regenerated: true,
+              kept_existing_highest: true,
+              c1_solutions: c1Rows || []
+            });
+          }
+        );
+      }
+
+      // New score is >= existing score: update record with higher scoring version
       db.run(
         'UPDATE tracksheets SET content = ?, track_name = ?, artist_name = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?',
         [generatedContent, cleanTrack, cleanArtist, targetId],
@@ -794,7 +1030,10 @@ app.post('/api/tracksheets/generate', async (req, res) => {
                 track_name: cleanTrack,
                 artist_name: cleanArtist,
                 content: generatedContent,
+                score: newScore,
+                previous_score: existingScore,
                 is_regenerated: true,
+                kept_existing_highest: false,
                 c1_solutions: c1Rows || []
               });
             }
@@ -821,6 +1060,7 @@ app.post('/api/tracksheets/generate', async (req, res) => {
             track_name: cleanTrack,
             artist_name: cleanArtist,
             content: generatedContent,
+            score: newScore,
             is_regenerated: false,
             c1_solutions: []
           });
@@ -919,8 +1159,51 @@ app.use((req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
+// Consolidate archive: always keep the historical tracksheet that has the highest score
+function consolidateHistoricalTracksheets() {
+  db.all('SELECT id, track_name, artist_name, content FROM tracksheets', (err, rows) => {
+    if (err || !rows) return;
+    const groups = {};
+    for (const r of rows) {
+      const key = (r.track_name || '').trim().toLowerCase();
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    }
+
+    for (const [key, items] of Object.entries(groups)) {
+      if (items.length > 1) {
+        // Sort descending by reliability score; tie-break on content length
+        items.sort((a, b) => {
+          const sA = extractTracksheetScore(a.content);
+          const sB = extractTracksheetScore(b.content);
+          if (sA !== sB) return sB - sA;
+          return (b.content?.length || 0) - (a.content?.length || 0);
+        });
+
+        const winner = items[0];
+        const losers = items.slice(1);
+        const loserIds = losers.map(l => l.id);
+        const placeholders = loserIds.map(() => '?').join(',');
+
+        console.log(`[Archive Consolidation] Keeping highest score (${extractTracksheetScore(winner.content)}%) for "${winner.track_name.trim()}" (ID ${winner.id}), consolidating ${loserIds.length} duplicate(s)`);
+
+        // Reassign all C1 solutions from duplicate IDs to the winner ID
+        db.run(`UPDATE c1_solutions SET track_id = ? WHERE track_id IN (${placeholders})`, [winner.id, ...loserIds], (updateErr) => {
+          if (updateErr) console.error('Error reassigning C1 solutions:', updateErr);
+          // Delete duplicate tracksheet rows and their personnel
+          db.run(`DELETE FROM tracksheets WHERE id IN (${placeholders})`, loserIds);
+          db.run(`DELETE FROM track_personnel WHERE track_id IN (${placeholders})`, loserIds);
+        });
+      }
+    }
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+
+  // Automatically consolidate historical tracksheets on startup to ensure highest scores are always kept
+  consolidateHistoricalTracksheets();
 
   // Trigger periodic DAW plugin knowledge check on server startup (after 5 seconds)
   setTimeout(() => {

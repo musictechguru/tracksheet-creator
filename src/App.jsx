@@ -89,28 +89,38 @@ const findArchivedTrack = (tName, aName, historyItems) => {
   const normT = normalizeString(tName);
   const normA = normalizeString(aName);
 
+  let matches = [];
   if (normA) {
     // 1. Exact match on both track name and artist name
-    const exactBoth = historyItems.find(item => 
+    matches = historyItems.filter(item => 
       normalizeString(item.track_name) === normT && 
       normalizeString(item.artist_name) === normA
     );
-    if (exactBoth) return exactBoth;
 
     // 2. Exact match on track name, and partial match on artist name (e.g. "Bowie" vs "David Bowie")
-    const fuzzyArtist = historyItems.find(item => {
-      if (normalizeString(item.track_name) !== normT) return false;
-      const itemA = normalizeString(item.artist_name);
-      return itemA && (itemA.includes(normA) || normA.includes(itemA));
-    });
-    if (fuzzyArtist) return fuzzyArtist;
+    if (matches.length === 0) {
+      matches = historyItems.filter(item => {
+        if (normalizeString(item.track_name) !== normT) return false;
+        const itemA = normalizeString(item.artist_name);
+        return itemA && (itemA.includes(normA) || normA.includes(itemA));
+      });
+    }
   } else {
     // If no artist entered, match by track name
-    const exactTrack = historyItems.find(item => normalizeString(item.track_name) === normT);
-    if (exactTrack) return exactTrack;
+    matches = historyItems.filter(item => normalizeString(item.track_name) === normT);
   }
 
-  return null;
+  if (matches.length === 0) return null;
+
+  // Always keep and select the historical tracksheet that has the highest score!
+  matches.sort((a, b) => {
+    const sA = a.score || 0;
+    const sB = b.score || 0;
+    if (sA !== sB) return sB - sA;
+    return (b.id || 0) - (a.id || 0);
+  });
+
+  return matches[0];
 };
 
 const dedupeSolutions = (rawSolutions) => {
@@ -564,6 +574,11 @@ function App() {
       setArtistName(data.artist_name || '');
       setC1Solutions(dedupeSolutions(data.c1_solutions));
       fetchHistory(); // refresh history list
+
+      if (data.kept_existing_highest) {
+        setCopyNotification(`Retained historical tracksheet with highest score (${data.score}% vs new ${data.new_score}%)`);
+        setTimeout(() => setCopyNotification(''), 4500);
+      }
     } catch (error) {
       console.error('Generation failed', error);
       setResult('Error connecting to the generation engine. Is the backend running?');
@@ -1005,6 +1020,7 @@ function App() {
                       <tr>
                         <th style={{ width: '50px' }}>ID</th>
                         <th>Track & Artist</th>
+                        <th>Score</th>
                         <th>Created</th>
                         <th>C1 Solutions</th>
                         <th style={{ textAlign: 'right' }}>Actions</th>
@@ -1013,7 +1029,7 @@ function App() {
                     <tbody>
                       {filteredTrackSheets.length === 0 ? (
                         <tr>
-                          <td colSpan={5} style={{ textAlign: 'center', padding: '2.5rem', color: '#64748B' }}>
+                          <td colSpan={6} style={{ textAlign: 'center', padding: '2.5rem', color: '#64748B' }}>
                             No historical track sheets matching criteria.
                           </td>
                         </tr>
@@ -1024,6 +1040,15 @@ function App() {
                             <td>
                               <div className="dev-track-title">{item.track_name}</div>
                               <div className="dev-track-artist">{item.artist_name || 'Unknown Artist'}</div>
+                            </td>
+                            <td>
+                              {item.score > 0 ? (
+                                <span className="dev-score-pill" title={`Reliability Score: ${item.score}%`}>
+                                  {item.score}%
+                                </span>
+                              ) : (
+                                <span style={{ color: '#64748B', fontSize: '0.8rem' }}>—</span>
+                              )}
                             </td>
                             <td style={{ fontSize: '0.8rem', color: '#94A3B8', whiteSpace: 'nowrap' }}>
                               {formatDate(item.created_at)}
@@ -1450,7 +1475,14 @@ function App() {
             <div className="history-grid">
               {history.map((item) => (
                 <div key={item.id} className="history-card" onClick={() => loadHistoryItem(item.id)}>
-                  <h3>{item.track_name}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                    <h3 style={{ margin: 0 }}>{item.track_name}</h3>
+                    {item.score > 0 && (
+                      <span className="history-score-badge" title={`Reliability Score: ${item.score}%`}>
+                        {item.score}%
+                      </span>
+                    )}
+                  </div>
                   <p>{item.artist_name || 'Unknown Artist'}</p>
                   <p style={{ fontSize: '0.8rem', marginTop: '0.5rem', opacity: 0.6 }}>
                     {new Date(item.created_at).toLocaleDateString()}

@@ -1,13 +1,15 @@
 {
   "name": "tracksheet-creator",
   "private": true,
-  "version": "1.2.7",
+  "version": "1.2.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:all": "concurrently \"npm run dev\" \"node server.js\"",
     "build": "vite build",
     "start": "node server.js",
+    "bot": "node decade_bot.js",
+    "bot:status": "node decade_bot.js --status",
     "postinstall": "npm rebuild sqlite3 --build-from-source",
     "lint": "eslint .",
     "preview": "vite preview"
