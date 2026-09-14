@@ -74,6 +74,63 @@ const formatDate = (isoString) => {
   }
 };
 
+const normalizeString = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/\s+/g, ' ');
+};
+
+const findArchivedTrack = (tName, aName, historyItems) => {
+  if (!tName || !historyItems || historyItems.length === 0) return null;
+  const normT = normalizeString(tName);
+  const normA = normalizeString(aName);
+
+  if (normA) {
+    // 1. Exact match on both track name and artist name
+    const exactBoth = historyItems.find(item => 
+      normalizeString(item.track_name) === normT && 
+      normalizeString(item.artist_name) === normA
+    );
+    if (exactBoth) return exactBoth;
+
+    // 2. Exact match on track name, and partial match on artist name (e.g. "Bowie" vs "David Bowie")
+    const fuzzyArtist = historyItems.find(item => {
+      if (normalizeString(item.track_name) !== normT) return false;
+      const itemA = normalizeString(item.artist_name);
+      return itemA && (itemA.includes(normA) || normA.includes(itemA));
+    });
+    if (fuzzyArtist) return fuzzyArtist;
+  } else {
+    // If no artist entered, match by track name
+    const exactTrack = historyItems.find(item => normalizeString(item.track_name) === normT);
+    if (exactTrack) return exactTrack;
+  }
+
+  return null;
+};
+
+const dedupeSolutions = (rawSolutions) => {
+  const dedupedSolutions = [];
+  const seenDaws = new Set();
+  for (const sol of rawSolutions || []) {
+    const norm = (sol.daw || '').toLowerCase();
+    if (!seenDaws.has(norm)) {
+      seenDaws.add(norm);
+      dedupedSolutions.push(sol);
+    }
+  }
+  dedupedSolutions.sort((a, b) => {
+    const idxA = DAW_OPTIONS.findIndex(d => d.toLowerCase() === (a.daw || '').toLowerCase());
+    const idxB = DAW_OPTIONS.findIndex(d => d.toLowerCase() === (b.daw || '').toLowerCase());
+    return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
+  });
+  return dedupedSolutions;
+};
+
 function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -344,23 +401,7 @@ function App() {
         setTrackName(data.track_name);
         setArtistName(data.artist_name || '');
         
-        // Deduplicate solutions by DAW name so each created DAW has its latest version
-        const rawSolutions = data.c1_solutions || [];
-        const dedupedSolutions = [];
-        const seenDaws = new Set();
-        for (const sol of rawSolutions) {
-          const norm = sol.daw.toLowerCase();
-          if (!seenDaws.has(norm)) {
-            seenDaws.add(norm);
-            dedupedSolutions.push(sol);
-          }
-        }
-        dedupedSolutions.sort((a, b) => {
-          const idxA = DAW_OPTIONS.findIndex(d => d.toLowerCase() === a.daw.toLowerCase());
-          const idxB = DAW_OPTIONS.findIndex(d => d.toLowerCase() === b.daw.toLowerCase());
-          return (idxA !== -1 ? idxA : 99) - (idxB !== -1 ? idxB : 99);
-        });
-        setC1Solutions(dedupedSolutions);
+        setC1Solutions(dedupeSolutions(data.c1_solutions));
         setActiveTab('tracksheet');
       }
     } catch (error) {
@@ -451,34 +492,78 @@ function App() {
     }
   };
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    if (!trackName) return;
+  const handleRegenerate = () => {
+    handleGenerate(null, true);
+  };
+
+  const handleGenerate = async (e, forceRegenerate = false) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!trackName || !trackName.trim()) return;
+
+    const targetTrackId = forceRegenerate ? currentTrackId : null;
+    const reqTrackName = trackName.trim();
+    const reqArtistName = artistName ? artistName.trim() : '';
 
     setLoading(true);
     setSearchActive(true);
-    const freshPhrases = getTracksheetActivityPhrases({ trackName, artistName });
+    const freshPhrases = getTracksheetActivityPhrases({ trackName: reqTrackName, artistName: reqArtistName });
     setTracksheetPhrases(freshPhrases);
     setResult(null);
     setCurrentTrackId(null);
     setC1Solutions([]);
     setActiveTab('tracksheet');
 
-    try {
-      const res = await fetch('/api/tracksheets/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ track_name: trackName, artist_name: artistName })
-      });
+    const startTime = Date.now();
+    // Simulate generation time when using archive (realistic typewriter activity playback)
+    const MIN_ANIMATION_MS = 3800;
 
-      if (res.ok) {
-        const data = await res.json();
-        setResult(data.content);
-        setCurrentTrackId(data.id);
-        fetchHistory(); // refresh history list
-      } else {
-        setResult('Error generating tracksheet. Please check the server connection.');
+    try {
+      let data = null;
+
+      // 1. If not forcing AI regeneration, check if this track already exists in local archive history
+      if (!forceRegenerate) {
+        const archivedMatch = findArchivedTrack(reqTrackName, reqArtistName, history);
+        if (archivedMatch) {
+          const res = await fetch(`/api/tracksheets/${archivedMatch.id}`);
+          if (res.ok) {
+            data = await res.json();
+          }
+        }
       }
+
+      // 2. If not found in local history or forceRegenerate is requested, call backend endpoint
+      if (!data) {
+        const res = await fetch('/api/tracksheets/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            track_name: reqTrackName,
+            artist_name: reqArtistName,
+            force_regenerate: forceRegenerate,
+            existing_id: targetTrackId || undefined
+          })
+        });
+
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          setResult('Error generating tracksheet. Please check the server connection.');
+          return;
+        }
+      }
+
+      // 3. Ensure Activity Typewriter has run for realistic duration before revealing document
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_ANIMATION_MS) {
+        await new Promise((resolve) => setTimeout(resolve, MIN_ANIMATION_MS - elapsed));
+      }
+
+      setResult(data.content);
+      setCurrentTrackId(data.id);
+      setTrackName(data.track_name);
+      setArtistName(data.artist_name || '');
+      setC1Solutions(dedupeSolutions(data.c1_solutions));
+      fetchHistory(); // refresh history list
     } catch (error) {
       console.error('Generation failed', error);
       setResult('Error connecting to the generation engine. Is the backend running?');
@@ -682,6 +767,19 @@ function App() {
                   'Generate Tracksheet'
                 )}
               </button>
+
+              {result && (
+                <button 
+                  type="button" 
+                  className="btn-regenerate-form" 
+                  onClick={handleRegenerate}
+                  disabled={loading || !trackName}
+                  title="Regenerate this tracksheet with AI"
+                >
+                  <RefreshCw size={16} />
+                  Regenerate
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -1216,6 +1314,18 @@ function App() {
                   <span style={{ color: '#4ADE80', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                     <Check size={16} /> {copyNotification}
                   </span>
+                )}
+
+                {isTracksheetTab && (
+                  <button 
+                    type="button" 
+                    className="btn-toolbar btn-regenerate" 
+                    onClick={handleRegenerate}
+                    disabled={loading || c1Loading}
+                    title="Regenerate this tracksheet with AI"
+                  >
+                    <RefreshCw size={15} /> Regenerate Tracksheet
+                  </button>
                 )}
 
                 <button 

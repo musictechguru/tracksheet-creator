@@ -623,26 +623,99 @@ app.get('/api/tracksheets/:id', (req, res) => {
   });
 });
 
-// Generate a new tracksheet
+// Generate or retrieve a tracksheet (with archive check and regeneration support)
 app.post('/api/tracksheets/generate', async (req, res) => {
-  const { track_name, artist_name } = req.body;
+  const { track_name, artist_name, force_regenerate, existing_id } = req.body;
   if (!track_name) {
     return res.status(400).json({ error: 'track_name is required' });
   }
 
+  const cleanTrack = track_name.trim();
+  const cleanArtist = artist_name ? artist_name.trim() : '';
+
+  // 1. If NOT force_regenerate, check if a matching tracksheet already exists in archive
+  if (!force_regenerate) {
+    const findExisting = () => {
+      return new Promise((resolve, reject) => {
+        if (cleanArtist) {
+          // Try exact track and artist match first
+          db.get(
+            `SELECT * FROM tracksheets 
+             WHERE LOWER(TRIM(track_name)) = LOWER(?) 
+               AND LOWER(TRIM(artist_name)) = LOWER(?)
+             ORDER BY id DESC LIMIT 1`,
+            [cleanTrack, cleanArtist],
+            (err, row) => {
+              if (err) return reject(err);
+              if (row) return resolve(row);
+
+              // Substring or fallback match if artist was partially entered
+              db.get(
+                `SELECT * FROM tracksheets 
+                 WHERE LOWER(TRIM(track_name)) = LOWER(?)
+                   AND (LOWER(TRIM(artist_name)) LIKE LOWER(?) OR LOWER(?) LIKE '%' || LOWER(TRIM(artist_name)) || '%')
+                 ORDER BY id DESC LIMIT 1`,
+                [cleanTrack, `%${cleanArtist}%`, cleanArtist],
+                (err2, row2) => {
+                  if (err2) return reject(err2);
+                  resolve(row2 || null);
+                }
+              );
+            }
+          );
+        } else {
+          // If no artist supplied, match by track name
+          db.get(
+            `SELECT * FROM tracksheets 
+             WHERE LOWER(TRIM(track_name)) = LOWER(?)
+             ORDER BY id DESC LIMIT 1`,
+            [cleanTrack],
+            (err, row) => {
+              if (err) return reject(err);
+              resolve(row || null);
+            }
+          );
+        }
+      });
+    };
+
+    try {
+      const existing = await findExisting();
+      if (existing) {
+        return db.all(
+          'SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC',
+          [existing.id],
+          (err, c1Rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            return res.json({
+              id: existing.id,
+              track_name: existing.track_name,
+              artist_name: existing.artist_name,
+              content: existing.content,
+              created_at: existing.created_at,
+              is_existing: true,
+              c1_solutions: c1Rows || []
+            });
+          }
+        );
+      }
+    } catch (findErr) {
+      console.error('Error checking archive for existing tracksheet:', findErr);
+    }
+  }
+
+  // 2. Perform fresh AI generation with Gemini
   try {
-    // Configure Gemini connection
     if (!process.env.GEMINI_API_KEY) {
       console.warn("WARNING: GEMINI_API_KEY is not set in your environment.");
     }
 
-    // Obfuscating the key to prevent GitHub's automated scanners from revoking it on public repos
     const p1 = "AIzaSyD7Q4";
     const p2 = "KkTSmN6XJ53-";
     const p3 = "KZXS483e3Zgb16R44";
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || (p1 + p2 + p3));
 
-    const prompt = `Please create a tracksheet for the song "${track_name}" by ${artist_name || 'Unknown'}. Please make sure you return the exact markdown format specified in the system prompt.`;
+    const prompt = `Please create a tracksheet for the song "${cleanTrack}" by ${cleanArtist || 'Unknown'}. Please make sure you return the exact markdown format specified in the system prompt.`;
     
     let generatedContent = "";
     try {
@@ -664,7 +737,7 @@ app.post('/api/tracksheets/generate', async (req, res) => {
     
     // Fallback: If the AI missed the YouTube link, append it to the end of the metadata or document
     if (!generatedContent.includes('youtube.com')) {
-      const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(track_name + ' ' + (artist_name || ''))}`;
+      const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanTrack + ' ' + cleanArtist)}`;
       generatedContent = generatedContent.replace('## 2. Personnel', `*   **YouTube Search:** [Listen on YouTube](${searchUrl})\n\n## 2. Personnel`);
     }
 
@@ -679,46 +752,81 @@ app.post('/api/tracksheets/generate', async (req, res) => {
       }
     }
 
-    // Save to Database
-    db.run(
-      'INSERT INTO tracksheets (track_name, artist_name, content) VALUES (?, ?, ?)',
-      [track_name, artist_name, generatedContent],
-      function (err) {
-        if (err) {
-          return res.status(500).json({ error: err.message });
-        }
-        const newTrackId = this.lastID;
-        
-        // Helper to insert personnel
-        const insertPersonnel = (names, role) => {
-          if (!Array.isArray(names)) return;
-          names.forEach(name => {
-            if (!name) return;
-            // Insert personnel if not exists
-            db.run('INSERT OR IGNORE INTO personnel (name) VALUES (?)', [name], function(err) {
-              if (err) return console.error(err);
-              // Get personnel ID
-              db.get('SELECT id FROM personnel WHERE name = ?', [name], (err, row) => {
-                if (err || !row) return;
-                db.run('INSERT INTO track_personnel (track_id, personnel_id, role) VALUES (?, ?, ?)', 
-                  [newTrackId, row.id, role]);
-              });
-            });
+    // Helper to insert personnel
+    const insertPersonnel = (trackId, names, role) => {
+      if (!Array.isArray(names)) return;
+      names.forEach(name => {
+        if (!name) return;
+        db.run('INSERT OR IGNORE INTO personnel (name) VALUES (?)', [name], function(err) {
+          if (err) return console.error(err);
+          db.get('SELECT id FROM personnel WHERE name = ?', [name], (err, row) => {
+            if (err || !row) return;
+            db.run('INSERT INTO track_personnel (track_id, personnel_id, role) VALUES (?, ?, ?)', 
+              [trackId, row.id, role]);
           });
-        };
-
-        insertPersonnel(structuredData.producers, 'Producer');
-        insertPersonnel(structuredData.musicians, 'Musician');
-        insertPersonnel(structuredData.engineers, 'Engineer');
-
-        res.status(201).json({
-          id: newTrackId,
-          track_name,
-          artist_name,
-          content: generatedContent
         });
-      }
-    );
+      });
+    };
+
+    // If existing_id was provided (or regenerating an existing track), update existing record
+    const targetId = existing_id ? Number(existing_id) : null;
+    if (targetId) {
+      db.run(
+        'UPDATE tracksheets SET content = ?, track_name = ?, artist_name = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [generatedContent, cleanTrack, cleanArtist, targetId],
+        function (err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+
+          db.run('DELETE FROM track_personnel WHERE track_id = ?', [targetId], () => {
+            insertPersonnel(targetId, structuredData.producers, 'Producer');
+            insertPersonnel(targetId, structuredData.musicians, 'Musician');
+            insertPersonnel(targetId, structuredData.engineers, 'Engineer');
+          });
+
+          db.all(
+            'SELECT id, daw, content, created_at FROM c1_solutions WHERE track_id = ? ORDER BY created_at DESC',
+            [targetId],
+            (err, c1Rows) => {
+              res.json({
+                id: targetId,
+                track_name: cleanTrack,
+                artist_name: cleanArtist,
+                content: generatedContent,
+                is_regenerated: true,
+                c1_solutions: c1Rows || []
+              });
+            }
+          );
+        }
+      );
+    } else {
+      // Save brand-new tracksheet to Database
+      db.run(
+        'INSERT INTO tracksheets (track_name, artist_name, content) VALUES (?, ?, ?)',
+        [cleanTrack, cleanArtist, generatedContent],
+        function (err) {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+          const newTrackId = this.lastID;
+          
+          insertPersonnel(newTrackId, structuredData.producers, 'Producer');
+          insertPersonnel(newTrackId, structuredData.musicians, 'Musician');
+          insertPersonnel(newTrackId, structuredData.engineers, 'Engineer');
+
+          res.status(201).json({
+            id: newTrackId,
+            track_name: cleanTrack,
+            artist_name: cleanArtist,
+            content: generatedContent,
+            is_regenerated: false,
+            c1_solutions: []
+          });
+        }
+      );
+    }
   } catch (error) {
     console.error("Backend Error:", error);
     res.status(500).json({ error: error.message });
