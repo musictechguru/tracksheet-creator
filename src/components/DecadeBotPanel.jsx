@@ -32,7 +32,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   // Fetch decades overview stats
   const fetchDecadesSummary = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/bot/decades');
+      const res = await fetch('/api/bot/decades');
       if (res.ok) {
         const json = await res.json();
         if (json.decades) {
@@ -48,7 +48,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   const fetchDecadeSongs = async (decadeId) => {
     setLoadingSongs(true);
     try {
-      const res = await fetch(`http://localhost:3001/api/bot/decades/${decadeId}`);
+      const res = await fetch(`/api/bot/decades/${decadeId}`);
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
@@ -65,7 +65,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   // Fetch live bot running status
   const fetchBotStatus = async () => {
     try {
-      const res = await fetch('http://localhost:3001/api/bot/status');
+      const res = await fetch('/api/bot/status');
       if (res.ok) {
         const status = await res.json();
         setBotStatus(status);
@@ -98,7 +98,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   // Start harvester bot
   const handleStartBot = async (decade = selectedDecade, limit = 10) => {
     try {
-      const res = await fetch('http://localhost:3001/api/bot/start', {
+      const res = await fetch('/api/bot/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -119,7 +119,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   // Stop harvester bot
   const handleStopBot = async () => {
     try {
-      await fetch('http://localhost:3001/api/bot/stop', { method: 'POST' });
+      await fetch('/api/bot/stop', { method: 'POST' });
       fetchBotStatus();
     } catch (err) {
       console.error('Failed to stop bot:', err);
@@ -129,7 +129,7 @@ export default function DecadeBotPanel({ onLoadTrack }) {
   // Generate a single track immediately
   const handleGenerateSingle = async (trackName, artistName) => {
     try {
-      const res = await fetch('http://localhost:3001/api/tracksheets/generate', {
+      const res = await fetch('/api/tracksheets/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ track_name: trackName, artist_name: artistName })
