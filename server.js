@@ -902,19 +902,29 @@ app.post('/api/tracksheets/generate', async (req, res) => {
     let generatedContent = "";
     try {
       const primaryModel = genAI.getGenerativeModel({
-        model: "gemini-3.6-flash",
+        model: "gemini-3.1-pro-preview",
         systemInstruction: SYSTEM_PROMPT,
       });
       const result = await primaryModel.generateContent(prompt);
       generatedContent = result.response.text();
     } catch (primaryErr) {
-      console.warn("Primary model (gemini-3.6-flash) error, trying gemini-3.1-pro-preview:", primaryErr.message);
-      const fallbackModel = genAI.getGenerativeModel({
-        model: "gemini-3.1-pro-preview",
-        systemInstruction: SYSTEM_PROMPT,
-      });
-      const result = await fallbackModel.generateContent(prompt);
-      generatedContent = result.response.text();
+      console.warn("Primary model (gemini-3.1-pro-preview) error, trying gemini-pro-latest:", primaryErr.message);
+      try {
+        const fallbackModel = genAI.getGenerativeModel({
+          model: "gemini-pro-latest",
+          systemInstruction: SYSTEM_PROMPT,
+        });
+        const result = await fallbackModel.generateContent(prompt);
+        generatedContent = result.response.text();
+      } catch (fallbackErr) {
+        console.warn("Secondary Pro model (gemini-pro-latest) error, trying gemini-3.6-flash:", fallbackErr.message);
+        const flashFallbackModel = genAI.getGenerativeModel({
+          model: "gemini-3.6-flash",
+          systemInstruction: SYSTEM_PROMPT,
+        });
+        const result = await flashFallbackModel.generateContent(prompt);
+        generatedContent = result.response.text();
+      }
     }
     
     // Fallback: If the AI missed the YouTube link, append it to the end of the metadata or document
